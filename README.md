@@ -1,2 +1,2 @@
 # bentoo
-An user-friendly Bundle of Funtoo Linux.
+An user-friendly Stage4 of Funtoo Linux.
