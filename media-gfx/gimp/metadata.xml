@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>sping@gentoo.org</email>
+	</maintainer>
+	<use>
+		<flag name="smp">
+			Enable support for multiprocessors
+		</flag>
+		<flag name="vector-icons">
+			Enable support for vector icons (experimental)
+		</flag>
+	</use>
+</pkgmetadata>
