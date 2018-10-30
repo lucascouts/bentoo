@@ -2,14 +2,14 @@
 <!DOCTYPE repositories SYSTEM "/dtd/repositories.dtd">
 <repositories xmlns="" version="1.0">
   <repo quality="experimental" status="unofficial">
-    <name><![CDATA[Bentoo]]></name>
-    <description lang="en"><![CDATA[Bentoo]]></description>
-    <homepage>https://github.com/lucascouts/Bentoo</homepage>
+    <name><![CDATA[bentoo]]></name>
+    <description lang="en"><![CDATA[bentoo]]></description>
+    <homepage>https://github.com/lucascouts/bentoo</homepage>
     <owner type="person">
       <email>lucascs@protonmail.com</email>
       <name><![CDATA[Lucas C.S.]]></name>
     </owner>
-    <source type="git">git://github.com/lucascouts/Bentoo.git</source>
-    <feed>https://github.com/lucascouts/Bentoo/commits/master.atom</feed>
+    <source type="git">git://github.com/lucascouts/bentoo.git</source>
+    <feed>https://github.com/lucascouts/bentoo/commits/master.atom</feed>
   </repo>
 </repositories>
