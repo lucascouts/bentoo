@@ -2,7 +2,7 @@
 <!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer type="project">
-		<email>x11@gentoo.org</email>
-		<name>X11</name>
+		<email>kde@gentoo.org</email>
+		<name>Gentoo KDE Project</name>
 	</maintainer>
 </pkgmetadata>
