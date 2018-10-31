@@ -7,7 +7,7 @@ CRATES="
 ansi_term-0.11.0
 atty-0.2.10
 bitflags-1.0.3
-cbindgen-0.6.6
+cbindgen-0.6.7
 cfg-if-0.1.3
 clap-2.31.2
 cloudabi-0.0.3
