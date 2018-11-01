@@ -6,7 +6,7 @@ PYTHON_COMPAT=( python2_7 python3_4 python3_5 python3_6 )
 
 EGIT_REPO_URI="https://llvm.org/git/${PN}.git
 	https://github.com/llvm-mirror/${PN}.git"
-EGIT_COMMIT="dabae5a2afb78cba0320a86e3f5f0b5dc83e077c"
+EGIT_COMMIT="96627043299f52bf08f6a68aa6d00b8037a0a2b0"
 
 if [[ ${PV} = 9999* ]]; then
 	GIT_ECLASS="git-r3"
@@ -30,7 +30,7 @@ fi
 
 LICENSE="|| ( MIT BSD )"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE_VIDEO_CARDS="video_cards_nvidia video_cards_r600 video_cards_radeonsi"
 IUSE="${IUSE_VIDEO_CARDS}"
 REQUIRED_USE="|| ( ${IUSE_VIDEO_CARDS} )"
