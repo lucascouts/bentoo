@@ -115,6 +115,10 @@ src_install() {
 	dodir ${MOZILLA_FIVE_HOME%/*}
 	mv "${S}" "${ED}"${MOZILLA_FIVE_HOME} || die
 
+	# Disable built-in auto-update because we update firefox-bin through package manager
+	insinto ${MOZILLA_FIVE_HOME}/distribution/
+	newins "${FILESDIR}"/disable-auto-update.policy.json policies.json
+
 	# Fix prefs that make no sense for a system-wide install
 	insinto ${MOZILLA_FIVE_HOME}/defaults/pref/
 	doins "${FILESDIR}"/local-settings.js
