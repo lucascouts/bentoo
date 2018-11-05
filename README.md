@@ -1,5 +1,6 @@
 # Bentoo
-An user-friendly Stage4 of Funtoo Linux.
+
+Bentōō is an initiative to distribute an user-friendly version of Funtoo linux Stage4 to new users, with more update packages, focusing on agility, security privacy and games.
 
 ## with local overlays
 
