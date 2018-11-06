@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>ramage.lucas@protonmail.com</email>
+		<description>Lucas Ramage</description>		
+	</maintainer>
+	<upstream>
+		<changelog>https://raw.githubusercontent.com/phoronix-test-suite/phoronix-test-suite/master/ChangeLog</changelog>
+		<remote-id type="github">phoronix-test-suite/phoronix-test-suite</remote-id>
+	</upstream>
+</pkgmetadata>
