@@ -43,7 +43,10 @@ COMMON_DEPEND="
 	app-crypt/qca:2[qt5(+)]
 	bittorrent? ( net-libs/libktorrent:5 )
 	gpg? ( app-crypt/gpgme[qt5] )
-	kde? ( $(add_plasma_dep plasma-workspace) )
+	kde? ( || (
+		$(add_plasma_dep libkworkspace)
+		$(add_plasma_dep plasma-workspace)
+	) )
 	mms? ( media-libs/libmms )
 	sqlite? ( dev-db/sqlite:3 )
 "
