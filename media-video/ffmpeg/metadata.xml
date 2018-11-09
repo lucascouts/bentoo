@@ -15,7 +15,6 @@
 	<flag name="bluray">Enable playback of Blu-ray filesystems</flag>
 	<flag name="bs2b">Enables <pkg>media-libs/libbs2b</pkg> based Bauer stereo-to-binaural filter.</flag>
 	<flag name="cdio">Enables audio CD grabbing with <pkg>dev-libs/libcdio</pkg>.</flag>
-	<flag name="celt">Adds Xiph CELT audio decoding support via <pkg>media-libs/celt</pkg></flag>
 	<flag name="chromaprint">Enables audio fingerprinting support with <pkg>media-libs/chromaprint</pkg>.</flag>
 	<flag name="chromium">Builds libffmpeg.so to enable media playback in Chromium-based browsers like Opera and Vivaldi.</flag>
 	<flag name="codec2">Enables codec2 low bit rate speech codec support via <pkg>media-libs/codec2</pkg>.</flag>
@@ -47,7 +46,6 @@
 	<flag name="opencl">Enable OpenCL support</flag>
 	<flag name="openh264">Enables H.264 encoding suppoprt via <pkg>media-libs/openh264</pkg>.</flag>
 	<flag name="openssl">Enables <pkg>dev-libs/openssl</pkg> support. Adds support for encrypted network protocols (TLS/HTTPS).</flag>
-	<flag name="opus">Adds (decoding) support for the Opus codec via <pkg>media-libs/opus</pkg>.</flag>
 	<flag name="pic">Force shared libraries to be built as PIC (this is slower)</flag>
 	<flag name="postproc">Build and install libpostproc.</flag>
 	<flag name="rubberband">Adds time-stretching and pitch-shifting audio filter based on <pkg>media-libs/rubberband</pkg>.</flag>
@@ -57,7 +55,6 @@
 	<flag name="ssh">Enable SSH/sftp support via <pkg>net-libs/libssh</pkg>.</flag>
 	<flag name="twolame">Enables MP2 encoding via <pkg>media-sound/twolame</pkg> as an alternative to the internal encoder.</flag>
 	<flag name="vpx">Enables vp8 codec support using libvpx: Decoding vp8 does not require this to be enabled but libvpx can also be used for decoding; encoding vp8 requires this useflag to be enabled though.</flag>
-	<flag name="webp">Enables WebP encoding with <pkg>media-libs/libwebp</pkg>.</flag>
 	<flag name="x265">Enables HEVC encoding with <pkg>media-libs/x265</pkg>.</flag>
 	<flag name="zeromq">Enables <pkg>net-libs/zeromq</pkg> support with the zmq/azmq filters.</flag>
 	<flag name="zimg">Enables <pkg>media-libs/zimg</pkg> based scale filter.</flag>
