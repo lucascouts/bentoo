@@ -5,26 +5,39 @@ EAPI="7"
 
 inherit autotools multilib-minimal
 
-MY_PV="${PV/_alpha/alpha}"
-MY_P="${PN}-${MY_PV}"
+if [[ ${PV} == "9999" ]] ; then
+	EGIT_REPO_URI="https://github.com/kyz/libmspack.git"
+	inherit git-r3
+	MY_P="${PN}-9999"
+else
+	KEYWORDS="amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sparc x86"
+	MY_PV="${PV/_alpha/alpha}"
+	MY_P="${PN}-${MY_PV}"
+	SRC_URI="https://www.cabextract.org.uk/libmspack/libmspack-${MY_PV}.tar.gz"
+fi
 
 DESCRIPTION="A library for Microsoft compression formats"
 HOMEPAGE="https://www.cabextract.org.uk/libmspack/"
-SRC_URI="https://www.cabextract.org.uk/libmspack/libmspack-${MY_PV}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
-IUSE="debug doc static-libs utils"
+IUSE="debug doc static-libs"
 
 DEPEND=""
-RDEPEND="
-	utils? ( !app-arch/mscompress )
-"
+RDEPEND=""
 
 S="${WORKDIR}/${MY_P}"
 
 src_prepare() {
+	if [[ ${PV} == "9999" ]] ; then
+		# Re-create file layout from release tarball
+		pushd "${WORKDIR}" &>/dev/null || die
+		cp -aL "${S}"/${PN} "${WORKDIR}"/${PN}-source || die
+		rm -r "${S}" || die
+		mv "${WORKDIR}"/${PN}-source "${S}" || die
+		popd &>/dev/null || die
+	fi
+
 	default
 
 	eautoreconf
@@ -51,9 +64,6 @@ multilib_src_install_all() {
 	default_src_install
 	if use doc; then
 		rm "${ED%/}"/usr/share/doc/"${PF}"/html/{Makefile*,Doxyfile*} || die
-	fi
-	if ! use utils; then
-		rm "${ED%/}"/usr/bin/* || die
 	fi
 
 	find "${ED}" -name '*.la' -delete || die
