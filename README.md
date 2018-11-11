@@ -27,4 +27,4 @@ Invoke the following:
 
 ### Bentoo Portage config
 
-Here you can see the portage files configurations : https://github.com/lucascouts/bentoo-portagedir
+Here you can see the portage files configurations : https://github.com/lucascouts/bentoo-cfg
