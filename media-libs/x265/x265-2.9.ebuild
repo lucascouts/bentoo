@@ -10,7 +10,7 @@ if [[ ${PV} = 9999* ]]; then
 	EHG_REPO_URI="https://bitbucket.org/multicoreware/x265"
 else
 	SRC_URI="https://bitbucket.org/multicoreware/x265/downloads/${PN}_${PV}.tar.gz"
-	KEYWORDS="amd64 arm ~arm64 hppa ia64 ppc ppc64 x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~x86"
 fi
 
 DESCRIPTION="Library for encoding video streams into the H.265/HEVC format"
@@ -18,7 +18,7 @@ HOMEPAGE="http://x265.org/"
 
 LICENSE="GPL-2"
 # subslot = libx265 soname
-SLOT="0/160"
+SLOT="0/165"
 IUSE="+10bit +12bit cpu_flags_arm_neon numa pic power8 test"
 
 ASM_DEPEND=">=dev-lang/yasm-1.2.0"
@@ -31,7 +31,7 @@ PATCHES=(
 	"${FILESDIR}/arm.patch"
 	"${FILESDIR}/neon.patch"
 	"${FILESDIR}/ppc64.patch"
-	"${FILESDIR}/non_x86.patch"
+	"${FILESDIR}"/${PN}-2.9-detect512.patch
 )
 
 src_unpack() {
