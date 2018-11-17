@@ -300,6 +300,10 @@ pkg_pretend() {
 	fi
 }
 
+python_check_deps() {
+	has_version ">=dev-python/mako-0.8.0[${PYTHON_USEDEP}]"
+}
+
 pkg_setup() {
 	# warning message for bug 459306
 	if use llvm && has_version sys-devel/llvm[!debug=]; then
