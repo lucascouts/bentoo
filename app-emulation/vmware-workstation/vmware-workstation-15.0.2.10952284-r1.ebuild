@@ -39,7 +39,7 @@ REQUIRED_USE="
 	vmware-tools-darwin? ( macos-guests )
 	vmware-tools-darwinPre15? ( macos-guests )
 "
-RESTRICT="mirror strip"
+RESTRICT="mirror preserve-libs strip"
 
 BUNDLED_LIBS_DIR=/opt/vmware/lib/vmware/lib
 
