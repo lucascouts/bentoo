@@ -88,12 +88,6 @@ PDEPEND="
 
 RESTRICT+=" test"
 
-PATCHES=(
-	"${FILESDIR}/${P}-virtualdesktop-crash.patch"
-	"${FILESDIR}/${P}-resizewindows-crash.patch"
-	"${FILESDIR}/${P}-kcrash-init.patch"
-)
-
 src_prepare() {
 	kde5_src_prepare
 	use multimedia || eapply "${FILESDIR}/${PN}-gstreamer-optional.patch"
