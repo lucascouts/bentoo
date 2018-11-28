@@ -57,5 +57,5 @@ src_install() {
 	# Note: intentionally not using "doins" so that we preserve +x bits
 	cp -r ./* "${ED}/${OPTPATH}" || die
 
-	dosym "../../${OPTPATH}/electron" "/usr/bin/electron-${SLOT}"
+	# dosym "../../${OPTPATH}/electron" "/usr/bin/electron-${SLOT}"
 }
