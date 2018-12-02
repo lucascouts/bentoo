@@ -7,10 +7,10 @@ inherit eapi7-ver eutils readme.gentoo-r1 gnome2-utils pam systemd xdg-utils
 
 MY_PN="VMware-Workstation-Full"
 MY_PV=$(ver_cut 1-3)
-PV_MODULES="329.$(ver_cut 2-3)"
+PV_MODULES="330.$(ver_cut 2-3)"
 PV_BUILD=$(ver_cut 4)
 MY_P="${MY_PN}-${MY_PV}-${PV_BUILD}"
-VMWARE_FUSION_VER="10.$(ver_cut 2-3)/10950653" # https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/
+VMWARE_FUSION_VER="11.$(ver_cut 2-3)/10952296" # https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/
 SYSTEMD_UNITS_TAG="gentoo-02"
 
 DESCRIPTION="Emulate a complete PC without the performance overhead of most emulators"
@@ -226,6 +226,11 @@ QA_WX_LOAD="opt/vmware/lib/vmware/tools-upgraders/vmware-tools-upgrader-32 opt/v
 # adding "opt/vmware/lib/vmware/lib/libvmware-gksu.so/libvmware-gksu.so" to QA_WX_LOAD doesn't work
 
 src_unpack() {
+	if has usersandbox $FEATURES ; then
+		ewarn "You are emerging ${P} with 'usersandbox' enabled." \
+			"If unpacking fails, try emerging with 'FEATURES=-usersandbox'!"
+	fi
+
 	for a in ${A}; do
 		if [ ${a##*.} == 'bundle' ]; then
 			cp "${DISTDIR}/${a}" "${WORKDIR}"
