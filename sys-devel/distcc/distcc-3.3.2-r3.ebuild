@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -69,7 +69,7 @@ src_prepare() {
 	sed \
 		-e "s:@EPREFIX@:${EPREFIX:-/}:" \
 		-e "s:@libdir@:/usr/lib:" \
-		"${FILESDIR}/3.2/distcc-config" > "${T}/distcc-config" || die
+		"${FILESDIR}/distcc-config" > "${T}/distcc-config" || die
 
 	hprefixify update-distcc-symlinks.py src/{serve,daemon}.c
 	python_fix_shebang update-distcc-symlinks.py "${T}/distcc-config"
@@ -79,6 +79,7 @@ src_prepare() {
 src_configure() {
 	local myconf=(
 		--disable-Werror
+		--libdir=/usr/lib
 		$(use_enable ipv6 rfc2553)
 		$(use_with gtk)
 		$(use_with gnome)
@@ -94,11 +95,11 @@ src_install() {
 	emake DESTDIR="${D}" GZIP_BIN=false install
 	python_optimize
 
-	newinitd "${FILESDIR}/3.2/init" distccd
+	newinitd "${FILESDIR}/distccd.initd" distccd
 	systemd_dounit "${FILESDIR}/distccd.service"
 	systemd_install_serviced "${FILESDIR}/distccd.service.conf"
 
-	cp "${FILESDIR}/3.2/conf" "${T}/distccd" || die
+	cp "${FILESDIR}/distccd.confd" "${T}/distccd" || die
 	if use zeroconf; then
 		cat >> "${T}/distccd" <<-EOF || die
 
