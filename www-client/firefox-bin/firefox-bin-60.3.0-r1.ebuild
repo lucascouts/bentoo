@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-MOZ_ESR=0
+MOZ_ESR=1
 
 # Can be updated using scripts/get_langs.sh from mozilla overlay
 # Missing when bumped : be
