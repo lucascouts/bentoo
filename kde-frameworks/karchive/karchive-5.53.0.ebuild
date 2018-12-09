@@ -11,9 +11,9 @@ KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 IUSE="+bzip2 +lzma"
 
 RDEPEND="
+	sys-libs/zlib
 	bzip2? ( app-arch/bzip2 )
 	lzma? ( app-arch/xz-utils )
-	sys-libs/zlib
 "
 DEPEND="${RDEPEND}"
 

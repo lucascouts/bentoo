@@ -35,26 +35,22 @@ export KDE_BUILD_TYPE
 case ${CATEGORY} in
 	kde-frameworks)
 		[[ ${KDE_BUILD_TYPE} = live ]] && : ${FRAMEWORKS_MINIMAL:=9999}
+		[[ ${PV} = 5.52.0* ]] && : ${QT_MINIMAL:=5.9.4}
 		;;
 	kde-plasma)
-		if [[ ${PV} = 5.14.4 ]]; then
-			: ${FRAMEWORKS_MINIMAL:=5.46.0}
-			: ${KDE_APPS_MINIMAL:=17.12.3}
-		fi
 		if [[ ${KDE_BUILD_TYPE} = live && ${PV} != 5.??.49* ]]; then
 			: ${FRAMEWORKS_MINIMAL:=9999}
 		fi
-		: ${QT_MINIMAL:=5.11.1}
 		;;
 	kde-apps)
-		[[ ${PV} = 18.08.3 ]] && : ${FRAMEWORKS_MINIMAL:=5.52.0}
+		[[ ${PV} = 18.08.3* ]] && : ${QT_MINIMAL:=5.9.4}
 		;;
 esac
 
 # @ECLASS-VARIABLE: QT_MINIMAL
 # @DESCRIPTION:
 # Minimum version of Qt to require. This affects add_qt_dep.
-: ${QT_MINIMAL:=5.9.4}
+: ${QT_MINIMAL:=5.11.1}
 
 # @ECLASS-VARIABLE: FRAMEWORKS_MINIMAL
 # @DESCRIPTION:
