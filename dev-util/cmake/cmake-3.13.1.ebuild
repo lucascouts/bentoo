@@ -120,7 +120,10 @@ cmake_src_test() {
 	#    RunCMake.CPack_RPM: breaks if app-arch/rpm is installed because
 	#        debugedit binary is not in the expected location
 	#    TestUpload, which requires network access
-	"${BUILD_DIR}"/bin/ctest ${ctestargs} \
+	"${BUILD_DIR}"/bin/ctest \
+		-j "$(makeopts_jobs)" \
+		--test-load "$(makeopts_loadavg)" \
+		${ctestargs} \
 		-E "(BootstrapTest|BundleUtilities|CTest.UpdateCVS|Fortran|Qt4Deploy|RunCMake.CPack_RPM|TestUpload)" \
 		|| die "Tests failed"
 
