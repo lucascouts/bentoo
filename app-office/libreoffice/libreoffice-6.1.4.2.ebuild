@@ -3,8 +3,8 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
-PYTHON_REQ_USE="threads,xml"
+PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} )
+PYTHON_REQ_USE="threads(+),xml"
 
 MY_PV="${PV/_alpha/.alpha}"
 MY_PV="${MY_PV/_beta/.beta}"
@@ -18,11 +18,10 @@ DEV_URI="
 ADDONS_URI="https://dev-www.libreoffice.org/src/"
 
 BRANDING="${PN}-branding-gentoo-0.8.tar.xz"
-PATCHSET="${PN}-6.1.3.1-patchset-01.tar.xz"
+# PATCHSET="${P}-patchset-01.tar.xz"
 
-[[ ${MY_PV} == *9999* ]] && SCM_ECLASS="git-r3"
-inherit autotools bash-completion-r1 check-reqs eapi7-ver flag-o-matic gnome2-utils java-pkg-opt-2 multiprocessing pax-utils python-single-r1 qmake-utils toolchain-funcs xdg-utils ${SCM_ECLASS}
-unset SCM_ECLASS
+[[ ${MY_PV} == *9999* ]] && inherit git-r3
+inherit autotools bash-completion-r1 check-reqs eapi7-ver flag-o-matic gnome2-utils java-pkg-opt-2 multiprocessing pax-utils python-single-r1 qmake-utils toolchain-funcs xdg-utils
 
 DESCRIPTION="A full office productivity suite"
 HOMEPAGE="https://www.libreoffice.org"
@@ -79,7 +78,8 @@ REQUIRED_USE="${PYTHON_REQUIRED_USE}
 LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
 [[ ${MY_PV} == *9999* ]] || \
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS=""
+#KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86 ~amd64-linux ~x86-linux"
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
@@ -136,7 +136,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	net-misc/curl
 	net-nds/openldap
 	sci-mathematics/lpsolve
-	sys-libs/zlib:=
+	sys-libs/zlib
 	virtual/glu
 	virtual/jpeg:0
 	virtual/opengl
@@ -194,9 +194,7 @@ RDEPEND="${COMMON_DEPEND}
 	!app-office/libreoffice-bin
 	!app-office/libreoffice-bin-debug
 	!app-office/openoffice
-	media-fonts/dejavu
 	media-fonts/liberation-fonts
-	media-fonts/libertine
 	|| ( x11-misc/xdg-utils kde-plasma/kde-cli-tools )
 	java? ( >=virtual/jre-1.6 )
 	kde? ( kde-frameworks/breeze-icons:* )
@@ -214,6 +212,7 @@ fi
 # FIXME: cppunit should be moved to test conditional
 #        after everything upstream is under gbuild
 #        as dmake execute tests right away
+#        tests apparently also need google-carlito-fonts (not packaged)
 DEPEND="${COMMON_DEPEND}
 	>=dev-libs/libatomic_ops-7.2d
 	dev-perl/Archive-Zip
@@ -239,18 +238,17 @@ DEPEND="${COMMON_DEPEND}
 		app-crypt/gnupg
 		dev-util/cppunit
 		media-fonts/dejavu
+		media-fonts/liberation-fonts
 	)
 "
 
 PATCHES=(
-	"${WORKDIR}"/${PATCHSET/.tar.xz/}
+	# "${WORKDIR}"/${PATCHSET/.tar.xz/}
 
 	# not upstreamable stuff
 	"${FILESDIR}/${PN}-5.4-system-pyuno.patch"
 	"${FILESDIR}/${PN}-5.3.4.2-kioclient5.patch"
-
-	# TODO: upstream
-	"${FILESDIR}/${PN}-5.2.5.1-glibc-2.24.patch"
+	"${FILESDIR}/${PN}-6.1-nomancompress.patch"
 )
 
 S="${WORKDIR}/${PN}-${MY_PV}"
@@ -297,6 +295,7 @@ src_unpack() {
 		[[ ${mypv} != ${MY_PV} ]] && branch="${PN}-${mypv/./-}"
 		git-r3_fetch "${base_uri}/${PN}/core" "refs/heads/${branch}"
 		git-r3_checkout "${base_uri}/${PN}/core"
+		LOCOREGIT_VERSION=${EGIT_VERSION}
 
 		git-r3_fetch "${base_uri}/${PN}/help" "refs/heads/master"
 		git-r3_checkout "${base_uri}/${PN}/help" "helpcontent2" # doesn't match on help
@@ -368,6 +367,11 @@ src_configure() {
 		export MOC5="$(qt5_get_bindir)/moc"
 	fi
 
+	local gentoo_buildid="Gentoo official package"
+	if [[ -n ${LOCOREGIT_VERSION} ]]; then
+		gentoo_buildid+=" (from git: ${LOCOREGIT_VERSION})"
+	fi
+
 	# system headers/libs/...: enforce using system packages
 	# --disable-breakpad: requires not-yet-in-tree dev-utils/breakpad
 	# --enable-cairo: ensure that cairo is always required
@@ -406,7 +410,7 @@ src_configure() {
 		--disable-qt5
 		--disable-report-builder
 		--with-alloc=system
-		--with-build-version="Gentoo official package"
+		--with-build-version="${gentoo_buildid}"
 		--enable-extension-integration
 		--with-external-dict-dir="${EPREFIX}/usr/share/myspell"
 		--with-external-hyph-dir="${EPREFIX}/usr/share/myspell"
