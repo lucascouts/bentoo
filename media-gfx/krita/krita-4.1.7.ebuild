@@ -4,12 +4,13 @@
 EAPI=6
 
 KDE_TEST="forceoptional"
+QT_MINIMAL="5.11.3"
 VIRTUALX_REQUIRED="test"
-PYTHON_COMPAT=( python3_{4,5,6} )
+PYTHON_COMPAT=( python3_{4,5,6,7} )
 inherit kde5 python-single-r1
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/${PN}/${PV%.1}/${P}.tar.gz"
+	SRC_URI="mirror://kde/stable/${PN}/${PV%.1}/${P}.101.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
@@ -19,6 +20,8 @@ LICENSE="GPL-3"
 IUSE="color-management fftw gif +gsl heif +jpeg openexr pdf qtmedia +raw tiff vc"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
+# FIXME: Drop subslot operator when QTBUG is fixed:
+# https://bugreports.qt.io/browse/QTBUG-72488
 COMMON_DEPEND="${PYTHON_DEPS}
 	$(add_frameworks_dep karchive)
 	$(add_frameworks_dep kcompletion)
@@ -28,7 +31,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	$(add_frameworks_dep kguiaddons)
 	$(add_frameworks_dep ki18n)
 	$(add_frameworks_dep kiconthemes)
-	$(add_frameworks_dep kio)
 	$(add_frameworks_dep kitemmodels)
 	$(add_frameworks_dep kitemviews)
 	$(add_frameworks_dep kwidgetsaddons)
@@ -85,6 +87,8 @@ RDEPEND="${COMMON_DEPEND}
 RESTRICT+=" test"
 
 PATCHES=( "${FILESDIR}/${PN}-4.0.3-tests-optional.patch" )
+
+S="${S}.101"
 
 pkg_setup() {
 	python-single-r1_pkg_setup
