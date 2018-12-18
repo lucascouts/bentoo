@@ -1,9 +1,9 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{4,5,6}} )
+PYTHON_COMPAT=( python{2_7,3_{4,5,6,7}} )
 
 inherit autotools multilib multilib-minimal python-single-r1
 
@@ -23,7 +23,7 @@ DEPEND="${RDEPEND}
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 PATCHES=(
-	"${FILESDIR}/${P}-missing_files.patch" #652422
+	"${FILESDIR}/${PN}-1.1.6-missing_files.patch" #652422
 )
 
 pkg_setup() {
@@ -56,8 +56,7 @@ multilib_src_configure() {
 		$(usex elibc_uclibc --without-versioned '')
 	)
 
-	ECONF_SOURCE="${S}" \
-	econf "${myeconfargs[@]}"
+	ECONF_SOURCE="${S}" econf "${myeconfargs[@]}"
 }
 
 multilib_src_compile() {
