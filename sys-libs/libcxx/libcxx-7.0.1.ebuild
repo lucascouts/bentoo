@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -19,7 +19,7 @@ SRC_URI="https://releases.llvm.org/${PV/_//}/${P/_/}.src.tar.xz"
 
 LICENSE="|| ( UoI-NCSA MIT )"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86 ~amd64-fbsd"
+KEYWORDS="~amd64 ~arm ~arm64 ~x86 ~amd64-fbsd"
 IUSE="elibc_glibc elibc_musl +libcxxabi libcxxrt +libunwind +static-libs test"
 REQUIRED_USE="libunwind? ( || ( libcxxabi libcxxrt ) )
 	?? ( libcxxabi libcxxrt )"
@@ -46,10 +46,6 @@ PATCHES=(
 	# Add link flag "-Wl,-z,defs" to avoid underlinking; this is needed in a
 	# out-of-tree build.
 	"${FILESDIR}/${PN}-3.9-cmake-link-flags.patch"
-
-	# Fix installing when using libsupc++ backend.
-	# https://bugs.gentoo.org/667174
-	"${FILESDIR}/${PN}-7.0.0-libsupcxx-install.patch"
 )
 
 # least intrusive of all

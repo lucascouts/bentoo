@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -79,11 +79,7 @@ CMAKE_BUILD_TYPE=RelWithDebInfo
 src_prepare() {
 	# Fix llvm-config for shared linking and sane flags
 	# https://bugs.gentoo.org/show_bug.cgi?id=565358
-	eapply "${FILESDIR}"/9999/0007-llvm-config-Clean-up-exported-values-update-for-shar.patch
-
-	# Fix x86 codegen bug triggered by Chromium
-	# https://bugs.gentoo.org/664868
-	eapply "${FILESDIR}"/7.0.0/0001-X86-Stop-X86DomainReassignment-from-creating-copies-.patch
+	eapply "${FILESDIR}"/7.0.9999/0007-llvm-config-Clean-up-exported-values-update-for-shar.patch
 
 	# disable use of SDK on OSX, bug #568758
 	sed -i -e 's/xcrun/false/' utils/lit/lit/util.py || die
