@@ -11,10 +11,11 @@ MY_P="VirtualBox-${MY_PV}"
 DESCRIPTION="VirtualBox kernel modules and user-space tools for Gentoo guests"
 HOMEPAGE="https://www.virtualbox.org/"
 SRC_URI="https://download.virtualbox.org/virtualbox/${MY_PV}/${MY_P}.tar.bz2
-	https://dev.gentoo.org/~polynomial-c/virtualbox/patchsets/virtualbox-5.2.16-patches-02.tar.xz"
+	https://dev.gentoo.org/~polynomial-c/virtualbox/patchsets/virtualbox-6.0.0_beta2-patches-01.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
+[[ "${PV}" == *_beta* ]] || [[ "${PV}" == *_rc* ]] || \
 KEYWORDS="~amd64 ~x86"
 IUSE="X"
 
