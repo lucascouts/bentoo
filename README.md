@@ -28,3 +28,9 @@ Invoke the following:
 ### Bentoo Portage config
 
 Here you can see the portage files configurations : https://github.com/lucascouts/bentoo-cfg
+
+### Installation guide
+
+To install just follow the Funtoo installation steps and replace the downloaded stage3 with the Bentoo Stage4.
+
+https://www.funtoo.org/install
