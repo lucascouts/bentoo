@@ -2,6 +2,8 @@
 
 Bentōō is an initiative to distribute an user-friendly version of Funtoo linux Stage4 to new users, with more update packages, focusing on agility, security privacy and games.
 
+our Telegram group -> https://t.me/joinchat/DG0l5Rez0MRt4p2GHnNohQ
+
 ## with local overlays
 
 [Local overlays](https://www.funtoo.org/Local_Overlay) should be managed via `/etc/portage/repos.conf/`.
