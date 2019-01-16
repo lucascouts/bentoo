@@ -68,7 +68,7 @@ PDEPEND="
 # tests hang
 RESTRICT+=" test"
 
-PATCHES=( "${FILESDIR}/${P}-revert-calcSpeed-refactoring.patch" )
+PATCHES=( "${FILESDIR}/${P}-5.52.0-sendfile.patch" )
 
 src_configure() {
 	local mycmakeargs=(
