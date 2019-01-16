@@ -68,8 +68,6 @@ PDEPEND="
 # tests hang
 RESTRICT+=" test"
 
-PATCHES=( "${FILESDIR}/${P}-5.52.0-sendfile.patch" )
-
 src_configure() {
 	local mycmakeargs=(
 		$(cmake-utils_use_find_package acl ACL)
