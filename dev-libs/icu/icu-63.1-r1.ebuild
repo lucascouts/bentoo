@@ -1,9 +1,9 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit eutils flag-o-matic toolchain-funcs autotools multilib-minimal
+inherit flag-o-matic toolchain-funcs autotools multilib-minimal
 
 DESCRIPTION="International Components for Unicode"
 HOMEPAGE="http://www.icu-project.org/"
@@ -13,14 +13,14 @@ LICENSE="BSD"
 
 SLOT="0/${PV}"
 
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~x64-solaris ~x86-solaris ~x86-winnt"
+KEYWORDS="alpha amd64 ~arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris ~x86-winnt"
 IUSE="debug doc examples static-libs"
 
 DEPEND="
+	doc? ( app-doc/doxygen[dot] )
+"
+BDEPEND="
 	virtual/pkgconfig
-	doc? (
-		app-doc/doxygen[dot]
-	)
 "
 
 S="${WORKDIR}/${PN}/source"
@@ -32,19 +32,10 @@ MULTILIB_CHOST_TOOLS=(
 PATCHES=(
 	"${FILESDIR}/${PN}-58.1-remove-bashisms.patch"
 	"${FILESDIR}/${PN}-58.2-darwin.patch"
+	"${FILESDIR}/${P}-CVE-2018-18928.patch"
 )
 
-pkg_pretend() {
-	if tc-is-gcc ; then
-		if [[ $(gcc-major-version) == 4 && $(gcc-minor-version) -lt 9 \
-			|| $(gcc-major-version) -lt 4 ]] ; then
-				die "You need at least sys-devel/gcc-4.9"
-		fi
-	fi
-}
-
 src_prepare() {
-	# apply patches
 	default
 
 	local variable
@@ -68,15 +59,7 @@ src_prepare() {
 }
 
 src_configure() {
-	# Use C++14
 	append-cxxflags -std=c++14
-
-	if tc-is-gcc ; then
-		if [[ $(gcc-major-version) == 4 && $(gcc-minor-version) -lt 9 \
-			|| $(gcc-major-version) -lt 4 ]] ; then
-				die "You need at least sys-devel/gcc-4.9"
-		fi
-	fi
 
 	if tc-is-cross-compiler; then
 		mkdir "${WORKDIR}"/host || die
@@ -102,11 +85,9 @@ multilib_src_configure() {
 		--disable-layoutex
 		$(use_enable debug)
 		$(use_enable static-libs static)
+		$(multilib_native_use_enable examples samples)
 	)
 
-	multilib_is_native_abi && myeconfargs+=(
-		$(use_enable examples samples)
-	)
 	tc-is-cross-compiler && myeconfargs+=(
 		--with-cross-build="${WORKDIR}"/host
 	)
@@ -116,12 +97,11 @@ multilib_src_configure() {
 
 	# make sure we configure with the same shell as we run icu-config
 	# with, or ECHO_N, ECHO_T and ECHO_C will be wrongly defined
-	export CONFIG_SHELL=${EPREFIX}/bin/sh
+	export CONFIG_SHELL="${EPREFIX}/bin/sh"
 	# probably have no /bin/sh in prefix-chain
-	[[ -x ${CONFIG_SHELL} ]] || CONFIG_SHELL=${BASH}
+	[[ -x ${CONFIG_SHELL} ]] || CONFIG_SHELL="${BASH}"
 
-	ECONF_SOURCE=${S} \
-	econf "${myeconfargs[@]}"
+	ECONF_SOURCE="${S}" econf "${myeconfargs[@]}"
 }
 
 multilib_src_compile() {
