@@ -1,7 +1,11 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # Build written by Andrew John Hughes (gnu_andrew@member.fsf.org)
+
+# *********************************************************
+# * IF YOU CHANGE THIS EBUILD, CHANGE ICEDTEA-6.* AS WELL *
+# *********************************************************
 
 EAPI="6"
 SLOT="8"
@@ -13,16 +17,16 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="c120c4fb7b31.tar.xz"
-JAXP_TARBALL="55420c5cc9f3.tar.xz"
-JAXWS_TARBALL="f824de94c42e.tar.xz"
-JDK_TARBALL="7b289a33ab97.tar.xz"
-LANGTOOLS_TARBALL="8496472630c5.tar.xz"
-OPENJDK_TARBALL="3b2d372838b9.tar.xz"
-NASHORN_TARBALL="79a2c8e2babc.tar.xz"
-HOTSPOT_TARBALL="d78088224b98.tar.xz"
-SHENANDOAH_TARBALL="b8b742251e42.tar.xz"
-AARCH32_TARBALL="891d70e93fb0.tar.xz"
+CORBA_TARBALL="8249f00d6619.tar.xz"
+JAXP_TARBALL="a1b060ef4f06.tar.xz"
+JAXWS_TARBALL="c0f01861a7fd.tar.xz"
+JDK_TARBALL="6e67500d0ed8.tar.xz"
+LANGTOOLS_TARBALL="7036a6fa432e.tar.xz"
+OPENJDK_TARBALL="90de74e82bfb.tar.xz"
+NASHORN_TARBALL="6cf21321f367.tar.xz"
+HOTSPOT_TARBALL="4e4ead43a282.tar.xz"
+SHENANDOAH_TARBALL="bc4deb768b1d.tar.xz"
+AARCH32_TARBALL="f38b47a322eb.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -133,7 +137,9 @@ RDEPEND="${COMMON_DEP}
 DEPEND="${COMMON_DEP} ${ALSA_COMMON_DEP} ${CUPS_COMMON_DEP} ${X_COMMON_DEP} ${X_DEPEND}
 	|| (
 		dev-java/icedtea-bin:8
+		dev-java/icedtea-bin:7
 		dev-java/icedtea:8
+		dev-java/icedtea:7
 	)
 	app-arch/cpio
 	app-arch/unzip
@@ -365,20 +371,7 @@ src_install() {
 	java-vm_sandbox-predict /proc/self/coredump_filter
 }
 
-pkg_preinst() {
-	# From 3.4.0 onwards, the arm directory is a symlink to the aarch32
-	# directory. We need to clear the old directory for a clean upgrade.
-	if use arm; then
-		local dir
-		for dir in "${EROOT}usr/$(get_libdir)/icedtea${SLOT}"/{lib,jre/lib}/arm; do
-			if [[ -d ${dir} && ! -L ${dir} ]]; then
-				rm -r "${dir}" || die
-			fi
-		done
-	fi
-
-	gnome2_icon_savelist
-}
+pkg_preinst() { gnome2_icon_savelist; }
 
 pkg_postinst() {
 	gnome2_icon_cache_update

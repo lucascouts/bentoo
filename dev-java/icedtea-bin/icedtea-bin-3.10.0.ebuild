@@ -1,11 +1,11 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
 # Don't block arm. See bug #600134.
 #MULTILIB_COMPAT=( abi_ppc_64 abi_x86_{32,64} )
-KEYWORDS="-* amd64 ~arm ~arm64 ~ppc64 x86"
+KEYWORDS="-* ~amd64 ~arm ~ppc64 ~x86"
 
 inherit java-vm-2 multilib-build toolchain-funcs
 
@@ -16,16 +16,15 @@ abi_uri() {
 		)"
 }
 
-BASE_URI="https://dev.gentoo.org/~chewi/distfiles"
+BASE_URI="https://dev.gentoo.org/~gyakovlev/distfiles"
 SRC_URI="doc? ( ${BASE_URI}/${PN}-doc-${PV}.tar.xz )
 	source? ( ${BASE_URI}/${PN}-src-${PV}.tar.xz )
-	multilib? ( amd64? ( abi_x86_32? ( ${BASE_URI}/${PN}-core-${PV}-r1-x86.tar.xz ) ) )
+	multilib? ( amd64? ( abi_x86_32? ( ${BASE_URI}/${PN}-core-${PV}-x86.tar.xz ) ) )
 	big-endian? ( $(abi_uri ppc64) )
 	!big-endian? ( $(abi_uri ppc64le ppc64) )
 	$(abi_uri amd64)
 	$(abi_uri arm)
-	$(abi_uri arm64)
-	$(abi_uri x86 x86 1)"
+	$(abi_uri x86 x86)"
 
 DESCRIPTION="A Gentoo-made binary build of the IcedTea JDK"
 HOMEPAGE="http://icedtea.classpath.org"
