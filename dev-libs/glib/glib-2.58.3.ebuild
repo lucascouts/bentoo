@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -123,9 +123,6 @@ src_prepare() {
 
 	# gdbus-codegen is a separate package
 	eapply "${FILESDIR}"/${PN}-2.58.2-external-gdbus-codegen.patch
-
-	# https://gitlab.gnome.org/GNOME/glib/issues/1626
-	eapply "${FILESDIR}"/${P}-gvariant-test-fix.patch
 
 	# Tarball doesn't come with gtk-doc.make and we can't unconditionally depend on dev-util/gtk-doc due
 	# to circular deps during bootstramp. If actually not building gtk-doc, an almost empty file will do
