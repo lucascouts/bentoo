@@ -19,6 +19,8 @@ DEPEND="${RDEPEND}
 	nls? ( $(add_qt_dep linguist-tools) )
 "
 
+PATCHES=( "${FILESDIR}/${P}-no-light-fontstyle-headings.patch" )
+
 src_test() {
 	# bug 650216, 653186
 	local myctestargs=( -E "(kdatecomboboxtest|ktooltipwidgettest)" )
