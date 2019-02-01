@@ -2,7 +2,7 @@
 
 EAPI="5"
 
-inherit autotools-utils readme.gentoo systemd toolchain-funcs
+inherit autotools-utils readme.gentoo toolchain-funcs
 
 DESCRIPTION="Graphical boot animation (splash) and logger"
 HOMEPAGE="http://cgit.freedesktop.org/plymouth/"
@@ -14,7 +14,7 @@ LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="*"
 IUSE_VIDEO_CARDS="video_cards_intel video_cards_radeon"
-IUSE="${IUSE_VIDEO_CARDS} debug gdm +gtk +libkms +pango static-libs systemd"
+IUSE="${IUSE_VIDEO_CARDS} debug gdm +gtk +libkms +pango static-libs"
 
 CDEPEND="
 	>=media-libs/libpng-1.2.16
@@ -23,7 +23,6 @@ CDEPEND="
 		>=x11-libs/gtk+-2.12:2 )
 	libkms? ( x11-libs/libdrm[libkms] )
 	pango? ( >=x11-libs/pango-1.21 )
-	systemd? ( sys-apps/systemd )
 	video_cards_intel? ( x11-libs/libdrm[video_cards_intel] )
 	video_cards_radeon? ( x11-libs/libdrm[video_cards_radeon] )
 "
@@ -44,15 +43,6 @@ PATCHES=(
 	"${FILESDIR}/0.8.8-initrd-binaries-paths.patch"
 )
 
-src_prepare() {
-	sed -i 's:/bin/systemd-tty-ask-password-agent:/usr/bin/systemd-tty-ask-password-agent:g' \
-		systemd-units/systemd-ask-password-plymouth.service.in || die \
-		'ask-password sed failed'
-	sed -i 's:/bin/udevadm:/usr/bin/udevadm:g' \
-		systemd-units/plymouth-start.service.in || die 'udevadm sed failed'
-	autotools-utils_src_prepare
-}
-
 src_configure() {
 	local myeconfargs=(
 		--with-system-root-install=no
@@ -63,7 +53,6 @@ src_configure() {
 		$(use_enable gtk gtk)
 		$(use_enable libkms)
 		$(use_enable pango)
-		$(use_enable systemd systemd-integration)
 		$(use_enable video_cards_intel libdrm_intel)
 		$(use_enable video_cards_radeon libdrm_radeon)
 		)
