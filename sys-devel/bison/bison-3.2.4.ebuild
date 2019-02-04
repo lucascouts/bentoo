@@ -5,14 +5,17 @@ EAPI="6"
 
 inherit flag-o-matic
 
+PATCHES="${PN}-3.2.3-patches-01.tar.xz"
+
 DESCRIPTION="A general-purpose (yacc-compatible) parser generator"
 HOMEPAGE="https://www.gnu.org/software/bison/"
 SRC_URI="mirror://gnu/${PN}/${P}.tar.xz
-	https://dev.gentoo.org/~whissi/dist/bison/${P}-patches-1.0.tar.xz"
+	https://dev.gentoo.org/~whissi/dist/bison/${PATCHES}
+	https://dev.gentoo.org/~polynomial-c/dist/bison/${PATCHES}"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="examples nls static test"
 
 RDEPEND=">=sys-devel/m4-1.4.16"
@@ -22,11 +25,11 @@ DEPEND="${RDEPEND}
 	nls? ( sys-devel/gettext )
 	test? ( dev-lang/perl )"
 
-DOCS=( AUTHORS ChangeLog-2012 NEWS README THANKS TODO ) # ChangeLog-1998 PACKAGING README-alpha README-release
+DOCS=( AUTHORS ChangeLog NEWS README THANKS TODO ) # ChangeLog-2012 ChangeLog-1998 PACKAGING README-alpha README-release
 
 PATCHES=(
-	"${WORKDIR}"/patches/${P}-optional-perl.patch #538300
-	"${WORKDIR}"/patches/${P}-avoid_autoreconf.patch
+	"${WORKDIR}"/patches/${PN}-3.1-optional-perl.patch #538300
+	"${WORKDIR}"/patches/${PN}-3.2.3-avoid_autoreconf.patch
 )
 
 src_prepare() {
