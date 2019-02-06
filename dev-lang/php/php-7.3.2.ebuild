@@ -154,6 +154,7 @@ REQUIRED_USE="
 "
 PATCHES=(
 	"${FILESDIR}/php-freetype-2.9.1.patch"
+	"${FILESDIR}/php-7.3.2-fix-iptcembed-bug77546.patch"
 )
 
 PHP_MV="$(ver_cut 1)"
