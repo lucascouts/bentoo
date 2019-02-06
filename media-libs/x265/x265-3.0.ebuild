@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -18,7 +18,7 @@ HOMEPAGE="http://x265.org/"
 
 LICENSE="GPL-2"
 # subslot = libx265 soname
-SLOT="0/165"
+SLOT="0/169"
 IUSE="+10bit +12bit cpu_flags_arm_neon numa pic power8 test"
 
 ASM_DEPEND=">=dev-lang/yasm-1.2.0"
@@ -31,7 +31,6 @@ PATCHES=(
 	"${FILESDIR}/arm.patch"
 	"${FILESDIR}/neon.patch"
 	"${FILESDIR}/ppc64.patch"
-	"${FILESDIR}"/${PN}-2.9-detect512.patch
 )
 
 src_unpack() {
