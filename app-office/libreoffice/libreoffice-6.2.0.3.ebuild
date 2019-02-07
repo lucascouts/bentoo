@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -18,7 +18,7 @@ DEV_URI="
 ADDONS_URI="https://dev-www.libreoffice.org/src/"
 
 BRANDING="${PN}-branding-gentoo-0.8.tar.xz"
-# PATCHSET="${P}-patchset-01.tar.xz"
+PATCHSET="${P}-patchset-02.tar.xz"
 
 [[ ${MY_PV} == *9999* ]] && inherit git-r3
 inherit autotools bash-completion-r1 check-reqs eapi7-ver flag-o-matic gnome2-utils java-pkg-opt-2 multiprocessing pax-utils python-single-r1 qmake-utils toolchain-funcs xdg-utils
@@ -63,12 +63,11 @@ unset ADDONS_SRC
 LO_EXTS="nlpsolver scripting-beanshell scripting-javascript wiki-publisher"
 
 IUSE="accessibility bluetooth +branding coinmp +cups dbus debug eds firebird
-googledrive gstreamer +gtk gtk2 kde mysql odk pdfimport postgres test vlc
+googledrive gstreamer +gtk gtk2 kde +mariadb odk pdfimport postgres test vlc
 $(printf 'libreoffice_extensions_%s ' ${LO_EXTS})"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 	bluetooth? ( dbus )
-	kde? ( gtk )
 	libreoffice_extensions_nlpsolver? ( java )
 	libreoffice_extensions_scripting-beanshell? ( java )
 	libreoffice_extensions_scripting-javascript? ( java )
@@ -79,7 +78,7 @@ LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
 [[ ${MY_PV} == *9999* ]] || \
 KEYWORDS=""
-#KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86 ~amd64-linux ~x86-linux"
+# KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86 ~amd64-linux ~x86-linux"
 
 COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
@@ -112,7 +111,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-libs/icu:=
 	dev-libs/libassuan
 	dev-libs/libgpg-error
-	=dev-libs/liborcus-0.13*
+	>=dev-libs/liborcus-0.14.0
 	dev-libs/librevenge
 	dev-libs/libxml2
 	dev-libs/libxslt
@@ -120,6 +119,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-libs/nss
 	>=dev-libs/redland-1.0.16
 	>=dev-libs/xmlsec-1.2.24[nss]
+	media-gfx/fontforge
 	media-gfx/graphite2
 	media-libs/fontconfig
 	media-libs/freetype:2
@@ -145,10 +145,13 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	x11-libs/libXrandr
 	x11-libs/libXrender
 	accessibility? ( dev-python/lxml[${PYTHON_USEDEP}] )
-	bluetooth? ( net-wireless/bluez )
+	bluetooth? (
+		dev-libs/glib:2
+		net-wireless/bluez
+	)
 	coinmp? ( sci-libs/coinor-mp )
 	cups? ( net-print/cups )
-	dbus? ( dev-libs/dbus-glib )
+	dbus? ( sys-apps/dbus )
 	eds? (
 		dev-libs/glib:2
 		gnome-base/dconf
@@ -185,7 +188,8 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	)
 	libreoffice_extensions_scripting-beanshell? ( dev-java/bsh )
 	libreoffice_extensions_scripting-javascript? ( dev-java/rhino:1.6 )
-	mysql? ( dev-db/mysql-connector-c++ )
+	mariadb? ( dev-db/mariadb-connector-c )
+	!mariadb? ( dev-db/mysql-connector-c )
 	pdfimport? ( app-text/poppler:=[cxx] )
 	postgres? ( >=dev-db/postgresql-9.0:*[kerberos] )
 "
@@ -219,7 +223,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-util/cppunit-1.14.0
 	>=dev-util/gperf-3
 	dev-util/intltool
-	=dev-util/mdds-1.3*:1=
+	>=dev-util/mdds-1.4.1:1=
 	media-libs/glm
 	sys-devel/bison
 	sys-devel/flex
@@ -243,12 +247,15 @@ DEPEND="${COMMON_DEPEND}
 "
 
 PATCHES=(
-	# "${WORKDIR}"/${PATCHSET/.tar.xz/}
+	"${WORKDIR}"/${PATCHSET/.tar.xz/}
 
 	# not upstreamable stuff
 	"${FILESDIR}/${PN}-5.4-system-pyuno.patch"
 	"${FILESDIR}/${PN}-5.3.4.2-kioclient5.patch"
 	"${FILESDIR}/${PN}-6.1-nomancompress.patch"
+
+	# master branch
+	"${FILESDIR}/${PN}-6.1.5.2-gtk3_kde5-non-native-fpicker-for-non-plasma.patch"
 )
 
 S="${WORKDIR}/${PN}-${MY_PV}"
@@ -390,6 +397,7 @@ src_configure() {
 		--with-system-headers
 		--with-system-jars
 		--with-system-libs
+		--enable-build-opensymbol
 		--enable-cairo-canvas
 		--enable-largefile
 		--enable-mergelibs
@@ -398,18 +406,16 @@ src_configure() {
 		--enable-randr
 		--enable-release-build
 		--disable-breakpad
+		--disable-bundle-mariadb
 		--disable-ccache
 		--disable-dependency-tracking
 		--disable-epm
 		--disable-fetch-external
 		--disable-gstreamer-0-10
-		--disable-kde5
 		--disable-online-update
 		--disable-openssl
 		--disable-pdfium
-		--disable-qt5
 		--disable-report-builder
-		--with-alloc=system
 		--with-build-version="${gentoo_buildid}"
 		--enable-extension-integration
 		--with-external-dict-dir="${EPREFIX}/usr/share/myspell"
@@ -438,8 +444,8 @@ src_configure() {
 		$(use_enable gstreamer gstreamer-1-0)
 		$(use_enable gtk gtk3)
 		$(use_enable gtk2 gtk)
-		$(use_enable kde gtk3-kde5)
-		$(use_enable mysql ext-mariadb-connector)
+		$(use_enable kde kde5)
+		$(use_enable kde qt5)
 		$(use_enable odk)
 		$(use_enable pdfimport)
 		$(use_enable postgres postgresql-sdbc)
@@ -449,9 +455,12 @@ src_configure() {
 		$(use_with googledrive gdrive-client-id ${google_default_client_id})
 		$(use_with googledrive gdrive-client-secret ${google_default_client_secret})
 		$(use_with java)
-		$(use_with mysql system-mysql-cppconn)
 		$(use_with odk doxygen)
 	)
+
+	if use gtk && use kde; then
+		myeconfargs+=( --enable-gtk3-kde5 )
+	fi
 
 	if use eds || use gtk; then
 		myeconfargs+=( --enable-dconf --enable-gio )
@@ -487,6 +496,7 @@ src_configure() {
 
 	is-flagq "-flto*" && myeconfargs+=( --enable-lto )
 
+	MARIADBCONFIG="$(type -p $(usex mariadb mariadb mysql)_config)" \
 	econf "${myeconfargs[@]}"
 }
 
@@ -546,7 +556,7 @@ src_install() {
 		insinto /usr/$(get_libdir)/${PN}/program
 		newins "${WORKDIR}/branding-sofficerc" sofficerc
 		dodir /etc/env.d
-		echo "CONFIG_PROTECT=/usr/$(get_libdir)/${PN}/program/sofficerc" > "${ED}"etc/env.d/99${PN} || die
+		echo "CONFIG_PROTECT=/usr/$(get_libdir)/${PN}/program/sofficerc" > "${ED%/}"/etc/env.d/99${PN} || die
 	fi
 
 	# Hack for offlinehelp, this needs fixing upstream at some point.
@@ -555,8 +565,8 @@ src_install() {
 	insinto /usr/$(get_libdir)/libreoffice/help
 	doins xmlhelp/util/*.xsl
 
-	pax-mark -m "${ED}"usr/$(get_libdir)/libreoffice/program/soffice.bin
-	pax-mark -m "${ED}"usr/$(get_libdir)/libreoffice/program/unopkg.bin
+	pax-mark -m "${ED%/}"/usr/$(get_libdir)/libreoffice/program/soffice.bin
+	pax-mark -m "${ED%/}"/usr/$(get_libdir)/libreoffice/program/unopkg.bin
 }
 
 pkg_postinst() {
