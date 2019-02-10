@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI="7"
 inherit toolchain-funcs multilib-minimal
 
 # To create a new testdata tarball:
@@ -9,9 +9,9 @@ inherit toolchain-funcs multilib-minimal
 # 2. export LIBVPX_TEST_DATA_PATH=libvpx-testdata
 # 3. configure --enable-unit-tests --enable-vp9-highbitdepth
 # 4. make testdata
-# 5. tar -cjf libvpx-testdata-${MY_PV}.tar.bz2 libvpx-testdata
+# 5. tar -cjf libvpx-testdata-${MY_PV}.tar.xz libvpx-testdata
 
-LIBVPX_TESTDATA_VER=1.7.0
+LIBVPX_TESTDATA_VER=1.8.0
 
 DESCRIPTION="WebM VP8 and VP9 Codec SDK"
 HOMEPAGE="https://www.webmproject.org"
@@ -19,7 +19,7 @@ SRC_URI="https://github.com/webmproject/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.
 	test? ( mirror://gentoo/${PN}-testdata-${LIBVPX_TESTDATA_VER}.tar.xz )"
 
 LICENSE="BSD"
-SLOT="0/5"
+SLOT="0/6"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux"
 IUSE="cpu_flags_x86_avx cpu_flags_x86_avx2 doc cpu_flags_x86_mmx postproc cpu_flags_x86_sse cpu_flags_x86_sse2 cpu_flags_x86_sse3 cpu_flags_x86_ssse3 cpu_flags_x86_sse4_1 +highbitdepth static-libs svc test +threads"
 
@@ -80,7 +80,7 @@ multilib_src_configure() {
 		$(use_enable cpu_flags_x86_sse3 sse3)
 		$(use_enable cpu_flags_x86_sse4_1 sse4_1)
 		$(use_enable cpu_flags_x86_ssse3 ssse3)
-		$(use_enable svc experimental) $(use_enable svc spatial-svc)
+		$(use_enable svc experimental)
 		$(use_enable static-libs static)
 		$(use_enable test unit-tests)
 		$(use_enable threads multithread)
