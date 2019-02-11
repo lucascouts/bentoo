@@ -11,9 +11,9 @@ if [[ ${PV} = *9999* ]]; then
 	EGIT_CHECKOUT_DIR="${WORKDIR}/${P}/src/${EGO_PN}"
 	inherit git-r3
 else
-	DOCKER_GITCOMMIT="4c52b90"
+	DOCKER_GITCOMMIT="6247962"
 	SRC_URI="https://${EGO_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~arm64"
+	KEYWORDS="amd64 ~arm ~arm64"
 	[ "$DOCKER_GITCOMMIT" ] || die "DOCKER_GITCOMMIT must be added manually for each bump!"
 	inherit golang-vcs-snapshot
 fi
@@ -56,6 +56,7 @@ RDEPEND="
 	dev-libs/libltdl
 	~app-emulation/containerd-1.2.2
 	~app-emulation/runc-1.0.0_rc6_p20181203[apparmor?,seccomp?]
+	>=app-emulation/runc-1.0.0_rc6_p20181203-r1
 	~app-emulation/docker-proxy-0.8.0_p20181207
 	container-init? ( >=sys-process/tini-0.18.0[static] )
 "
