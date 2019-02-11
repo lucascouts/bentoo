@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -55,7 +55,7 @@ LICENSE="
 	samba? ( GPL-3 )
 "
 if [ "${PV#9999}" = "${PV}" ] ; then
-	KEYWORDS="~amd64 ~arm ~hppa ~ia64 ~mips ~x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris ~x86-solaris"
+	KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris ~x86-solaris"
 fi
 
 # Options to use as use_enable in the foo[:bar] form.
@@ -71,12 +71,12 @@ FFMPEG_FLAG_MAP=(
 		cdio:libcdio iec61883:libiec61883 ieee1394:libdc1394 libcaca openal
 		opengl
 		# indevs
-		libv4l:libv4l2 pulseaudio:libpulse libdrm
+		libv4l:libv4l2 pulseaudio:libpulse libdrm jack:libjack
 		# decoders
 		amr:libopencore-amrwb amr:libopencore-amrnb codec2:libcodec2 fdk:libfdk-aac
 		jpeg2k:libopenjpeg bluray:libbluray gme:libgme gsm:libgsm
 		mmal modplug:libmodplug opus:libopus libilbc librtmp ssh:libssh
-		speex:libspeex svg:librsvg video_cards_nvidia:ffnvcodec
+		speex:libspeex srt:libsrt svg:librsvg video_cards_nvidia:ffnvcodec
 		vorbis:libvorbis vpx:libvpx zvbi:libzvbi
 		# libavfilter options
 		appkit
@@ -98,7 +98,7 @@ FFMPEG_ENCODER_FLAG_MAP=(
 )
 
 IUSE="
-	alsa chromium doc +encode jack oss pic static-libs test v4l
+	alsa chromium doc +encode oss pic static-libs test v4l
 	${FFMPEG_FLAG_MAP[@]%:*}
 	${FFMPEG_ENCODER_FLAG_MAP[@]%:*}
 "
@@ -226,9 +226,10 @@ RDEPEND="
 	pulseaudio? ( >=media-sound/pulseaudio-2.1-r1[${MULTILIB_USEDEP}] )
 	librtmp? ( >=media-video/rtmpdump-2.4_p20131018[${MULTILIB_USEDEP}] )
 	rubberband? ( >=media-libs/rubberband-1.8.1-r1[${MULTILIB_USEDEP}] )
-	samba? ( >=net-fs/samba-3.6.23-r1[${MULTILIB_USEDEP}] )
+	samba? ( >=net-fs/samba-3.6.23-r1[client,${MULTILIB_USEDEP}] )
 	sdl? ( media-libs/libsdl2[sound,video,${MULTILIB_USEDEP}] )
 	speex? ( >=media-libs/speex-1.2_rc1-r1[${MULTILIB_USEDEP}] )
+	srt? ( >=net-libs/srt-1.3.0[${MULTILIB_USEDEP}] )
 	ssh? ( >=net-libs/libssh-0.5.5[${MULTILIB_USEDEP}] )
 	svg? ( gnome-base/librsvg:2=[${MULTILIB_USEDEP}] )
 	truetype? ( >=media-libs/freetype-2.5.0.1:2[${MULTILIB_USEDEP}] )
@@ -262,7 +263,7 @@ RDEPEND="
 RDEPEND="${RDEPEND}
 	libressl? ( dev-libs/libressl:0=[${MULTILIB_USEDEP}] )
 	!libressl? (
-		openssl? ( >=dev-libs/openssl-1.0.1h-r2:0[${MULTILIB_USEDEP}] )
+		openssl? ( >=dev-libs/openssl-1.0.1h-r2:0=[${MULTILIB_USEDEP}] )
 		!openssl? ( gnutls? ( >=net-libs/gnutls-2.12.23-r6:=[${MULTILIB_USEDEP}] ) )
 	)
 "
@@ -309,6 +310,10 @@ PATCHES=(
 MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/libavutil/avconfig.h
 )
+
+build_separate_libffmpeg() {
+	use opencl
+}
 
 src_prepare() {
 	if [[ "${PV%_p*}" != "${PV}" ]] ; then # Snapshot
@@ -403,6 +408,10 @@ multilib_src_configure() {
 		--enable-avfilter
 		--enable-avresample
 		--disable-stripping
+		# This is only for hardcoded cflags; those are used in configure checks that may
+		# interfere with proper detections, bug #671746 and bug #645778
+		# We use optflags, so that overrides them anyway.
+		--disable-optimizations
 		--disable-libcelt # bug #664158
 		"${myconf[@]}"
 	)
@@ -446,7 +455,7 @@ multilib_src_configure() {
 	echo "${@}"
 	"${@}" || die
 
-	if multilib_is_native_abi && use chromium; then
+	if multilib_is_native_abi && use chromium && build_separate_libffmpeg; then
 		einfo "Configuring for Chromium"
 		mkdir -p ../chromium || die
 		pushd ../chromium >/dev/null || die
@@ -454,7 +463,7 @@ multilib_src_configure() {
 			--disable-shared \
 			--enable-static \
 			--enable-pic \
-			--extra-cflags="-DFF_API_CONVERGENCE_DURATION=0"
+			--disable-opencl
 		echo "${@}"
 		"${@}" || die
 		popd >/dev/null || die
@@ -472,10 +481,14 @@ multilib_src_compile() {
 		done
 
 		if use chromium; then
-			einfo "Compiling for Chromium"
-			pushd ../chromium >/dev/null || die
-			emake V=1 libffmpeg
-			popd >/dev/null || die
+			if build_separate_libffmpeg; then
+				einfo "Compiling for Chromium"
+				pushd ../chromium >/dev/null || die
+				emake V=1 libffmpeg
+				popd >/dev/null || die
+			else
+				emake V=1 libffmpeg
+			fi
 		fi
 	fi
 }
@@ -491,10 +504,14 @@ multilib_src_install() {
 		done
 
 		if use chromium; then
-			einfo "Installing for Chromium"
-			pushd ../chromium >/dev/null || die
-			emake V=1 DESTDIR="${D}" install-libffmpeg
-			popd >/dev/null || die
+			if build_separate_libffmpeg; then
+				einfo "Installing for Chromium"
+				pushd ../chromium >/dev/null || die
+				emake V=1 DESTDIR="${D}" install-libffmpeg
+				popd >/dev/null || die
+			else
+				emake V=1 DESTDIR="${D}" install-libffmpeg
+			fi
 		fi
 	fi
 }
