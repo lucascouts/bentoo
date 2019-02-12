@@ -131,10 +131,7 @@ DEPEND="${CDEPEND}
 # Due to a bug in GCC, profile guided optimization will produce
 # AVX2 instructions, bug #677052
 REQUIRED_USE="wifi? ( dbus )
-	pgo? (
-		lto
-		!clang? ( cpu_flags_x86_avx2 )
-	)"
+	pgo? ( lto )"
 
 S="${WORKDIR}/firefox-${PV%_*}"
 
@@ -321,6 +318,15 @@ src_configure() {
 				show_old_compiler_warning=1
 			fi
 
+			if ! use cpu_flags_x86_avx2 ; then
+				# due to a GCC bug, GCC will produce AVX2 instructions
+				# even if the CPU doesn't support AVX2, https://gcc.gnu.org/ml/gcc-patches/2018-12/msg01142.html
+				einfo "Disable IPA cdtor due to bug in GCC and missing AVX2 support -- triggered by USE=lto"
+				append-ldflags -fdisable-ipa-cdtor
+			else
+				einfo "No GCC workaround required, system supports AVX2"
+			fi
+
 			# Linking only works when using ld.gold when LTO is enabled
 			mozconfig_annotate "forcing ld=gold due to USE=lto" --enable-linker=gold
 		fi
@@ -475,6 +481,12 @@ src_configure() {
 	# allow elfhack to work in combination with unstripped binaries
 	# when they would normally be larger than 2GiB.
 	append-ldflags "-Wl,--compress-debug-sections=zlib"
+
+	if use clang ; then
+		# https://bugzilla.mozilla.org/show_bug.cgi?id=1482204
+		# https://bugzilla.mozilla.org/show_bug.cgi?id=1483822
+		mozconfig_annotate 'elf-hack is broken when using Clang' --disable-elf-hack
+	fi
 
 	echo "mk_add_options MOZ_OBJDIR=${BUILD_OBJ_DIR}" >> "${S}"/.mozconfig
 	echo "mk_add_options XARGS=/usr/bin/xargs" >> "${S}"/.mozconfig
