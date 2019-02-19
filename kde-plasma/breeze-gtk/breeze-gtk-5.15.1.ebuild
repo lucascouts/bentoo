@@ -15,8 +15,12 @@ IUSE=""
 BDEPEND="${PYTHON_DEPS}
 	$(add_plasma_dep breeze)
 	$(python_gen_any_dep 'dev-python/pycairo[${PYTHON_USEDEP}]')
-	dev-ruby/sass
+	dev-lang/sassc
 "
+
+python_check_deps() {
+	has_version "dev-python/pycairo[${PYTHON_USEDEP}]"
+}
 
 pkg_setup() {
 	python-any-r1_pkg_setup

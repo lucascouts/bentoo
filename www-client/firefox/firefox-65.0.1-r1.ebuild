@@ -27,7 +27,7 @@ if [[ ${MOZ_ESR} == 1 ]] ; then
 fi
 
 # Patch version
-PATCH="${PN}-65.0-patches-02"
+PATCH="${PN}-65.0-patches-03"
 MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/releases"
 
 inherit check-reqs flag-o-matic toolchain-funcs eutils gnome2-utils llvm \
