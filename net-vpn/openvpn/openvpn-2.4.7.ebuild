@@ -6,7 +6,7 @@ EAPI=6
 inherit autotools flag-o-matic user systemd linux-info
 
 DESCRIPTION="Robust and highly flexible tunneling application compatible with many OSes"
-SRC_URI="https://swupdate.openvpn.net/community/releases/${P}.tar.gz
+SRC_URI="https://github.com/OpenVPN/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 	test? ( https://raw.githubusercontent.com/OpenVPN/${PN}/v${PV}/tests/unit_tests/${PN}/mock_msg.h )"
 HOMEPAGE="https://openvpn.net/"
 
