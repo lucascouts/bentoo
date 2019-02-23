@@ -22,6 +22,9 @@ HOMEPAGE="https://www.darwinsys.com/file/"
 LICENSE="BSD-2"
 SLOT="0"
 IUSE="python static-libs zlib"
+
+S="${WORKDIR}/file-FILE5_36"
+
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 DEPEND="
