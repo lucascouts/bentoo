@@ -6,7 +6,7 @@ EAPI=6
 
 PYTHON_COMPAT=( python3_{4,5,6,7} )
 
-inherit distutils-r1 eapi7-ver gnome2-utils python-r1
+inherit distutils-r1 gnome2-utils python-r1
 
 DESCRIPTION="Lutris is an open source gaming platform for GNU/Linux."
 HOMEPAGE="https://lutris.net/"
@@ -18,7 +18,7 @@ if [[ "${MY_PV}" == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/lutris/${MY_PN}.git"
 	inherit git-r3
 else
-	MY_PV="$(ver_rs 3 -)"
+	MY_PV="${PV//_/}"
 	MY_P="${MY_PN}-${MY_PV}"
 	SRC_URI="https://github.com/lutris/${MY_PN}/archive/v${MY_PV}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
@@ -37,7 +37,9 @@ RDEPEND="
 	dev-python/dbus-python[${PYTHON_USEDEP}]
 	dev-python/python-evdev[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
+	gnome-base/gnome-desktop[introspection]
 	net-libs/libsoup
+	net-libs/webkit-gtk:4[introspection]
 	sys-auth/polkit
 	sys-process/psmisc
 	x11-apps/xrandr
