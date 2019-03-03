@@ -23,7 +23,7 @@ SRC_URI="
 
 LICENSE="GPL-2 NVIDIA-r2"
 SLOT="0/${PV%.*}"
-KEYWORDS="-* amd64 ~amd64-fbsd"
+KEYWORDS="-* ~amd64 ~amd64-fbsd"
 RESTRICT="bindist mirror"
 EMULTILIB_PKG="true"
 
@@ -279,7 +279,14 @@ src_install() {
 		# pkg_preinst, see bug #491414
 		insinto /etc/modprobe.d
 		newins "${FILESDIR}"/nvidia-169.07 nvidia.conf
-		doins "${FILESDIR}"/nvidia-rmmod.conf
+		if use uvm; then
+			doins "${FILESDIR}"/nvidia-rmmod.conf
+			udev_newrules "${FILESDIR}"/nvidia-uvm.udev-rule 99-nvidia-uvm.rules
+		else
+			sed -e 's|nvidia-uvm ||g' "${FILESDIR}"/nvidia-rmmod.conf \
+				> "${T}"/nvidia-rmmod.conf || die
+			doins "${T}"/nvidia-rmmod.conf
+		fi
 
 		# Ensures that our device nodes are created when not using X
 		exeinto "$(get_udevdir)"
