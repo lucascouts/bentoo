@@ -1,17 +1,16 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_TEST="forceoptional"
 QT_MINIMAL="5.11.3"
 VIRTUALX_REQUIRED="test"
-PYTHON_COMPAT=( python3_{4,5,6,7} )
+PYTHON_COMPAT=( python3_{5,6,7} )
 inherit kde5 python-single-r1
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/${PN}/${PV%.1}/${P}.101.tar.gz
-		https://dev.gentoo.org/~asturm/distfiles/${P}-patchset.tar.xz"
+	SRC_URI="mirror://kde/stable/${PN}/${PV}/${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
@@ -21,8 +20,13 @@ LICENSE="GPL-3"
 IUSE="color-management fftw gif +gsl heif +jpeg openexr pdf qtmedia +raw tiff vc"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-# FIXME: Drop subslot operator when QTBUG is fixed:
+# FIXME: drop qtgui subslot operator when QTBUG is fixed or QT_MINIMAL >= 5.12.0:
 # https://bugreports.qt.io/browse/QTBUG-72488
+BDEPEND="
+	dev-cpp/eigen:3
+	dev-lang/perl
+	sys-devel/gettext
+"
 COMMON_DEPEND="${PYTHON_DEPS}
 	$(add_frameworks_dep karchive)
 	$(add_frameworks_dep kcompletion)
@@ -40,7 +44,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	$(add_qt_dep qtconcurrent)
 	$(add_qt_dep qtdbus)
 	$(add_qt_dep qtdeclarative)
-	$(add_qt_dep qtgui '-gles2')
+	$(add_qt_dep qtgui '-gles2' '' '5=')
 	$(add_qt_dep qtnetwork)
 	$(add_qt_dep qtprintsupport)
 	$(add_qt_dep qtsvg)
@@ -74,9 +78,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	tiff? ( media-libs/tiff:0 )
 "
 DEPEND="${COMMON_DEPEND}
-	dev-cpp/eigen:3
-	dev-lang/perl
-	sys-devel/gettext
 	vc? ( >=dev-libs/vc-1.1.0 )
 "
 RDEPEND="${COMMON_DEPEND}
@@ -87,15 +88,7 @@ RDEPEND="${COMMON_DEPEND}
 # bug 630508
 RESTRICT+=" test"
 
-PATCHES=(
-	"${FILESDIR}/${PN}-4.0.3-tests-optional.patch"
-	"${WORKDIR}/${P}-exiv2-0.27.patch"
-	"${WORKDIR}/${P}-resize-hud.patch"
-	"${WORKDIR}/${P}-overview-docker.patch"
-	"${WORKDIR}/${P}-assert-error.patch"
-)
-
-S="${S}.101"
+PATCHES=( "${FILESDIR}/${PN}-4.0.3-tests-optional.patch" )
 
 pkg_setup() {
 	python-single-r1_pkg_setup

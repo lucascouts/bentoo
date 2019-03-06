@@ -5,7 +5,7 @@ EAPI=6
 
 WX_GTK_VER="3.0-gtk3"
 
-inherit autotools flag-o-matic gnome2-utils wxwidgets
+inherit autotools flag-o-matic wxwidgets xdg
 
 MY_PV=${PV/_/-}
 MY_P="FileZilla_${MY_PV}"
@@ -61,15 +61,23 @@ src_prepare() {
 }
 
 src_configure() {
-	econf $(use_with dbus) $(use_enable nls locales) \
-		--with-pugixml=system \
+	local myeconfargs=(
 		--disable-autoupdatecheck
+		--with-pugixml=system
+		$(use_enable nls locales)
+		$(use_with dbus)
+	)
+	econf "${myeconfargs[@]}"
+}
+
+pkg_preinst() {
+	xdg_pkg_preinst
 }
 
 pkg_postinst() {
-	gnome2_icon_cache_update
+	xdg_pkg_postinst
 }
 
 pkg_postrm() {
-	gnome2_icon_cache_update
+	xdg_pkg_postrm
 }
