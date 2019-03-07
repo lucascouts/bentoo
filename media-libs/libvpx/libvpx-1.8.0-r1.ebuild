@@ -21,13 +21,9 @@ SRC_URI="https://github.com/webmproject/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.
 LICENSE="BSD"
 SLOT="0/6"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux"
-IUSE="cpu_flags_x86_avx cpu_flags_x86_avx2 doc cpu_flags_x86_mmx postproc cpu_flags_x86_sse cpu_flags_x86_sse2 cpu_flags_x86_sse3 cpu_flags_x86_ssse3 cpu_flags_x86_sse4_1 +highbitdepth static-libs svc test +threads"
+IUSE="doc +highbitdepth postproc static-libs svc test +threads"
 
-REQUIRED_USE="
-	cpu_flags_x86_sse2? ( cpu_flags_x86_mmx )
-	cpu_flags_x86_ssse3? ( cpu_flags_x86_sse2 )
-	test? ( threads )
-"
+REQUIRED_USE="test? ( threads )"
 
 # Disable test phase when USE="-test"
 RESTRICT="!test? ( test )"
@@ -71,15 +67,7 @@ multilib_src_configure() {
 		--enable-vp9
 		--enable-shared
 		--extra-cflags="${CFLAGS}"
-		$(use_enable cpu_flags_x86_avx avx)
-		$(use_enable cpu_flags_x86_avx2 avx2)
-		$(use_enable cpu_flags_x86_mmx mmx)
 		$(use_enable postproc)
-		$(use cpu_flags_x86_sse2 && use_enable cpu_flags_x86_sse sse || echo --disable-sse)
-		$(use_enable cpu_flags_x86_sse2 sse2)
-		$(use_enable cpu_flags_x86_sse3 sse3)
-		$(use_enable cpu_flags_x86_sse4_1 sse4_1)
-		$(use_enable cpu_flags_x86_ssse3 ssse3)
 		$(use_enable svc experimental)
 		$(use_enable static-libs static)
 		$(use_enable test unit-tests)
@@ -107,6 +95,7 @@ multilib_src_configure() {
 		myconfargs+=( --disable-examples --disable-install-docs --disable-docs )
 	fi
 
+	echo "${S}"/configure "${myconfargs[@]}" >&2
 	"${S}"/configure "${myconfargs[@]}"
 }
 
