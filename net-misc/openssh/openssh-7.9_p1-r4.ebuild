@@ -289,7 +289,7 @@ src_configure() {
 		# We apply the sctp patch conditionally, so can't pass --without-sctp
 		# unconditionally else we get unknown flag warnings.
 		$(use sctp && use_with sctp)
-		$(use_with ldns)
+		$(use_with ldns ldns "${EPREFIX%/}"/usr)
 		$(use_with libedit)
 		$(use_with pam)
 		$(use_with pie)
@@ -390,7 +390,7 @@ src_install() {
 	emake install-nokeys DESTDIR="${D}"
 	fperms 600 /etc/ssh/sshd_config
 	dobin contrib/ssh-copy-id
-	newinitd "${FILESDIR}"/sshd.initd sshd
+	newinitd "${FILESDIR}"/sshd-r1.initd sshd
 	newconfd "${FILESDIR}"/sshd-r1.confd sshd
 
 	newpamd "${FILESDIR}"/sshd.pam_include.2 sshd
