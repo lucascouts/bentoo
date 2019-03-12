@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_TEST="true"
 VIRTUALX_REQUIRED="test"
@@ -29,9 +29,7 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 src_configure() {
-	local mycmakeargs=(
-		-DCMAKE_DISABLE_FIND_PACKAGE_KF5KExiv2=true
-	)
+	use test && local mycmakeargs=( -DCMAKE_DISABLE_FIND_PACKAGE_KF5KExiv2=true )
 
 	kde5_src_configure
 }

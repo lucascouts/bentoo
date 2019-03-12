@@ -7,7 +7,7 @@ inherit qt5-build
 DESCRIPTION="Text-to-speech library for the Qt5 framework"
 
 if [[ ${QT5_BUILD_TYPE} == release ]]; then
-	KEYWORDS="~amd64 ~arm64 ~x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 fi
 
 # TODO: flite plugin - needs 2.0.0 (not yet in tree)
@@ -19,4 +19,4 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
-PATCHES=( "${FILESDIR}/${PN}-5.9.4-nogui.patch" )
+PATCHES=( "${FILESDIR}/${PN}-5.12.1-nogui.patch" )

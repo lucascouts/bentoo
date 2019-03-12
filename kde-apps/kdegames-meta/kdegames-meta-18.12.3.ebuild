@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DESCRIPTION="kdegames - merge this to pull in all kdegames-derived packages"
 HOMEPAGE="https://games.kde.org/"

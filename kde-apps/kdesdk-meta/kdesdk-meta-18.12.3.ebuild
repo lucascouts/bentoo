@@ -1,14 +1,14 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 DESCRIPTION="KDE SDK - merge this to pull in all kdesdk-derived packages"
 HOMEPAGE="https://www.kde.org/applications/development"
 
 LICENSE="metapackage"
 SLOT="5"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="bazaar cvs git mercurial subversion +webkit"
 
 RDEPEND="

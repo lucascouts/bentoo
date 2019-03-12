@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KMNAME="dolphin-plugins"
 KDE_HANDBOOK="false"
@@ -9,7 +9,7 @@ MY_PLUGIN_NAME="svn"
 inherit kde5
 
 DESCRIPTION="Dolphin plugin for Subversion integration"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE=""
 
 DEPEND="

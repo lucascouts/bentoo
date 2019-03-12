@@ -1,14 +1,14 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 PYTHON_COMPAT=( python2_7 )
 USE_RUBY="ruby25"
 inherit kde5 python-single-r1 ruby-single
 
 DESCRIPTION="Kross interpreter plugins for programming languages"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE="+python ruby"
 
 REQUIRED_USE="|| ( python ruby ) python? ( ${PYTHON_REQUIRED_USE} )"

@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_HANDBOOK="forceoptional"
 PYTHON_COMPAT=( python2_7 python3_{5,6} )
@@ -10,7 +10,7 @@ inherit python-single-r1 kde5
 DESCRIPTION="KDE Applications 5 translation tool"
 HOMEPAGE="https://www.kde.org/applications/development/lokalize
 https://l10n.kde.org/tools/"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~x86"
 IUSE=""
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
