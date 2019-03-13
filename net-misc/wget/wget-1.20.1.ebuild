@@ -1,9 +1,9 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-PYTHON_COMPAT=( python3_{4,5,6} )
+PYTHON_COMPAT=( python3_{4,5,6,7} )
 
 inherit flag-o-matic python-any-r1 toolchain-funcs
 
@@ -19,8 +19,8 @@ REQUIRED_USE=" ntlm? ( !gnutls ssl ) gnutls? ( ssl )"
 
 # Force a newer libidn2 to avoid libunistring deps. #612498
 LIB_DEPEND="
-	idn? ( >=net-dns/libidn2-0.14[static-libs(+)] )
-	pcre? ( dev-libs/libpcre[static-libs(+)] )
+	idn? ( >=net-dns/libidn2-0.14:=[static-libs(+)] )
+	pcre? ( dev-libs/libpcre2[static-libs(+)] )
 	ssl? (
 		gnutls? ( net-libs/gnutls:0=[static-libs(+)] )
 		!gnutls? (
@@ -48,8 +48,6 @@ DEPEND="
 "
 
 DOCS=( AUTHORS MAILING-LIST NEWS README doc/sample.wgetrc )
-
-PATCHES=( "${FILESDIR}"/${P}-fix-dot-prefixed-domain-matching.patch )
 
 pkg_setup() {
 	use test && python-any-r1_pkg_setup
@@ -87,6 +85,7 @@ src_configure() {
 	# and since we force the latest, we can force off libunistring. #612498
 	local myeconfargs=(
 		--disable-assert
+		--disable-pcre
 		--disable-rpath
 		--without-included-libunistring
 		--without-libunistring-prefix
@@ -95,7 +94,7 @@ src_configure() {
 		$(use_enable ipv6)
 		$(use_enable nls)
 		$(use_enable ntlm)
-		$(use_enable pcre)
+		$(use_enable pcre pcre2)
 		$(use_enable ssl digest)
 		$(use_enable ssl opie)
 		$(use_with idn libidn)

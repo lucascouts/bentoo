@@ -12,8 +12,7 @@ inherit check-reqs chromium-2 desktop flag-o-matic multilib ninja-utils pax-util
 
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="http://chromium.org/"
-SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz
-	https://dev.gentoo.org/~floppym/dist/chromium-webrtc-includes-r1.patch.xz"
+SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}.tar.xz"
 
 LICENSE="BSD"
 SLOT="0"
@@ -141,6 +140,13 @@ GTK+ icon theme.
 PATCHES=(
 	"${FILESDIR}/chromium-compiler-r7.patch"
 	"${FILESDIR}/chromium-widevine-r4.patch"
+	"${FILESDIR}/chromium-73-gcc-0.patch"
+	"${FILESDIR}/chromium-73-gcc-1.patch"
+	"${FILESDIR}/chromium-73-gcc-2.patch"
+	"${FILESDIR}/chromium-73-gcc-3.patch"
+	"${FILESDIR}/chromium-73-gcc-4.patch"
+	"${FILESDIR}/chromium-73-gcc-5.patch"
+	"${FILESDIR}/chromium-73-gcc-6.patch"
 )
 
 pre_build_checks() {
@@ -184,10 +190,6 @@ src_prepare() {
 
 	default
 
-	pushd third_party/webrtc >/dev/null || die
-	eapply "${WORKDIR}"/chromium-webrtc-includes-r1.patch
-	popd >/dev/null || die
-
 	mkdir -p third_party/node/linux/node-linux-x64/bin || die
 	ln -s "${EPREFIX}"/usr/bin/node third_party/node/linux/node-linux-x64/bin/node || die
 
@@ -205,11 +207,9 @@ src_prepare() {
 		buildtools/third_party/libc++abi
 		chrome/third_party/mozilla_security_manager
 		courgette/third_party
-		net/third_party/http2
 		net/third_party/mozilla_security_manager
 		net/third_party/nss
 		net/third_party/quic
-		net/third_party/spdy
 		net/third_party/uri_template
 		third_party/abseil-cpp
 		third_party/angle
@@ -320,6 +320,7 @@ src_prepare() {
 		third_party/sfntly
 		third_party/simplejson
 		third_party/skia
+		third_party/skia/include/third_party/vulkan
 		third_party/skia/third_party/gif
 		third_party/skia/third_party/skcms
 		third_party/skia/third_party/vulkan
@@ -347,6 +348,7 @@ src_prepare() {
 		third_party/woff2
 		third_party/zlib/google
 		url/third_party/mozilla
+		v8/src/third_party/siphash
 		v8/src/third_party/valgrind
 		v8/src/third_party/utf8-decoder
 		v8/third_party/inspector_protocol
