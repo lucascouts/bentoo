@@ -237,7 +237,7 @@ RDEPEND="${COMMON_DEPEND}
 	vlc? ( media-video/vlc )
 "
 if [[ ${MY_PV} != *9999* ]] && [[ ${PV} != *_* ]]; then
-	PDEPEND="=app-office/libreoffice-l10n-$(ver_cut 1-2)*"
+	PDEPEND="app-office/libreoffice-l10n"
 else
 	# Translations are not reliable on live ebuilds
 	# rather force people to use english only.
