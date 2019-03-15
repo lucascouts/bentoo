@@ -64,7 +64,7 @@ PDEPEND="
 src_prepare() {
 	# 005 does not compile bigdecimal and is questionable because it
 	# compiles ruby in a non-standard way, may be dropped
-	eapply "${FILESDIR}"/2.6/009*.patch
+	eapply "${FILESDIR}"/2.6/010*.patch
 
 	einfo "Unbundling gems..."
 	cd "$S"
@@ -191,7 +191,7 @@ src_install() {
 	export LD_LIBRARY_PATH RUBYLIB
 
 	# Create directory for the default gems
-	local gem_home="/usr/$(get_libdir)/ruby/gems/${RUBYVERSION}"
+	local gem_home="${EPREFIX}/usr/$(get_libdir)/ruby/gems/${RUBYVERSION}"
 	mkdir -p "${D}/${gem_home}" || die "mkdir gem home failed"
 
 	emake V=1 DESTDIR="${D}" GEM_DESTDIR=${gem_home} install || die "make install failed"
