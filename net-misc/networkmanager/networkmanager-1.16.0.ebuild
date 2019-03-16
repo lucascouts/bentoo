@@ -19,8 +19,8 @@ SLOT="0" # add subslot if libnm-util.so.2 or libnm-glib.so.4 bumps soname versio
 IUSE="audit bluetooth connection-sharing consolekit +dhclient dhcpcd elogind gnutls +introspection iwd json kernel_linux +nss +modemmanager ncurses ofono ovs policykit +ppp resolvconf selinux systemd teamd test vala +wext +wifi"
 
 REQUIRED_USE="
+	bluetooth? ( modemmanager )
 	iwd? ( wifi )
-	modemmanager? ( ppp )
 	vala? ( introspection )
 	wext? ( wifi )
 	^^ ( nss gnutls )
@@ -86,7 +86,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-util/gtk-doc-am
 	>=dev-util/intltool-0.40
 	>=sys-devel/gettext-0.17
-	>=sys-kernel/linux-headers-2.6.29
+	>=sys-kernel/linux-headers-3.18
 	virtual/pkgconfig[${MULTILIB_USEDEP}]
 	introspection? (
 		$(python_gen_any_dep 'dev-python/pygobject:3[${PYTHON_USEDEP}]')
@@ -173,6 +173,7 @@ multilib_src_configure() {
 		--with-udev-dir="$(get_udevdir)"
 		--with-config-plugins-default=keyfile
 		--with-iptables=/sbin/iptables
+		--with-ebpf=yes
 		$(multilib_native_enable concheck)
 		--with-crypto=$(usex nss nss gnutls)
 		--with-session-tracking=$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind $(multilib_native_usex consolekit consolekit no)))
