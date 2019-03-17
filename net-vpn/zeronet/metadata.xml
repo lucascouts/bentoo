@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>leycec@gmail.com</email>
+		<name>leycec</name>
+	</maintainer>
+	<longdescription>
+Decentralized websites using Bitcoin crypto and the BitTorrent network
+
+Why?
+
+* We believe in open, free, and uncensored network and communication.
+* No single point of failure: Site remains online so long as at least 1 peer is serving it.
+* No hosting costs: Sites are served by visitors.
+* Impossible to shut down: It's nowhere because it's everywhere.
+* Fast and works offline: You can access the site even if Internet is unavailable.
+
+Features
+
+* Real-time updated sites
+* Namecoin .bit domains support
+* Easy to setup: unpack &amp; run
+* Clone websites in one click
+* Password-less BIP32 based authorization: Your account is protected by the same cryptography as your Bitcoin wallet
+* Built-in SQL server with P2P data synchronization: Allows easier site development and faster page load times
+* Anonymity: Full Tor network support with .onion hidden services instead of IPv4 addresses
+* TLS encrypted connections
+* Automatic uPnP port opening
+* Plugin for multiuser (openproxy) support
+* Works with any browser/OS
+</longdescription>
+	<upstream>
+		<remote-id type="github">HelloZeroNet/ZeroNet</remote-id>
+		<bugs-to>https://github.com/HelloZeroNet/ZeroNet/issues</bugs-to>
+	</upstream>
+	<use>
+        <flag name="debug">Enable debugging (recommended for zite development)</flag>
+		<flag name="tor"  >Enable Tor-based anonymization (highly recommended)</flag>
+		<flag name="meek" >Enable meek-based Tor block circumvention</flag>
+	</use>
+</pkgmetadata>
