@@ -19,6 +19,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE="+closure-compile component-build cups gnome-keyring +hangouts jumbo-build kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
+REQUIRED_USE="component-build? ( !suid )"
 
 COMMON_DEPEND="
 	>=app-accessibility/at-spi2-atk-2.26:2
@@ -37,7 +38,7 @@ COMMON_DEPEND="
 	>=media-libs/alsa-lib-1.0.19:=
 	media-libs/fontconfig:=
 	media-libs/freetype:=
-	>=media-libs/harfbuzz-2.0.0:0=[icu(-)]
+	>=media-libs/harfbuzz-2.2.0:0=[icu(-)]
 	media-libs/libjpeg-turbo:=
 	media-libs/libpng:=
 	system-libvpx? ( media-libs/libvpx:=[postproc,svc] )
@@ -150,17 +151,12 @@ PATCHES=(
 )
 
 pre_build_checks() {
-	#if [[ ${MERGE_TYPE} != binary ]]; then
-	#	local -x CPP="$(tc-getCXX) -E"
-	#	if tc-is-clang && ! version_is_at_least "3.9.1" "$(clang-fullversion)"; then
-	#		# bugs: #601654
-	#		die "At least clang 3.9.1 is required"
-	#	fi
-	#	if tc-is-gcc && ! version_is_at_least 5.0 "$(gcc-version)"; then
-	#		# bugs: #535730, #525374, #518668, #600288, #627356
-	#		die "At least gcc 5.0 is required"
-	#	fi
-	#fi
+	if [[ ${MERGE_TYPE} != binary ]]; then
+		local -x CPP="$(tc-getCXX) -E"
+		if tc-is-gcc && ! ver_test "$(gcc-version)" -ge 8.0; then
+			die "At least gcc 8.0 is required"
+		fi
+	fi
 
 	# Check build requirements, bug #541816 and bug #471810 .
 	CHECKREQS_MEMORY="3G"
@@ -329,6 +325,7 @@ src_prepare() {
 		third_party/SPIRV-Tools
 		third_party/sqlite
 		third_party/swiftshader
+		third_party/swiftshader/third_party/llvm-7.0
 		third_party/swiftshader/third_party/llvm-subzero
 		third_party/swiftshader/third_party/subzero
 		third_party/unrar
