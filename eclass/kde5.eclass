@@ -162,9 +162,9 @@ KDE_UNRELEASED=( )
 if [[ ${KDEBASE} = kdevelop ]]; then
 	HOMEPAGE="https://www.kdevelop.org/"
 elif [[ ${KMNAME} = kdepim ]]; then
-	HOMEPAGE="https://www.kde.org/applications/office/kontact/"
+	HOMEPAGE="https://kde.org/applications/office/kontact/"
 else
-	HOMEPAGE="https://www.kde.org/"
+	HOMEPAGE="https://kde.org/"
 fi
 
 LICENSE="GPL-2"
@@ -582,10 +582,10 @@ kde5_src_prepare() {
 				diff -Naur ${f}.old ${f} 1>>${pf}
 				rm ${f}.old || die "Failed to clean up"
 			done
-			einfo "Build system was modified by KDE_TEST=forceoptional-recursive."
-			einfo "Unified diff file ready for pickup in:"
-			einfo "  ${pf}"
-			einfo "Push it upstream to make this message go away."
+			eqawarn "Build system was modified by KDE_TEST=forceoptional-recursive."
+			eqawarn "Unified diff file ready for pickup in:"
+			eqawarn "  ${pf}"
+			eqawarn "Push it upstream to make this message go away."
 		elif [[ ${CATEGORY} = kde-frameworks || ${CATEGORY} = kde-plasma || ${CATEGORY} = kde-apps ]] ; then
 			cmake_comment_add_subdirectory autotests test tests
 		fi
@@ -702,8 +702,11 @@ kde5_src_install() {
 	# cmake can't find the tags and qthelp viewers can't find the docs
 	local p=$(best_version dev-qt/qtcore:5)
 	local pv=$(echo ${p/%-r[0-9]*/} | rev | cut -d - -f 1 | rev)
-	if [[ -d ${ED%/}/usr/share/doc/qt-${pv} ]]; then
-		docompress -x /usr/share/doc/qt-${pv}
+	if [[ ${pv} = 5.11* ]]; then
+		#todo: clean up trailing slash check when EAPI <7 is removed
+		if [[ -d ${ED%/}/usr/share/doc/qt-${pv} ]]; then
+			docompress -x /usr/share/doc/qt-${pv}
+		fi
 	fi
 
 	if [[ ${EAPI} = 6 ]]; then
