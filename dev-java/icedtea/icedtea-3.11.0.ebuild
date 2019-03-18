@@ -17,16 +17,16 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="8249f00d6619.tar.xz"
-JAXP_TARBALL="a1b060ef4f06.tar.xz"
-JAXWS_TARBALL="c0f01861a7fd.tar.xz"
-JDK_TARBALL="6e67500d0ed8.tar.xz"
-LANGTOOLS_TARBALL="7036a6fa432e.tar.xz"
-OPENJDK_TARBALL="90de74e82bfb.tar.xz"
-NASHORN_TARBALL="6cf21321f367.tar.xz"
-HOTSPOT_TARBALL="4e4ead43a282.tar.xz"
-SHENANDOAH_TARBALL="bc4deb768b1d.tar.xz"
-AARCH32_TARBALL="f38b47a322eb.tar.xz"
+CORBA_TARBALL="cfc35c4598d9.tar.xz"
+JAXP_TARBALL="1c01fbb460ba.tar.xz"
+JAXWS_TARBALL="cf4d2b27895c.tar.xz"
+JDK_TARBALL="34ade0cd2dd5.tar.xz"
+LANGTOOLS_TARBALL="78414f4f0172.tar.xz"
+OPENJDK_TARBALL="9edccdd36f81.tar.xz"
+NASHORN_TARBALL="3cb2fe2b1b7d.tar.xz"
+HOTSPOT_TARBALL="a24b4e46303e.tar.xz"
+SHENANDOAH_TARBALL="1e8639cc8075.tar.xz"
+AARCH32_TARBALL="5caf41da4f93.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -71,7 +71,7 @@ KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
 IUSE="+alsa cacao +cups doc examples +gtk headless-awt
 	jamvm +jbootstrap kerberos libressl nsplugin pax_kernel +pch
-	pulseaudio sctp selinux shenandoah smartcard +source +sunec +system-lcms test +webstart zero"
+	pulseaudio sctp selinux shenandoah smartcard +source +system-lcms test +webstart zero"
 
 REQUIRED_USE="gtk? ( !headless-awt )"
 
@@ -106,7 +106,6 @@ COMMON_DEP="
 	kerberos? ( virtual/krb5 )
 	sctp? ( net-misc/lksctp-tools )
 	smartcard? ( sys-apps/pcsc-lite )
-	sunec? ( >=dev-libs/nss-3.16.1-r1 )
 	system-lcms? ( >=media-libs/lcms-2.9:2= )"
 
 # Gtk+ will move to COMMON_DEP in time; PR1982
@@ -140,6 +139,8 @@ DEPEND="${COMMON_DEP} ${ALSA_COMMON_DEP} ${CUPS_COMMON_DEP} ${X_COMMON_DEP} ${X_
 		dev-java/icedtea-bin:7
 		dev-java/icedtea:8
 		dev-java/icedtea:7
+		dev-java/openjdk:8
+		dev-java/openjdk-bin:8
 	)
 	app-arch/cpio
 	app-arch/unzip
@@ -181,7 +182,8 @@ pkg_setup() {
 
 	JAVA_PKG_WANT_BUILD_VM="
 		icedtea-8 icedtea-bin-8
-		icedtea-7 icedtea-bin-7"
+		icedtea-7 icedtea-bin-7
+		openjdk-8 openjdk-bin-8"
 	JAVA_PKG_WANT_SOURCE="1.5"
 	JAVA_PKG_WANT_TARGET="1.5"
 
@@ -321,7 +323,6 @@ src_configure() {
 		$(use_with pax_kernel pax "${EPREFIX}/usr/sbin/paxmark.sh") \
 		$(use_enable sctp system-sctp) \
 		$(use_enable smartcard system-pcsc) \
-		$(use_enable sunec) \
 		${zero_config} ${cacao_config} ${jamvm_config} ${hs_config}
 }
 
