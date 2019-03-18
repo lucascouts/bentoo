@@ -45,6 +45,7 @@ PATCHES=(
 S="${WORKDIR}/squashfs${PV/_p*}/${PN}"
 
 src_prepare() {
+	mv "${WORKDIR}"/debian/patches/0016-remove-frag_deflator_thread.patch "${WORKDIR}"/ || die
 	eapply -p2 "${WORKDIR}"/debian/patches/*.patch
 	eapply -p2 ${PATCHES[@]}
 	eapply_user
