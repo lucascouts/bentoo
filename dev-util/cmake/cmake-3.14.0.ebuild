@@ -50,12 +50,13 @@ SITEFILE="50${PN}-gentoo.el"
 PATCHES=(
 	# prefix
 	"${FILESDIR}"/${PN}-3.4.0_rc1-darwin-bundle.patch
-	"${FILESDIR}"/${PN}-3.9.0_rc2-prefix-dirs.patch
-	"${FILESDIR}"/${PN}-3.1.0-darwin-isysroot.patch
+	"${FILESDIR}"/${PN}-3.14.0_rc3-prefix-dirs.patch
+	# Next patch requires new work from prefix people
+	#"${FILESDIR}"/${PN}-3.1.0-darwin-isysroot.patch
 
 	# handle gentoo packaging in find modules
-	"${FILESDIR}"/${PN}-3.11.0_rc2-FindBLAS.patch
-	"${FILESDIR}"/${PN}-3.0.2-FindLAPACK.patch
+	"${FILESDIR}"/${PN}-3.14.0_rc1-FindBLAS.patch
+	"${FILESDIR}"/${PN}-3.14.0_rc1-FindLAPACK.patch
 	"${FILESDIR}"/${PN}-3.5.2-FindQt4.patch
 
 	# respect python eclasses
@@ -143,6 +144,7 @@ src_prepare() {
 	# Add gcc libs to the default link paths
 	sed -i \
 		-e "s|@GENTOO_PORTAGE_GCCLIBDIR@|${EPREFIX}/usr/${CHOST}/lib/|g" \
+		-e "$(usex prefix-guest "s|@GENTOO_HOST@||" "/@GENTOO_HOST@/d")" \
 		-e "s|@GENTOO_PORTAGE_EPREFIX@|${EPREFIX}/|g" \
 		Modules/Platform/{UnixPaths,Darwin}.cmake || die "sed failed"
 	if ! has_version \>=${CATEGORY}/${PN}-3.4.0_rc1 ; then

@@ -12,25 +12,23 @@ SRC_URI="https://www.nih.at/libzip/${P}.tar.xz"
 LICENSE="BSD"
 SLOT="0/5"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~x86-macos"
-IUSE="bzip2 doc gnutls libressl ssl static-libs test"
+IUSE="bzip2 doc gnutls libressl mbedtls ssl static-libs test"
 
 DEPEND="
 	sys-libs/zlib
 	bzip2? ( app-arch/bzip2 )
 	ssl? (
-		gnutls? ( net-libs/gnutls )
+		gnutls? ( net-libs/gnutls:= )
 		!gnutls? (
-			!libressl? ( dev-libs/openssl:0= )
-			libressl? ( dev-libs/libressl:0= )
+			mbedtls? ( net-libs/mbedtls:= )
+			!mbedtls? (
+				!libressl? ( dev-libs/openssl:0= )
+				libressl? ( dev-libs/libressl:0= )
+			)
 		)
 	)
 "
 RDEPEND="${DEPEND}"
-
-PATCHES=(
-	"${FILESDIR}/${P}-options.patch"
-	"${FILESDIR}/${P}-bzip2.patch"
-)
 
 pkg_setup() {
 	# Upstream doesn't support building dynamic & static
@@ -60,13 +58,29 @@ src_configure() {
 		fi
 
 		if use ssl; then
-			mycmakeargs+=(
-				-DENABLE_GNUTLS=$(usex gnutls)
-				-DENABLE_OPENSSL=$(usex !gnutls)
-			)
+			if use gnutls; then
+				mycmakeargs+=(
+					-DENABLE_GNUTLS=$(usex gnutls)
+					-DENABLE_MBEDTLS=OFF
+					-DENABLE_OPENSSL=OFF
+				)
+			elif use mbedtls; then
+				mycmakeargs+=(
+					-DENABLE_GNUTLS=OFF
+					-DENABLE_MBEDTLS=$(usex mbedtls)
+					-DENABLE_OPENSSL=OFF
+				)
+			else
+				mycmakeargs+=(
+					-DENABLE_GNUTLS=OFF
+					-DENABLE_MBEDTLS=OFF
+					-DENABLE_OPENSSL=ON
+				)
+			fi
 		else
 			mycmakeargs+=(
 				-DENABLE_GNUTLS=OFF
+				-DENABLE_MBEDTLS=OFF
 				-DENABLE_OPENSSL=OFF
 			)
 		fi

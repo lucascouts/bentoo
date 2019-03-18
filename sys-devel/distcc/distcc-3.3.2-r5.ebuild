@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,7 +14,7 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 arm ~arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh ~sparc ~x86"
 IUSE="gnome gssapi gtk hardened ipv6 selinux xinetd zeroconf"
 
 RESTRICT="test"
@@ -32,6 +32,7 @@ CDEPEND="${PYTHON_DEPS}
 	zeroconf? ( >=net-dns/avahi-0.6[dbus] )
 "
 DEPEND="${CDEPEND}
+	sys-devel/autoconf-archive
 	sys-libs/binutils-libs
 	virtual/pkgconfig"
 RDEPEND="${CDEPEND}
@@ -98,7 +99,7 @@ src_install() {
 	python_optimize
 
 	newinitd "${FILESDIR}/distccd.initd" distccd
-	systemd_dounit "${FILESDIR}/distccd.service"
+	systemd_newunit "${FILESDIR}/distccd.service-1" distccd.service
 	systemd_install_serviced "${FILESDIR}/distccd.service.conf"
 
 	cp "${FILESDIR}/distccd.confd" "${T}/distccd" || die
