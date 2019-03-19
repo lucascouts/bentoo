@@ -17,7 +17,7 @@ HOMEPAGE="https://www.ruby-lang.org/"
 SRC_URI="mirror://ruby/${SLOT}/${MY_P}.tar.xz"
 
 LICENSE="|| ( Ruby-BSD BSD-2 )"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
 IUSE="berkdb debug doc examples gdbm ipv6 jemalloc libressl +rdoc rubytests socks5 +ssl static-libs tk xemacs"
 
 RDEPEND="
@@ -61,7 +61,7 @@ PDEPEND="
 	xemacs? ( app-xemacs/ruby-modes )"
 
 src_prepare() {
-	eapply "${FILESDIR}"/${SLOT}/{002,005,009}*.patch
+	eapply "${FILESDIR}"/${SLOT}/{002,005,009,012}*.patch
 
 	einfo "Unbundling gems..."
 	cd "$S"
