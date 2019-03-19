@@ -19,7 +19,7 @@ sr sv-SE ta te th tr uk uz vi xh zh-CN zh-TW )
 # Convert the ebuild version to the upstream mozilla version, used by mozlinguas
 MOZ_PV="${PV/_alpha/a}" # Handle alpha for SRC_URI
 MOZ_PV="${MOZ_PV/_beta/b}" # Handle beta for SRC_URI
-MOZ_PV="${MOZ_PV/_rc/rc}" # Handle rc for SRC_URI
+MOZ_PV="${MOZ_PV%%_rc*}" # Handle rc for SRC_URI
 
 if [[ ${MOZ_ESR} == 1 ]] ; then
 	# ESR releases have slightly different version numbers
@@ -27,12 +27,22 @@ if [[ ${MOZ_ESR} == 1 ]] ; then
 fi
 
 # Patch version
-PATCH="${PN}-65.0-patches-04"
-MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/releases"
+PATCH="${PN}-66.0-patches-05"
 
-inherit check-reqs flag-o-matic toolchain-funcs eutils gnome2-utils llvm \
-		mozcoreconf-v6 pax-utils xdg-utils autotools mozlinguas-v2 \
-		virtualx
+MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/releases"
+MOZ_SRC_URI="${MOZ_HTTP_URI}/${MOZ_PV}/source/firefox-${MOZ_PV}.source.tar.xz"
+
+if [[ "${PV}" == *_rc* ]]; then
+	MOZ_HTTP_URI="https://archive.mozilla.org/pub/${PN}/candidates/${MOZ_PV}-candidates/build${PV##*_rc}"
+	MOZ_LANGPACK_PREFIX="linux-i686/xpi/"
+	MOZ_SRC_URI="${MOZ_HTTP_URI}/source/${PN}-${MOZ_PV}.source.tar.xz -> $P.tar.xz"
+fi
+
+LLVM_MAX_SLOT=8
+
+inherit check-reqs eapi7-ver flag-o-matic toolchain-funcs eutils \
+		gnome2-utils llvm mozcoreconf-v6 pax-utils xdg-utils \
+		autotools mozlinguas-v2 virtualx
 
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE="https://www.mozilla.com/firefox"
@@ -50,11 +60,11 @@ RESTRICT="!bindist? ( bindist )"
 
 PATCH_URIS=( https://dev.gentoo.org/~{anarchy,axs,polynomial-c,whissi}/mozilla/patchsets/${PATCH}.tar.xz )
 SRC_URI="${SRC_URI}
-	${MOZ_HTTP_URI}/${MOZ_PV}/source/firefox-${MOZ_PV}.source.tar.xz
+	${MOZ_SRC_URI}
 	${PATCH_URIS[@]}"
 
 CDEPEND="
-	>=dev-libs/nss-3.41
+	>=dev-libs/nss-3.42
 	>=dev-libs/nspr-4.19
 	>=app-text/hunspell-1.5.4:*
 	dev-libs/atk
@@ -85,15 +95,15 @@ CDEPEND="
 	x11-libs/libXfixes
 	x11-libs/libXrender
 	x11-libs/libXt
-	system-harfbuzz? ( >=media-libs/harfbuzz-1.4.2:0= >=media-gfx/graphite2-1.3.9-r1 )
-	system-icu? ( >=dev-libs/icu-60.2:= )
+	system-harfbuzz? ( >=media-libs/harfbuzz-2.3.1:0= >=media-gfx/graphite2-1.3.13 )
+	system-icu? ( >=dev-libs/icu-63.1:= )
 	system-jpeg? ( >=media-libs/libjpeg-turbo-1.2.1 )
-	system-libevent? ( >=dev-libs/libevent-2.0:0= )
+	system-libevent? ( >=dev-libs/libevent-2.0:0=[threads] )
 	system-libvpx? (
 		>=media-libs/libvpx-1.7.0:0=[postproc]
-		<media-libs/libvpx-1.8
+		<media-libs/libvpx-1.8:0=[postproc]
 	)
-	system-sqlite? ( >=dev-db/sqlite-3.25.3:3[secure-delete,debug=] )
+	system-sqlite? ( >=dev-db/sqlite-3.26:3[secure-delete,debug=] )
 	system-webp? ( >=media-libs/libwebp-1.0.1:0= )
 	wifi? ( kernel_linux? ( >=sys-apps/dbus-0.60
 			>=dev-libs/dbus-glib-0.72
@@ -110,16 +120,38 @@ RDEPEND="${CDEPEND}
 DEPEND="${CDEPEND}
 	app-arch/zip
 	app-arch/unzip
-	>=dev-util/cbindgen-0.6.7
+	>=dev-util/cbindgen-0.6.8
 	>=net-libs/nodejs-8.11.0
 	>=sys-devel/binutils-2.30
 	sys-apps/findutils
-	>=sys-devel/llvm-4.0.1
-	>=sys-devel/clang-4.0.1
-	clang? (
-		>=sys-devel/llvm-4.0.1[gold]
-		>=sys-devel/lld-4.0.1
-		pgo? ( >=sys-libs/compiler-rt-sanitizers-4.0.1[profile] )
+	|| (
+		(
+			sys-devel/clang:8
+			!clang? ( sys-devel/llvm:8 )
+			clang? (
+				=sys-devel/lld-8*
+				sys-devel/llvm:8[gold]
+				pgo? ( =sys-libs/compiler-rt-sanitizers-8*[profile] )
+			)
+		)
+		(
+			sys-devel/clang:7
+			!clang? ( sys-devel/llvm:7 )
+			clang? (
+				=sys-devel/lld-7*
+				sys-devel/llvm:7[gold]
+				pgo? ( =sys-libs/compiler-rt-sanitizers-7*[profile] )
+			)
+		)
+		(
+			sys-devel/clang:6
+			!clang? ( sys-devel/llvm:6 )
+			clang? (
+				=sys-devel/lld-6*
+				sys-devel/llvm:6[gold]
+				pgo? ( =sys-libs/compiler-rt-sanitizers-6*[profile] )
+			)
+		)
 	)
 	pulseaudio? ( media-sound/pulseaudio )
 	>=virtual/cargo-1.30.0
@@ -146,7 +178,26 @@ if [[ -z $GMP_PLUGIN_LIST ]] ; then
 fi
 
 llvm_check_deps() {
-	has_version "sys-devel/clang:${LLVM_SLOT}"
+	if ! has_version --host-root "sys-devel/clang:${LLVM_SLOT}" ; then
+		ewarn "sys-devel/clang:${LLVM_SLOT} is missing! Cannot use LLVM slot ${LLVM_SLOT} ..."
+		return 1
+	fi
+
+	if use clang ; then
+		if ! has_version --host-root "=sys-devel/lld-${LLVM_SLOT}*" ; then
+			ewarn "=sys-devel/lld-${LLVM_SLOT}* is missing! Cannot use LLVM slot ${LLVM_SLOT} ..."
+			return 1
+		fi
+
+		if use pgo ; then
+			if ! has_version --host-root "=sys-libs/compiler-rt-sanitizers-${LLVM_SLOT}*" ; then
+				ewarn "=sys-libs/compiler-rt-sanitizers-${LLVM_SLOT}* is missing! Cannot use LLVM slot ${LLVM_SLOT} ..."
+				return 1
+			fi
+		fi
+	fi
+
+	einfo "Will use LLVM slot ${LLVM_SLOT}!"
 }
 
 pkg_setup() {
@@ -319,10 +370,17 @@ src_configure() {
 			fi
 
 			if ! use cpu_flags_x86_avx2 ; then
-				# due to a GCC bug, GCC will produce AVX2 instructions
-				# even if the CPU doesn't support AVX2, https://gcc.gnu.org/ml/gcc-patches/2018-12/msg01142.html
-				einfo "Disable IPA cdtor due to bug in GCC and missing AVX2 support -- triggered by USE=lto"
-				append-ldflags -fdisable-ipa-cdtor
+				local _gcc_version_with_ipa_cdtor_fix="8.3"
+				local _current_gcc_version="$(gcc-major-version).$(gcc-minor-version)"
+
+				if ver_test "${_current_gcc_version}" -lt "${_gcc_version_with_ipa_cdtor_fix}" ; then
+					# due to a GCC bug, GCC will produce AVX2 instructions
+					# even if the CPU doesn't support AVX2, https://gcc.gnu.org/ml/gcc-patches/2018-12/msg01142.html
+					einfo "Disable IPA cdtor due to bug in GCC and missing AVX2 support -- triggered by USE=lto"
+					append-ldflags -fdisable-ipa-cdtor
+				else
+					einfo "No GCC workaround required, GCC version is already patched!"
+				fi
 			else
 				einfo "No GCC workaround required, system supports AVX2"
 			fi
@@ -425,13 +483,6 @@ src_configure() {
 		mozconfig_annotate '' --enable-rust-simd
 	fi
 
-	# skia has no support for big-endian platforms
-	if [[ $(tc-endian) == "big" ]] ; then
-		mozconfig_annotate 'big endian target' --disable-skia
-	else
-		mozconfig_annotate '' --enable-skia
-	fi
-
 	# use the gtk3 toolkit (the only one supported at this point)
 	# TODO: Will this result in automagic dependency on x11-libs/gtk+[wayland]?
 	mozconfig_annotate '' --enable-default-toolkit=cairo-gtk3
@@ -469,9 +520,10 @@ src_configure() {
 	# Enable/Disable eme support
 	use eme-free && mozconfig_annotate '+eme-free' --disable-eme
 
-	# Setup api key for location services
+	# Setup api key for location services and safebrowsing, https://bugzilla.mozilla.org/show_bug.cgi?id=1531176#c34
 	echo -n "${_google_api_key}" > "${S}"/google-api-key
-	mozconfig_annotate '' --with-google-api-keyfile="${S}/google-api-key"
+	mozconfig_annotate '' --with-google-location-service-api-keyfile="${S}/google-api-key"
+	mozconfig_annotate '' --with-google-safebrowsing-api-keyfile="${S}/google-api-key"
 
 	mozconfig_annotate '' --enable-extensions="${MEXTENSIONS}"
 
