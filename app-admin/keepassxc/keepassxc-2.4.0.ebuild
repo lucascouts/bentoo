@@ -9,9 +9,14 @@ DESCRIPTION="KeePassXC - KeePass Cross-platform Community Edition"
 HOMEPAGE="https://keepassxc.org"
 
 if [[ "${PV}" != 9999 ]] ; then
-	#SRC_URI="https://github.com/keepassxreboot/keepassxc/archive/${PV}.tar.gz -> ${P}.tar.gz"
-	SRC_URI="https://github.com/keepassxreboot/keepassxc/releases/download/${PV}/${P}-src.tar.xz"
-	KEYWORDS="~amd64 ~x86"
+	if [[ "${PV}" == *_beta* ]] ; then
+		SRC_URI="https://github.com/keepassxreboot/keepassxc/archive/${PV/_/-}.tar.gz -> ${P}.tar.gz"
+		S="${WORKDIR}/${P/_/-}"
+	else
+		SRC_URI="https://github.com/keepassxreboot/keepassxc/archive/${PV}.tar.gz -> ${P}.tar.gz"
+		#SRC_URI="https://github.com/keepassxreboot/keepassxc/releases/download/${PV}/${P}-src.tar.xz"
+		KEYWORDS="~amd64 ~x86"
+	fi
 else
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/keepassxreboot/${PN}"
@@ -53,8 +58,8 @@ PDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}/${PN}-2.3.3-qt-5.11-edit-entry-widget-includes.patch" #655844
 	"${FILESDIR}/${PN}-dont_call_mandb.patch"
+	"${FILESDIR}/${P}-build_fix.patch"
 )
 
 src_prepare() {
@@ -70,11 +75,13 @@ src_configure() {
 		-DWITH_TESTS="$(usex test)"
 		-DWITH_XC_AUTOTYPE="$(usex autotype)"
 		-DWITH_XC_BROWSER="$(usex browser)"
-		-DWITH_XC_HTTP=OFF
 		-DWITH_XC_NETWORKING="$(usex network)"
 		-DWITH_XC_SSHAGENT=ON
 		-DWITH_XC_YUBIKEY="$(usex yubikey)"
 	)
+	if [[ "${PV}" != 9999 ]] ; then
+		mycmakeargs+=( -DOVERRIDE_VERSION="${PV/_/-}" )
+	fi
 	cmake-utils_src_configure
 }
 
