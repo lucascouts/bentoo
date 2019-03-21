@@ -16,7 +16,7 @@ SRC_URI="https://commondatastorage.googleapis.com/chromium-browser-official/${P}
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 ~x86"
 IUSE="+closure-compile component-build cups gnome-keyring +hangouts jumbo-build kerberos neon pic +proprietary-codecs pulseaudio selinux +suid +system-ffmpeg +system-icu +system-libvpx +tcmalloc widevine"
 RESTRICT="!system-ffmpeg? ( proprietary-codecs? ( bindist ) )"
 REQUIRED_USE="component-build? ( !suid )"
@@ -141,6 +141,7 @@ GTK+ icon theme.
 PATCHES=(
 	"${FILESDIR}/chromium-compiler-r7.patch"
 	"${FILESDIR}/chromium-widevine-r4.patch"
+	"${FILESDIR}/chromium-fix-char_traits.patch"
 	"${FILESDIR}/chromium-73-gcc-0.patch"
 	"${FILESDIR}/chromium-73-gcc-1.patch"
 	"${FILESDIR}/chromium-73-gcc-2.patch"
