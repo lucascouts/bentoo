@@ -1,17 +1,19 @@
 # Distributed under the terms of the GNU General Public License v2
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} )
+inherit multilib-minimal
 
-inherit python-r1 multilib-minimal
-
-DESCRIPTION="x11-proto/xcb-proto package stub (provided by xcb-proto)."
+DESCRIPTION="X.Org Protocol presentproto-1.2 package stub (provided by xorg-proto)."
 
 KEYWORDS="*"
 
 SLOT="0"
 
-RDEPEND="=x11-base/xcb-proto-1.13[${MULTILIB_USEDEP}]"
+RDEPEND=" || (
+	=x11-base/xorg-proto-2018.4_p99999999-r2
+	=x11-base/xorg-proto-2018.4_p20180627-r2
+	=x11-base/xorg-proto-2018.4-r2
+)"
 DEPEND="${RDEPEND}"
 
 S="${WORKDIR}"
