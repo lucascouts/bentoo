@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -180,6 +180,7 @@ RDEPEND="
 	dev-libs/icu
 	dev-libs/json-c
 	dev-libs/nettle:0/6.2
+	<gnome-base/dconf-0.30.1
 	gnome-base/gconf
 	gnome-base/libgnome-keyring
 	media-gfx/graphite2
