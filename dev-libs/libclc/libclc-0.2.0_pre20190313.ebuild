@@ -1,12 +1,12 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python2_7 python3_4 python3_5 python3_6 )
+PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 
 EGIT_REPO_URI="https://llvm.org/git/${PN}.git
 	https://github.com/llvm-mirror/${PN}.git"
-EGIT_COMMIT="dabae5a2afb78cba0320a86e3f5f0b5dc83e077c"
+EGIT_COMMIT="45017385361603d6328997a2272d140e50786686"
 
 if [[ ${PV} = 9999* ]]; then
 	GIT_ECLASS="git-r3"
@@ -30,13 +30,15 @@ fi
 
 LICENSE="|| ( MIT BSD )"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="~amd64 ~x86"
 IUSE_VIDEO_CARDS="video_cards_nvidia video_cards_r600 video_cards_radeonsi"
 IUSE="${IUSE_VIDEO_CARDS}"
 REQUIRED_USE="|| ( ${IUSE_VIDEO_CARDS} )"
 
 DEPEND="
 	|| (
+		sys-devel/clang:9
+		sys-devel/clang:8
 		sys-devel/clang:7
 		sys-devel/clang:6
 		sys-devel/clang:5
@@ -44,8 +46,6 @@ DEPEND="
 		>=sys-devel/clang-3.9:0
 	)
 	${PYTHON_DEPS}"
-
-LLVM_MAX_SLOT=7
 
 llvm_check_deps() {
 	has_version "sys-devel/clang:${LLVM_SLOT}"
