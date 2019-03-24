@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -17,12 +17,10 @@ KEYWORDS="~amd64 ~x86"
 IUSE=""
 
 DEPEND="
-	dev-qt/qtcore:5
 	dev-qt/qtgui:5
 	dev-qt/qtsvg:5
-	dev-qt/qtwidgets:5
 	dev-qt/qtx11extras:5
-	x11-libs/libX11
+	x11-libs/libXext
 "
 RDEPEND="${DEPEND}"
 
