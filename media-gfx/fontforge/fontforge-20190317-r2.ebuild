@@ -20,6 +20,7 @@ RESTRICT="!test? ( test )"
 
 REQUIRED_USE="
 	cairo? ( png )
+	gtk? ( cairo )
 	python? ( ${PYTHON_REQUIRED_USE} )
 	test? ( png python )
 "
@@ -65,6 +66,7 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}"/20170731-gethex-unaligned.patch
+	"${FILESDIR}"/20190317-gdk_init.patch
 )
 
 pkg_setup() {
@@ -75,7 +77,6 @@ src_configure() {
 	local myeconfargs=(
 		--disable-static
 		$(use_enable truetype-debugger freetype-debugger "${EPREFIX}/usr/include/freetype2/internal4fontforge")
-		$(use_enable gtk gdk gdk3)
 		$(use_enable python python-extension)
 		$(use_enable python python-scripting)
 		--enable-tile-path
@@ -92,16 +93,23 @@ src_configure() {
 		--without-libzmq
 		$(use_with X x)
 	)
+	if use gtk; then
+		# broken AC_ARG_ENABLE usage
+		# https://bugs.gentoo.org/681550
+		myeconfargs+=( --enable-gdk=gdk3 )
+	fi
 	econf "${myeconfargs[@]}"
 }
 
 src_compile() {
 	# Build system deps are broken
-	emake -C plugins
-	emake
+	emake -C plugins HTDOCS_SUBDIR=/html
+	emake HTDOCS_SUBDIR=/html
 }
 
 src_install() {
-	default
+	emake DESTDIR="${D}" HTDOCS_SUBDIR=/html install
+	docompress -x /usr/share/doc/${PF}/html
+	einstalldocs
 	find "${ED}" -name '*.la' -type f -delete || die
 }

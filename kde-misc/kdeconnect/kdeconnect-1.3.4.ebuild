@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_HANDBOOK="forceoptional"
 KDE_TEST="true"
@@ -10,12 +10,12 @@ KDE_SELINUX_MODULE="${PN}"
 inherit kde5
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/${PN}/${PV}/src/${KMNAME}-${PV}.tar.xz"
+	SRC_URI="mirror://kde/stable/${PN}/${PV}/${KMNAME}-${PV}.tar.xz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
 DESCRIPTION="Adds communication between KDE Plasma and your smartphone"
-HOMEPAGE="https://www.kde.org/ https://community.kde.org/KDEConnect"
+HOMEPAGE="https://kde.org/ https://community.kde.org/KDEConnect"
 LICENSE="GPL-2+"
 IUSE="app bluetooth mousepad wayland"
 
