@@ -8,47 +8,38 @@ inherit autotools toolchain-funcs pax-utils mozcoreconf-v5
 MY_PN="mozjs"
 MY_P="${MY_PN}-${PV/_rc/.rc}"
 MY_P="${MY_P/_pre/pre}"
+MY_P="${MY_P%_p[0-9]*}"
 DESCRIPTION="Stand-alone JavaScript C++ library"
 HOMEPAGE="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey"
-#SRC_URI="https://people.mozilla.org/~sfink/${MY_P}.tar.bz2"
-SRC_URI="http://ftp.mozilla.org/pub/spidermonkey/prereleases/52/pre1/mozjs-52.9.1pre1.tar.bz2 -> ${MY_P}.tar.bz2
-	https://dev.gentoo.org/~axs/distfiles/${PN}-52.0-patches-0.tar.xz"
+#SRC_URI="https://archive.mozilla.org/pub/spidermonkey/prereleases/60/pre3/${MY_P}.tar.bz2
+SRC_URI="https://dev.gentoo.org/~axs/distfiles/${MY_P}.tar.bz2
+	https://dev.gentoo.org/~axs/distfiles/${PN}-60.0-patches-03.tar.xz"
 
 LICENSE="NPL-1.1"
-SLOT="52"
-KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ia64 ~mips ppc ppc64 s390 ~sh ~sparc x86 ~x86-fbsd"
-IUSE="debug minimal +system-icu test"
+SLOT="60"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
+IUSE="debug +jit minimal +system-icu test"
 
 RESTRICT="ia64? ( test )"
 
 S="${WORKDIR}/${MY_P%.rc*}"
+
 BUILDDIR="${S}/jsobj"
 
 RDEPEND=">=dev-libs/nspr-4.13.1
 	virtual/libffi
 	sys-libs/readline:0=
-	>=sys-libs/zlib-1.2.3
-	system-icu? ( >=dev-libs/icu-58.1:= )"
+	>=sys-libs/zlib-1.2.3:=
+	system-icu? ( >=dev-libs/icu-59.1:= )"
 DEPEND="${RDEPEND}"
 
 pkg_setup(){
 	[[ ${MERGE_TYPE} == "binary" ]] || \
 		moz_pkgsetup
-
-	export SHELL="${EPREFIX}/bin/bash"
 }
 
 src_prepare() {
-	# remove patches integrated by upstream
-	rm -f	"${WORKDIR}"/${PN}/0002-build-Add-major-version-to-make-parallel-installable.patch \
-		"${WORKDIR}"/${PN}/0005-headers-Fix-symbols-visibility.patch \
-		"${WORKDIR}"/${PN}/0007-build-Remove-unnecessary-NSPR-dependency.patch \
-		"${WORKDIR}"/${PN}/0008-tests-Skip-on-all-64-bit-archs.patch \
-		|| die
-
 	eapply "${WORKDIR}/${PN}"
-	eapply "${FILESDIR}"/moz38-dont-hardcode-libc-soname.patch
-	eapply "${FILESDIR}"/${PN}-52.0-fix-alpha-bitness.patch
 
 	eapply_user
 
@@ -57,12 +48,12 @@ src_prepare() {
 		ln -sfn "${BUILDDIR}/config/Linux_All.mk" "${S}/config/$(uname -s)$(uname -r).mk" || die
 	fi
 
-	cd "${S}"/js/src || die
+	cd "${S}/js/src" || die
 	eautoconf old-configure.in
 	eautoconf
 
 	# there is a default config.cache that messes everything up
-	rm -f "${S}"/js/src/config.cache || die
+	rm -f "${S}/js/src"/config.cache || die
 
 	mkdir -p "${BUILDDIR}" || die
 }
@@ -72,14 +63,15 @@ src_configure() {
 
 	ECONF_SOURCE="${S}/js/src" \
 	econf \
-		--enable-jemalloc \
+		--disable-jemalloc \
 		--enable-readline \
 		--with-system-nspr \
+		--with-system-zlib \
 		--disable-optimize \
 		--with-intl-api \
-		--disable-gold \
 		$(use_with system-icu) \
 		$(use_enable debug) \
+		$(use_enable jit ion) \
 		$(use_enable test tests) \
 		XARGS="/usr/bin/xargs" \
 		SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
@@ -94,7 +86,6 @@ cross_make() {
 		CC="${BUILD_CC}" \
 		CXX="${BUILD_CXX}" \
 		RANLIB="${BUILD_RANLIB}" \
-		SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 		"$@"
 }
 src_compile() {
@@ -124,7 +115,6 @@ src_compile() {
 	fi
 
 	MOZ_MAKE_FLAGS="${MAKEOPTS}" \
-	SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 	emake \
 		MOZ_OPTIMIZE_FLAGS="" MOZ_DEBUG_FLAGS="" \
 		HOST_OPTIMIZE_FLAGS="" MODULE_OPTIMIZE_FLAGS="" \
@@ -138,11 +128,12 @@ src_test() {
 
 src_install() {
 	cd "${BUILDDIR}" || die
-	SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
 	emake DESTDIR="${D}" install
 
 	if ! use minimal; then
-		pax-mark m "${ED}"usr/bin/js${SLOT}
+		if use jit; then
+			pax-mark m "${ED}"usr/bin/js${SLOT}
+		fi
 	else
 		rm -f "${ED}"usr/bin/js${SLOT}
 	fi
