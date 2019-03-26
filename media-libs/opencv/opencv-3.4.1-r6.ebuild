@@ -472,10 +472,6 @@ python_module_compile() {
 
 	# Set all python variables to load the correct Gentoo paths
 	mycmakeargs+=(
-		# cheap trick: python_setup sets one of them as a symlink
-		# to the correct interpreter, and the other to fail-wrapper
-		-DPYTHON2_EXECUTABLE=$(type -P python2)
-		-DPYTHON3_EXECUTABLE=$(type -P python3)
 		-DINSTALL_PYTHON_EXAMPLES=$(usex examples)
 		-DLIBPY_SUFFIX=64
 	)
