@@ -1,12 +1,12 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit autotools pam pax-utils systemd user xdg-utils
 
 DESCRIPTION="Policy framework for controlling privileges for system-wide services"
-HOMEPAGE="https://www.freedesktop.org/wiki/Software/polkit"
+HOMEPAGE="https://www.freedesktop.org/wiki/Software/polkit https://gitlab.freedesktop.org/polkit/polkit"
 SRC_URI="https://www.freedesktop.org/software/${PN}/releases/${P}.tar.gz"
 
 LICENSE="LGPL-2"
@@ -16,19 +16,7 @@ IUSE="elogind examples gtk +introspection jit kde nls pam selinux systemd test"
 
 REQUIRED_USE="?? ( elogind systemd )"
 
-CDEPEND="
-	dev-lang/spidermonkey:52[-debug]
-	dev-libs/glib:2
-	dev-libs/expat
-	elogind? ( sys-auth/elogind )
-	introspection? ( dev-libs/gobject-introspection )
-	pam? (
-		sys-auth/pambase
-		virtual/pam
-	)
-	systemd? ( sys-apps/systemd:0=[policykit] )
-"
-DEPEND="${CDEPEND}
+BDEPEND="
 	app-text/docbook-xml-dtd:4.1.2
 	app-text/docbook-xsl-stylesheets
 	dev-libs/gobject-introspection-common
@@ -38,8 +26,20 @@ DEPEND="${CDEPEND}
 	dev-util/intltool
 	sys-devel/gettext
 	virtual/pkgconfig
+	introspection? ( dev-libs/gobject-introspection )
 "
-RDEPEND="${CDEPEND}
+DEPEND="
+	dev-lang/spidermonkey:60[-debug]
+	dev-libs/glib:2
+	dev-libs/expat
+	elogind? ( sys-auth/elogind )
+	pam? (
+		sys-auth/pambase
+		virtual/pam
+	)
+	systemd? ( sys-apps/systemd:0=[policykit] )
+"
+RDEPEND="${DEPEND}
 	selinux? ( sec-policy/selinux-policykit )
 "
 PDEPEND="
@@ -57,6 +57,7 @@ PATCHES=(
 	# bug 660880
 	"${FILESDIR}"/polkit-0.115-elogind.patch
 	"${FILESDIR}"/CVE-2018-19788.patch
+	"${FILESDIR}"/polkit-0.115-spidermonkey-60.patch
 )
 
 QA_MULTILIB_PATHS="
