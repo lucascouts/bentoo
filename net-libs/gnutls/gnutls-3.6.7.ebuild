@@ -11,7 +11,7 @@ SRC_URI="mirror://gnupg/gnutls/v$(ver_cut 1-2)/${P}.tar.xz"
 
 LICENSE="GPL-3 LGPL-2.1"
 SLOT="0/30" # libgnutls.so number
-KEYWORDS="~alpha amd64 arm ~arm64 ~hppa ~ia64 ~m68k ~mips ppc ppc64 s390 ~sh ~sparc ~x86 ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="+cxx dane doc examples guile +idn nls +openssl pkcs11 seccomp sslv2 sslv3 static-libs test test-full +tls-heartbeat tools valgrind"
 
 REQUIRED_USE="
@@ -73,11 +73,6 @@ src_prepare() {
 
 	# Use sane .so versioning on FreeBSD.
 	elibtoolize
-
-	# detect also guile-2.2, bug#676402
-	# aclocal/autoreconf will require more dependencies
-	# that we want to have
-	sed -i 's/_guile_required_version=2.2$/_guile_required_version=2.0/' configure || die
 }
 
 multilib_src_configure() {
