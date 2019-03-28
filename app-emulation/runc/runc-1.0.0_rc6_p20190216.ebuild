@@ -8,7 +8,7 @@ if [[ ${PV} == *9999 ]]; then
 	inherit golang-build golang-vcs
 else
 	MY_PV="${PV/_/-}"
-	RUNC_COMMIT="96ec2177ae841256168fcf76954f7177af9446eb" # Change this when you update the ebuild
+	RUNC_COMMIT="2b18fe1d885ee5083ef9f0838fee39b62d653e30" # Change this when you update the ebuild
 	SRC_URI="https://${EGO_PN}/archive/${RUNC_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 ~arm ~arm64 ~ppc64"
 	inherit golang-build golang-vcs-snapshot
@@ -26,8 +26,6 @@ RDEPEND="
 	seccomp? ( sys-libs/libseccomp )
 	!app-emulation/docker-runc
 "
-
-PATCHES=( "${FILESDIR}/${PN}-fix-cve.patch" )
 
 src_prepare() {
 	pushd src/${EGO_PN}
