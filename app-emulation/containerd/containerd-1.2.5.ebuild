@@ -11,7 +11,7 @@ if [[ ${PV} == *9999 ]]; then
 else
 	MY_PV="${PV/_rc/-rc.}"
 	EGIT_COMMIT="v${MY_PV}"
-	CONTAINERD_COMMIT="9754871865f7fe2f4e74d43e2fc7ccd237edcbce"
+	CONTAINERD_COMMIT="bb71b10fd8f58240ca47fbb579b9d1028eea7c84"
 	SRC_URI="https://${EGO_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 ~arm ~arm64 ~ppc64"
 	inherit golang-vcs-snapshot
@@ -52,5 +52,5 @@ src_compile() {
 src_install() {
 	newinitd "${FILESDIR}"/${PN}.initd ${PN}
 	keepdir /var/lib/containerd
-	dobin bin/containerd{-shim,-stress,} bin/ctr
+	dobin bin/*
 }
