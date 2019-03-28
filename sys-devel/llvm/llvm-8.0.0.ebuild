@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -18,7 +18,7 @@ SRC_URI="https://releases.llvm.org/${PV/_//}/${P/_/}.src.tar.xz
 
 # Keep in sync with CMakeLists.txt
 ALL_LLVM_TARGETS=( AArch64 AMDGPU ARM BPF Hexagon Lanai Mips MSP430
-	NVPTX PowerPC Sparc SystemZ X86 XCore )
+	NVPTX PowerPC Sparc SystemZ WebAssembly X86 XCore )
 ALL_LLVM_TARGETS=( "${ALL_LLVM_TARGETS[@]/#/llvm_targets_}" )
 
 # Additional licenses:
@@ -40,7 +40,12 @@ RESTRICT="!test? ( test )"
 RDEPEND="
 	sys-libs/zlib:0=
 	exegesis? ( dev-libs/libpfm:= )
-	gold? ( >=sys-devel/binutils-2.22:*[cxx] )
+	gold? (
+		|| (
+			>=sys-devel/binutils-2.31.1-r4:*[plugins]
+			<sys-devel/binutils-2.31.1-r4:*[cxx]
+		)
+	)
 	libedit? ( dev-libs/libedit:0=[${MULTILIB_USEDEP}] )
 	libffi? ( >=virtual/libffi-3.0.13-r1:0=[${MULTILIB_USEDEP}] )
 	ncurses? ( >=sys-libs/ncurses-5.9-r3:0=[${MULTILIB_USEDEP}] )
@@ -56,7 +61,11 @@ DEPEND="${RDEPEND}
 		<sys-libs/libcxx-$(ver_cut 1-3).9999
 		>=sys-devel/binutils-apple-5.1
 	)
-	doc? ( dev-python/sphinx )
+	doc? ( $(python_gen_any_dep '
+		dev-python/recommonmark[${PYTHON_USEDEP}]
+		dev-python/sphinx[${PYTHON_USEDEP}]
+	') )
+	!doc? ( ${PYTHON_DEPS} )
 	gold? ( sys-libs/binutils-libs )
 	libffi? ( virtual/pkgconfig )
 	!!<dev-python/configparser-3.3.0.2
@@ -76,16 +85,35 @@ S=${WORKDIR}/${P/_/}.src
 # least intrusive of all
 CMAKE_BUILD_TYPE=RelWithDebInfo
 
+python_check_deps() {
+	use doc || return 0
+
+	has_version "dev-python/recommonmark[${PYTHON_USEDEP}]" &&
+	has_version "dev-python/sphinx[${PYTHON_USEDEP}]"
+}
+
 src_prepare() {
 	# Fix llvm-config for shared linking and sane flags
 	# https://bugs.gentoo.org/show_bug.cgi?id=565358
-	eapply "${FILESDIR}"/7.0.9999/0007-llvm-config-Clean-up-exported-values-update-for-shar.patch
+	eapply "${FILESDIR}"/9999/0007-llvm-config-Clean-up-exported-values-update-for-shar.patch
 
 	# disable use of SDK on OSX, bug #568758
 	sed -i -e 's/xcrun/false/' utils/lit/lit/util.py || die
 
 	# User patches + QA
 	cmake-utils_src_prepare
+}
+
+# Is LLVM being linked against libc++?
+is_libcxx_linked() {
+	local code='#include <ciso646>
+#if defined(_LIBCPP_VERSION)
+	HAVE_LIBCXX
+#endif
+'
+	local out=$($(tc-getCXX) ${CXXFLAGS} ${CPPFLAGS} -x c++ -E -P - <<<"${code}") || return 1
+
+	[[ ${out} == *HAVE_LIBCXX* ]]
 }
 
 multilib_src_configure() {
@@ -128,6 +156,15 @@ multilib_src_configure() {
 		# disable OCaml bindings (now in dev-ml/llvm-ocaml)
 		-DOCAMLFIND=NO
 	)
+
+	if is_libcxx_linked; then
+		# Smart hack: alter version suffix -> SOVERSION when linking
+		# against libc++. This way we won't end up mixing LLVM libc++
+		# libraries with libstdc++ clang, and the other way around.
+		mycmakeargs+=(
+			-DLLVM_VERSION_SUFFIX="libcxx"
+		)
+	fi
 
 #	Note: go bindings have no CMake rules at the moment
 #	but let's kill the check in case they are introduced
