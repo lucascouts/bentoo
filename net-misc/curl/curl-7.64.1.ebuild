@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI="7"
 
 inherit autotools eutils prefix multilib-minimal
 
@@ -11,7 +11,7 @@ SRC_URI="https://curl.haxx.se/download/${P}.tar.bz2"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="adns brotli http2 idn ipv6 kerberos ldap metalink rtmp samba ssh ssl static-libs test threads"
 IUSE+=" curl_ssl_gnutls curl_ssl_libressl curl_ssl_mbedtls curl_ssl_nss +curl_ssl_openssl curl_ssl_winssl"
 IUSE+=" elibc_Winnt"
@@ -85,7 +85,7 @@ REQUIRED_USE="
 	)"
 
 DOCS=( CHANGES README docs/FEATURES docs/INTERNALS.md \
-	docs/MANUAL docs/FAQ docs/BUGS docs/CONTRIBUTE.md )
+	docs/FAQ docs/BUGS docs/CONTRIBUTE.md )
 
 MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/curl/curlbuild.h
@@ -152,6 +152,7 @@ multilib_src_configure() {
 	# grep -- --with configure | grep Check | awk '{ print $4 }' | sort
 	ECONF_SOURCE="${S}" \
 	econf \
+		--disable-alt-svc \
 		--enable-crypto-auth \
 		--enable-dict \
 		--enable-file \
@@ -184,8 +185,10 @@ multilib_src_configure() {
 		$(use_enable threads threaded-resolver) \
 		$(use_enable threads pthreads) \
 		--disable-versioned-symbols \
+		--without-amissl \
 		--without-cyassl \
 		--without-darwinssl \
+		--without-fish-functions-dir \
 		$(use_with idn libidn2) \
 		$(use_with kerberos gssapi "${EPREFIX}"/usr) \
 		$(use_with metalink libmetalink) \
@@ -193,6 +196,7 @@ multilib_src_configure() {
 		$(use_with rtmp librtmp) \
 		$(use_with brotli) \
 		--without-schannel \
+		--without-secure-transport \
 		--without-spnego \
 		--without-winidn \
 		--without-wolfssl \
@@ -229,7 +233,6 @@ multilib_src_configure() {
 
 multilib_src_install_all() {
 	einstalldocs
-	prune_libtool_files --all
-
+	find "${ED}" -type f -name '*.la' -delete
 	rm -rf "${ED}"/etc/
 }
