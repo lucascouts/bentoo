@@ -4,9 +4,9 @@
 EAPI=6
 
 # latest gentoo apache files
-GENTOO_PATCHSTAMP="20190226"
+GENTOO_PATCHSTAMP="20190402"
 GENTOO_DEVELOPER="polynomial-c"
-GENTOO_PATCHNAME="gentoo-apache-2.4.38"
+GENTOO_PATCHNAME="gentoo-apache-2.4.39"
 
 # IUSE/USE_EXPAND magic
 IUSE_MPMS_FORK="prefork"
@@ -130,7 +130,7 @@ HOMEPAGE="https://httpd.apache.org/"
 # some helper scripts are Apache-1.1, thus both are here
 LICENSE="Apache-2.0 Apache-1.1"
 SLOT="2"
-KEYWORDS="~alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-linux ~x64-macos ~x86-macos ~m68k-mint ~sparc64-solaris ~x64-solaris"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x64-macos ~x86-macos ~m68k-mint ~sparc64-solaris ~x64-solaris"
 
 # Enable http2 by default (bug #563452)
 # FIXME: Move to apache-2.eclass once this has reached stable.
