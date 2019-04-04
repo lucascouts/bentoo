@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_TEST="forceoptional"
 QT_MINIMAL="5.11.3"
@@ -88,7 +88,11 @@ RDEPEND="${COMMON_DEPEND}
 # bug 630508
 RESTRICT+=" test"
 
-PATCHES=( "${FILESDIR}/${PN}-4.0.3-tests-optional.patch" )
+PATCHES=(
+	"${FILESDIR}/${PN}-4.0.3-tests-optional.patch"
+	"${FILESDIR}/${P}-qt-5.12-fix-unsupported-composition-mode.patch"
+	"${FILESDIR}/${P}-fix-pre-5.12-tablet-support.patch"
+)
 
 pkg_setup() {
 	python-single-r1_pkg_setup
