@@ -25,9 +25,9 @@ RDEPEND="
 	>=dev-libs/glib-2.36.0:2
 	udev? ( >=virtual/libgudev-230:= )
 	introspection? ( >=dev-libs/gobject-introspection-0.9.6:= )
-	mbim? ( >=net-libs/libmbim-1.16.0 )
+	mbim? ( >=net-libs/libmbim-1.18.0 )
 	policykit? ( >=sys-auth/polkit-0.106[introspection] )
-	qmi? ( >=net-libs/libqmi-1.20.0:= )
+	qmi? ( >=net-libs/libqmi-1.22.0:= )
 	elogind? ( sys-auth/elogind )
 	systemd? ( >=sys-apps/systemd-209 )
 "
