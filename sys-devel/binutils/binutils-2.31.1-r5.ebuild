@@ -8,8 +8,10 @@ inherit eutils libtool flag-o-matic gnuconfig multilib versionator
 DESCRIPTION="Tools necessary to build programs"
 HOMEPAGE="https://sourceware.org/binutils/"
 LICENSE="GPL-3+"
-IUSE="default-gold doc +gold multitarget +nls +plugins static-libs test"
-REQUIRED_USE="default-gold? ( gold )"
+# USE="+cxx" is a transitional flag until llvm migrates to new flags:
+#    bug #677888
+IUSE="+cxx default-gold doc +gold multitarget +nls +plugins static-libs test"
+REQUIRED_USE="cxx? ( gold plugins ) default-gold? ( gold )"
 
 # Variables that can be set here:
 # PATCH_VER          - the patchset version
@@ -20,7 +22,7 @@ REQUIRED_USE="default-gold? ( gold )"
 #                      for the patchsets
 #                      Default: dilfridge :)
 
-PATCH_VER=5
+PATCH_VER=6
 PATCH_DEV=dilfridge
 
 case ${PV} in
@@ -43,7 +45,7 @@ case ${PV} in
 	*)
 		SRC_URI="mirror://gnu/binutils/binutils-${PV}.tar.xz"
 		SLOT=$(get_version_component_range 1-2)
-		KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
+		#KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
 		;;
 esac
 
@@ -55,6 +57,9 @@ PATCH_DEV=${PATCH_DEV:-slyfox}
 
 [[ -z ${PATCH_VER} ]] || SRC_URI="${SRC_URI}
 	https://dev.gentoo.org/~${PATCH_DEV}/distfiles/binutils-${PATCH_BINUTILS_VER}-patches-${PATCH_VER}.tar.xz"
+
+# Disable gold testsuite since it always fails.
+PATCHES=( "${FILESDIR}/${PN}-2.29.1-nogoldtest.patch" )
 
 #
 # The cross-compile logic
