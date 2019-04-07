@@ -1,19 +1,10 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-inherit eapi7-ver gnome2-utils xdg
+EAPI=7
+inherit unpacker xdg
 
 MY_PV="$(ver_cut 4)"
-
-case ${ARCH} in
-	amd64)
-		MY_P="${PN}_${PV}_x86_64"
-		;;
-	x86)
-		MY_P="${PN}_${PV}_x86"
-		;;
-esac
 
 DESCRIPTION="WPS Office is an office productivity suite"
 HOMEPAGE="http://www.wps.cn/product/wpslinux/ http://wps-community.org/"
@@ -21,8 +12,8 @@ HOMEPAGE="http://www.wps.cn/product/wpslinux/ http://wps-community.org/"
 KEYWORDS="~amd64 ~x86"
 
 SRC_URI="
-	amd64? ( http://kdl.cc.ksosoft.com/wps-community/download/${MY_PV}/${PN}_${PV}_x86_64.tar.xz )
-	x86? ( http://kdl.cc.ksosoft.com/wps-community/download/${MY_PV}/${PN}_${PV}_x86.tar.xz )
+	amd64? ( http://kdl.cc.ksosoft.com/wps-community/download/${MY_PV}/${PN}_${PV}_amd64.deb )
+	x86? ( http://kdl.cc.ksosoft.com/wps-community/download/${MY_PV}/${PN}_${PV}_i386.deb )
 "
 
 SLOT="0"
@@ -75,43 +66,22 @@ RDEPEND="
 	sys-apps/attr
 "
 DEPEND=""
+BDEPEND=""
 
-S="${WORKDIR}/${MY_P}"
-
-#src_prepare() {
-#	default
-	# We need to drop qtwebkit bundled lib completely because it causes
-	# crashes in *some* setups (https://bugs.gentoo.org/647950)
-#	rm -f "${S}"/opt/kingsoft/wps-office/office6/libQtWebKit* || die
-#}
+S="${WORKDIR}"
 
 src_install() {
 	exeinto /usr/bin
 	exeopts -m0755
-	doexe "${S}"/wps
-	doexe "${S}"/wpp
-	doexe "${S}"/et
+	doexe "${S}"/usr/bin/wps
+	doexe "${S}"/usr/bin/wpp
+	doexe "${S}"/usr/bin/et
 
 	insinto /usr/share
-	doins -r "${S}"/resource/{applications,icons,mime}
+	doins -r "${S}"/usr/share/{applications,desktop-directories,icons,mime,templates}
 
 	insinto /opt/kingsoft/wps-office
-	doins -r "${S}"/office6
+	doins -r "${S}"/opt/kingsoft/wps-office/{office6,templates}
 
 	fperms 0755 /opt/kingsoft/wps-office/office6/{wps,wpp,et}
-}
-
-pkg_preinst() {
-	xdg_pkg_preinst
-	gnome2_icon_savelist
-}
-
-pkg_postinst() {
-	xdg_pkg_postinst
-	gnome2_icon_cache_update
-}
-
-pkg_postrm() {
-	xdg_pkg_postrm
-	gnome2_icon_cache_update
 }

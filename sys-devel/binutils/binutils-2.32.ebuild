@@ -22,8 +22,8 @@ REQUIRED_USE="cxx? ( gold plugins ) default-gold? ( gold )"
 #                      for the patchsets
 #                      Default: dilfridge :)
 
-PATCH_VER=6
-PATCH_DEV=dilfridge
+PATCH_VER=1
+PATCH_DEV=slyfox
 
 case ${PV} in
 	9999)
@@ -45,7 +45,7 @@ case ${PV} in
 	*)
 		SRC_URI="mirror://gnu/binutils/binutils-${PV}.tar.xz"
 		SLOT=$(get_version_component_range 1-2)
-		#KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
+		KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
 		;;
 esac
 
@@ -57,9 +57,6 @@ PATCH_DEV=${PATCH_DEV:-slyfox}
 
 [[ -z ${PATCH_VER} ]] || SRC_URI="${SRC_URI}
 	https://dev.gentoo.org/~${PATCH_DEV}/distfiles/binutils-${PATCH_BINUTILS_VER}-patches-${PATCH_VER}.tar.xz"
-
-# Disable gold testsuite since it always fails.
-PATCHES=( "${FILESDIR}/${PN}-2.29.1-nogoldtest.patch" )
 
 #
 # The cross-compile logic
@@ -103,6 +100,9 @@ src_unpack() {
 
 src_prepare() {
 	if [[ ! -z ${PATCH_VER} ]] ; then
+		# Use upstream patch to enable development mode
+		rm -v "${WORKDIR}/patch"/0000-Gentoo-Git-is-development.patch || die
+
 		einfo "Applying binutils-${PATCH_BINUTILS_VER} patchset ${PATCH_VER}"
 		eapply "${WORKDIR}/patch"/*.patch
 	fi
@@ -291,7 +291,8 @@ src_test() {
 	# bug 637066
 	filter-flags -Wall -Wreturn-type
 
-	emake -k check
+	# enable verbose test run and result logging
+	emake -k check RUNTESTFLAGS='-a -v' VERBOSE=1
 }
 
 src_install() {
