@@ -52,7 +52,7 @@ S="${WORKDIR}/${MY_P}"
 pkg_setup() {
 	MODULE_NAMES="vboxguest(misc:${WORKDIR}/vboxguest:${WORKDIR}/vboxguest)
 		vboxsf(misc:${WORKDIR}/vboxsf:${WORKDIR}/vboxsf)"
-	use X && MODULE_NAMES+=" vboxvideo(misc:${WORKDIR}/vboxvideo::${WORKDIR}/vboxvideo)"
+	#use X && MODULE_NAMES+=" vboxvideo(misc:${WORKDIR}/vboxvideo::${WORKDIR}/vboxvideo)"
 
 	linux-mod_pkg_setup
 	BUILD_PARAMS="KERN_DIR=/lib/modules/${KV_FULL}/build KERNOUT=${KV_OUT_DIR}"
