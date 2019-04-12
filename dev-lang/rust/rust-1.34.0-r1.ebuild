@@ -3,9 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 python3_{5,6} pypy )
-
-LLVM_MAX_SLOT=7
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} pypy )
 
 inherit check-reqs eapi7-ver estack flag-o-matic llvm multiprocessing multilib-build python-any-r1 rust-toolchain toolchain-funcs
 
@@ -23,7 +21,7 @@ else
 	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 fi
 
-RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).1"
+RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
@@ -32,7 +30,7 @@ SRC_URI="https://static.rust-lang.org/dist/${SRC} -> rustc-${PV}-src.tar.xz
 		$(rust_all_arch_uris rust-${RUST_STAGE0_VERSION})"
 
 ALL_LLVM_TARGETS=( AArch64 AMDGPU ARM BPF Hexagon Lanai Mips MSP430
-	NVPTX PowerPC Sparc SystemZ X86 XCore )
+	NVPTX PowerPC Sparc SystemZ WebAssembly X86 XCore )
 ALL_LLVM_TARGETS=( "${ALL_LLVM_TARGETS[@]/#/llvm_targets_}" )
 LLVM_TARGET_USEDEPS=${ALL_LLVM_TARGETS[@]/%/?}
 
@@ -40,14 +38,34 @@ LICENSE="|| ( MIT Apache-2.0 ) BSD-1 BSD-2 BSD-4 UoI-NCSA"
 
 IUSE="clippy cpu_flags_x86_sse2 debug doc libressl rls rustfmt system-llvm wasm ${ALL_LLVM_TARGETS[*]}"
 
-COMMON_DEPEND=">=app-eselect/eselect-rust-0.3_pre20150425
-		sys-libs/zlib
-		!libressl? ( dev-libs/openssl:0= )
-		libressl? ( dev-libs/libressl:0= )
-		net-libs/libssh2
-		net-libs/http-parser:=
-		net-misc/curl[ssl]
-		system-llvm? ( sys-devel/llvm:7= )"
+# Please keep the LLVM dependency block separate. Since LLVM is slotted,
+# we need to *really* make sure we're not pulling one than more slot
+# simultaneously.
+
+# How to use it:
+# 1. List all the working slots (with min versions) in ||, newest first.
+# 2. Update the := to specify *max* version, e.g. < 9.
+# 3. Specify LLVM_MAX_SLOT, e.g. 8.
+LLVM_DEPEND="
+	|| (
+		sys-devel/llvm:8[llvm_targets_WebAssembly?]
+	)
+	<sys-devel/llvm-9:=
+"
+LLVM_MAX_SLOT=8
+
+COMMON_DEPEND="
+	sys-libs/zlib
+	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:0= )
+	net-libs/libssh2
+	net-libs/http-parser:=
+	net-misc/curl[ssl]
+	system-llvm? (
+		${LLVM_DEPEND}
+	)
+"
+
 DEPEND="${COMMON_DEPEND}
 	${PYTHON_DEPS}
 	|| (
@@ -56,21 +74,17 @@ DEPEND="${COMMON_DEPEND}
 	)
 	dev-util/cmake"
 RDEPEND="${COMMON_DEPEND}
+	>=app-eselect/eselect-rust-20190311
 	!dev-util/cargo
 	rustfmt? ( !dev-util/rustfmt )"
 REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
-				x86? ( cpu_flags_x86_sse2 )"
+	wasm? ( llvm_targets_WebAssembly )
+	x86? ( cpu_flags_x86_sse2 )
+"
+
+PATCHES=( "${FILESDIR}"/0001-llvm-cmake-Add-additional-headers-only-if-they-exist.patch )
 
 S="${WORKDIR}/${MY_P}-src"
-
-PATCHES=(
-	"${FILESDIR}"/1.30.1-clippy-sysroot.patch
-	"${FILESDIR}"/1.32.0-fix-configure-of-bundled-llvm.patch
-	"${FILESDIR}"/1.32.0-system-llvm-7-SIGSEGV.patch
-	# Support LibreSSL 2.8.x: https://github.com/sfackler/rust-openssl/commit/9fd7584a84168655cb27e03b7e19a9847b88e77f
-	# Support LibreSSL 2.9.0: https://github.com/sfackler/rust-openssl/commit/af4488357c9b3e003b883e89c16aaa675ad0c6ac
-	"${FILESDIR}"/1.32.0-libressl.patch
-)
 
 toml_usex() {
 	usex "$1" true false
@@ -95,9 +109,7 @@ pkg_pretend() {
 pkg_setup() {
 	pre_build_checks
 	python-any-r1_pkg_setup
-	if use system-llvm; then
-		llvm_pkg_setup
-	fi
+	use system-llvm && llvm_pkg_setup
 }
 
 src_prepare() {
@@ -149,7 +161,7 @@ src_configure() {
 		release-debuginfo = $(toml_usex debug)
 		assertions = $(toml_usex debug)
 		targets = "${LLVM_TARGETS// /;}"
-		experimental-targets = "$(usex wasm WebAssembly '')"
+		experimental-targets = ""
 		link-shared = $(toml_usex system-llvm)
 		[build]
 		build = "${rust_target}"
@@ -211,14 +223,14 @@ src_configure() {
 
 src_compile() {
 	env $(cat "${S}"/config.env)\
-		"${EPYTHON}" ./x.py build --config="${S}"/config.toml -j$(makeopts_jobs) \
+		"${EPYTHON}" ./x.py build -v --config="${S}"/config.toml -j$(makeopts_jobs) \
 		--exclude src/tools/miri || die # https://github.com/rust-lang/rust/issues/52305
 }
 
 src_install() {
 	local rust_target abi_libdir
 
-	env DESTDIR="${D}" "${EPYTHON}" ./x.py install || die
+	env DESTDIR="${D}" "${EPYTHON}" ./x.py install -v || die
 
 	mv "${D}/usr/bin/rustc" "${D}/usr/bin/rustc-${PV}" || die
 	mv "${D}/usr/bin/rustdoc" "${D}/usr/bin/rustdoc-${PV}" || die

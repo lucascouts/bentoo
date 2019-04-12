@@ -76,7 +76,6 @@ RDEPEND="${CDEPEND}
 	perl? (
 		dev-perl/Error
 		dev-perl/MailTools
-		dev-perl/Net-SMTP-SSL
 		dev-perl/Authen-SASL
 		cgi? (
 			dev-perl/CGI
@@ -140,6 +139,9 @@ PATCHES=(
 	"${FILESDIR}"/git-2.18.0_rc1-optional-cvs.patch
 
 	"${FILESDIR}"/git-2.2.0-svn-fe-linking.patch
+	# Make submodule output quiet
+	"${FILESDIR}"/git-2.21.0-quiet-submodules.patch
+	"${FILESDIR}"/git-2.21.0-quiet-submodules-testcase.patch
 )
 
 pkg_setup() {
