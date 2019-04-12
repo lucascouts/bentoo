@@ -13,8 +13,8 @@ if [[ "${PV}" != 9999 ]] ; then
 		SRC_URI="https://github.com/keepassxreboot/keepassxc/archive/${PV/_/-}.tar.gz -> ${P}.tar.gz"
 		S="${WORKDIR}/${P/_/-}"
 	else
-		SRC_URI="https://github.com/keepassxreboot/keepassxc/archive/${PV}.tar.gz -> ${P}.tar.gz"
-		#SRC_URI="https://github.com/keepassxreboot/keepassxc/releases/download/${PV}/${P}-src.tar.xz"
+		#SRC_URI="https://github.com/keepassxreboot/keepassxc/archive/${PV}.tar.gz -> ${P}.tar.gz"
+		SRC_URI="https://github.com/keepassxreboot/keepassxc/releases/download/${PV}/${P}-src.tar.xz"
 		KEYWORDS="~amd64 ~x86"
 	fi
 else
@@ -33,7 +33,9 @@ RDEPEND="
 	dev-qt/qtdbus:5
 	dev-qt/qtgui:5
 	dev-qt/qtnetwork:5
+	dev-qt/qtsvg:5
 	dev-qt/qtwidgets:5
+	media-gfx/qrencode:=
 	sys-libs/zlib
 	autotype? (
 		dev-qt/qtx11extras:5
@@ -60,6 +62,7 @@ PDEPEND="
 PATCHES=(
 	"${FILESDIR}/${PN}-dont_call_mandb.patch"
 	"${FILESDIR}/${P}-build_fix.patch"
+	"${FILESDIR}/${P}-update_checker_toggle.patch"
 )
 
 src_prepare() {
@@ -77,9 +80,10 @@ src_configure() {
 		-DWITH_XC_BROWSER="$(usex browser)"
 		-DWITH_XC_NETWORKING="$(usex network)"
 		-DWITH_XC_SSHAGENT=ON
+		-DWITH_XC_UPDATECHECK=OFF
 		-DWITH_XC_YUBIKEY="$(usex yubikey)"
 	)
-	if [[ "${PV}" != 9999 ]] ; then
+	if [[ "${PV}" == *_beta* ]] ; then
 		mycmakeargs+=( -DOVERRIDE_VERSION="${PV/_/-}" )
 	fi
 	cmake-utils_src_configure
