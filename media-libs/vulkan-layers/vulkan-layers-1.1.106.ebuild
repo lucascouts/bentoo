@@ -9,8 +9,8 @@ if [[ "${PV}" == "9999" ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="f06d731b7caf3e446acef3f4f5e62bdecd6f73d6"
-	KEYWORDS="~amd64"
+	EGIT_COMMIT="21638dfbe1f15091659a722a805c9020e87ddf49"
+	KEYWORDS="~amd64 ~x86"
 	SRC_URI="https://github.com/KhronosGroup/Vulkan-ValidationLayers/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	S="${WORKDIR}/Vulkan-ValidationLayers-${EGIT_COMMIT}"
 fi
@@ -25,9 +25,9 @@ SLOT="0"
 IUSE="X wayland"
 
 DEPEND="${PYTHON_DEPS}
-		>=dev-util/glslang-7.10.2984:=[${MULTILIB_USEDEP}]
-		>=dev-util/spirv-tools-2019.1:=[${MULTILIB_USEDEP}]
-		>=dev-util/vulkan-headers-1.1.101
+		>=dev-util/glslang-7.11.3113:=[${MULTILIB_USEDEP}]
+		>=dev-util/spirv-tools-2019.1-r1:=[${MULTILIB_USEDEP}]
+		>=dev-util/vulkan-headers-1.1.106
 		wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 		X? (
 		   x11-libs/libX11:=[${MULTILIB_USEDEP}]
