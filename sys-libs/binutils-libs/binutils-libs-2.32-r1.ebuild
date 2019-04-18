@@ -3,8 +3,8 @@
 
 EAPI=6
 
-PATCH_VER=1
-PATCH_DEV=slyfox
+PATCH_VER=2
+PATCH_DEV=dilfridge
 
 inherit eutils libtool toolchain-funcs multilib-minimal
 
@@ -21,7 +21,7 @@ SRC_URI="mirror://gnu/binutils/${MY_P}.tar.xz
 LICENSE="|| ( GPL-3 LGPL-3 )"
 SLOT="0/${PV}"
 IUSE="64-bit-bfd multitarget nls static-libs"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
+#KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
 
 COMMON_DEPEND="sys-libs/zlib[${MULTILIB_USEDEP}]"
 DEPEND="${COMMON_DEPEND}
