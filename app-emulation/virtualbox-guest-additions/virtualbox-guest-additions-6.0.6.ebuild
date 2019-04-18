@@ -52,7 +52,7 @@ S="${WORKDIR}/${MY_P}"
 pkg_setup() {
 	MODULE_NAMES="vboxguest(misc:${WORKDIR}/vboxguest:${WORKDIR}/vboxguest)
 		vboxsf(misc:${WORKDIR}/vboxsf:${WORKDIR}/vboxsf)"
-	#use X && MODULE_NAMES+=" vboxvideo(misc:${WORKDIR}/vboxvideo::${WORKDIR}/vboxvideo)"
+	use X && MODULE_NAMES+=" vboxvideo(misc:${WORKDIR}/vboxvideo::${WORKDIR}/vboxvideo)"
 
 	linux-mod_pkg_setup
 	BUILD_PARAMS="KERN_DIR=/lib/modules/${KV_FULL}/build KERNOUT=${KV_OUT_DIR}"
@@ -63,18 +63,19 @@ src_unpack() {
 
 	# Create and unpack a tarball with the sources of the Linux guest
 	# kernel modules, to include all the needed files
-	"${S}"/src/VBox/Additions/linux/export_modules.sh "${WORKDIR}/vbox-kmod.tar.gz"
+	"${S}"/src/VBox/Additions/linux/export_modules.sh \
+		"${WORKDIR}/vbox-kmod.tar.gz" &>/dev/null || die
 	unpack ./vbox-kmod.tar.gz
 
 	# Remove shipped binaries (kBuild,yasm), see bug #232775
-	cd "${S}"
-	rm -rf kBuild/bin tools
+	cd "${S}" || die
+	rm -r kBuild/bin tools || die
 }
 
 src_prepare() {
 	# PaX fixes (see bug #298988)
 	pushd "${WORKDIR}" &>/dev/null || die
-	eapply "${FILESDIR}"/vboxguest-4.1.0-log-use-c99.patch
+	eapply "${FILESDIR}"/vboxguest-6.0.6-log-use-c99.patch
 	popd &>/dev/null || die
 
 	# Disable things unused or splitted into separate ebuilds
