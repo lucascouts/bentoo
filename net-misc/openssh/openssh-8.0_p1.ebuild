@@ -18,16 +18,15 @@ HPN_PATCHES=(
 )
 
 SCTP_VER="1.2" SCTP_PATCH="${PARCH}-sctp-${SCTP_VER}.patch.xz"
-X509_VER="11.6" X509_PATCH="${PARCH}+x509-${X509_VER}.diff.gz"
+X509_VER="12.0" X509_PATCH="${PARCH}+x509-${X509_VER}.diff.gz"
 
 PATCH_SET="openssh-7.9p1-patches-1.0"
 
 DESCRIPTION="Port of OpenBSD's free SSH release"
 HOMEPAGE="https://www.openssh.com/"
 SRC_URI="mirror://openbsd/OpenSSH/portable/${PARCH}.tar.gz
-	https://dev.gentoo.org/~whissi/dist/${PN}/${PATCH_SET}.tar.xz
 	${SCTP_PATCH:+sctp? ( https://dev.gentoo.org/~whissi/dist/openssh/${SCTP_PATCH} )}
-	${HPN_VER:+hpn? ( $(printf "mirror://sourceforge/hpnssh/HPN-SSH%%20${HPN_VER/./v}%%20${HPN_PV/_}/%s\n" "${HPN_PATCHES[@]}") )}
+	${HPN_VER:+hpn? ( $(printf "mirror://sourceforge/hpnssh/HPN-SSH%%20${HPN_VER/./v}%%20${HPN_PV/_P/p}/%s\n" "${HPN_PATCHES[@]}") )}
 	${X509_PATCH:+X509? ( https://roumenpetrov.info/openssh/x509-${X509_VER}/${X509_PATCH} )}
 	"
 
@@ -116,21 +115,11 @@ src_prepare() {
 	# don't break .ssh/authorized_keys2 for fun
 	sed -i '/^AuthorizedKeysFile/s:^:#:' sshd_config || die
 
-	eapply "${FILESDIR}"/${PN}-7.9_p1-openssl-1.0.2-compat.patch
 	eapply "${FILESDIR}"/${PN}-7.9_p1-include-stdlib.patch
-	eapply "${FILESDIR}"/${PN}-7.8_p1-GSSAPI-dns.patch #165444 integrated into gsskex
+	eapply "${FILESDIR}"/${PN}-8.0_p1-GSSAPI-dns.patch #165444 integrated into gsskex
 	eapply "${FILESDIR}"/${PN}-6.7_p1-openssl-ignore-status.patch
 	eapply "${FILESDIR}"/${PN}-7.5_p1-disable-conch-interop-tests.patch
-
-	if use X509 ; then
-		# patch doesn't apply due to X509 modifications
-		rm \
-			"${WORKDIR}"/patches/0001-fix-key-type-check.patch \
-			"${WORKDIR}"/patches/0002-request-rsa-sha2-cert-signatures.patch \
-			|| die
-	else
-		eapply "${FILESDIR}"/${PN}-7.9_p1-CVE-2018-20685.patch # X509 patch set includes this patch
-	fi
+	eapply "${FILESDIR}"/${PN}-8.0_p1-tests.patch
 
 	[[ -d ${WORKDIR}/patches ]] && eapply "${WORKDIR}"/patches
 
@@ -141,11 +130,6 @@ src_prepare() {
 		eapply "${FILESDIR}/${P}-X509-glue-${X509_VER}.patch"
 		eapply "${FILESDIR}/${P}-X509-dont-make-piddir-${X509_VER}.patch"
 		popd || die
-
-		if use hpn ; then
-			einfo "Will disable MT AES cipher due to incompatbility caused by X509 patch set"
-			HPN_DISABLE_MTAES=1
-		fi
 
 		eapply "${WORKDIR}"/${X509_PATCH%.*}
 		eapply "${FILESDIR}"/${P}-X509-${X509_VER}-tests.patch
@@ -185,13 +169,22 @@ src_prepare() {
 		mkdir "${hpn_patchdir}"
 		cp $(printf -- "${DISTDIR}/%s\n" "${HPN_PATCHES[@]}") "${hpn_patchdir}"
 		pushd "${hpn_patchdir}"
-		eapply "${FILESDIR}"/${P}-hpn-glue.patch
-		use X509 && eapply "${FILESDIR}"/${P}-hpn-X509-glue.patch
-		use sctp && eapply "${FILESDIR}"/${P}-hpn-sctp-glue.patch
+		eapply "${FILESDIR}"/${PN}-8.0_p1-hpn-glue.patch
+		if use X509; then
+			einfo "Will disable MT AES cipher due to incompatbility caused by X509 patch set"
+			# X509 and AES-CTR-MT don't get along, let's just drop it
+			rm openssh-${HPN_PV//./_}-hpn-AES-CTR-${HPN_VER}.diff || die
+			eapply "${FILESDIR}"/${PN}-8.0_p1-hpn-X509-glue.patch
+		fi
+		use sctp && eapply "${FILESDIR}"/${PN}-7.9_p1-hpn-sctp-glue.patch
 		popd
 
 		eapply "${hpn_patchdir}"
-		eapply "${FILESDIR}/openssh-7.9_p1-hpn-openssl-1.1.patch"
+
+		if ! use X509; then
+			eapply "${FILESDIR}/openssh-7.9_p1-hpn-openssl-1.1.patch"
+			eapply "${FILESDIR}/openssh-8.0_p1-hpn-version.patch"
+		fi
 
 		einfo "Patching Makefile.in for HPN patch set ..."
 		sed -i \
@@ -327,7 +320,7 @@ src_test() {
 	mkdir -p "${sshhome}"/.ssh
 	for t in "${tests[@]}" ; do
 		# Some tests read from stdin ...
-		HOMEDIR="${sshhome}" HOME="${sshhome}" \
+		HOMEDIR="${sshhome}" HOME="${sshhome}" SUDO="" \
 		emake -k -j1 ${t} </dev/null \
 			&& passed+=( "${t}" ) \
 			|| failed+=( "${t}" )
