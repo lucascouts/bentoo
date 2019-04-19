@@ -45,7 +45,7 @@ case ${CATEGORY} in
 		fi
 		;;
 	kde-apps)
-		[[ ${KDE_BUILD_TYPE} = live ]] && : ${FRAMEWORKS_MINIMAL:=5.56.0}
+		[[ ${PV} = 19.04* ]] && : ${FRAMEWORKS_MINIMAL:=5.57.0}
 		;;
 esac
 
@@ -62,29 +62,18 @@ esac
 # @ECLASS-VARIABLE: PLASMA_MINIMAL
 # @DESCRIPTION:
 # Minimum version of Plasma to require. This affects add_plasma_dep.
-: ${PLASMA_MINIMAL:=5.12.5}
+: ${PLASMA_MINIMAL:=5.14.5}
 
 # @ECLASS-VARIABLE: KDE_APPS_MINIMAL
 # @DESCRIPTION:
 # Minimum version of KDE Applications to require. This affects add_kdeapps_dep.
-: ${KDE_APPS_MINIMAL:=18.08.3}
+: ${KDE_APPS_MINIMAL:=18.12.3}
 
 # @ECLASS-VARIABLE: KDE_GCC_MINIMAL
 # @DEFAULT_UNSET
 # @DESCRIPTION:
 # Minimum version of active GCC to require. This is checked in kde5.eclass in
 # kde5_pkg_pretend and kde5_pkg_setup.
-
-# @ECLASS-VARIABLE: KDEBASE
-# @DEFAULT_UNSET
-# @DESCRIPTION:
-# This gets set to a non-zero value when a package is considered a
-# kdevelop ebuild.
-if [[ ${KMNAME-${PN}} = kdevelop ]]; then
-	KDEBASE=kdevelop
-fi
-
-debug-print "${ECLASS}: ${KDEBASE} ebuild recognized"
 
 # @FUNCTION: _check_gcc_version
 # @INTERNAL
