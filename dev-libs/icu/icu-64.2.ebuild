@@ -13,7 +13,7 @@ LICENSE="BSD"
 
 SLOT="0/${PV}"
 
-KEYWORDS="alpha amd64 ~arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris ~x86-winnt"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris ~x86-winnt"
 IUSE="debug doc examples static-libs"
 
 DEPEND="
@@ -31,12 +31,13 @@ MULTILIB_CHOST_TOOLS=(
 
 PATCHES=(
 	"${FILESDIR}/${PN}-58.1-remove-bashisms.patch"
-	"${FILESDIR}/${PN}-58.2-darwin.patch"
-	"${FILESDIR}/${P}-CVE-2018-18928.patch"
+	"${FILESDIR}/${PN}-64.2-darwin.patch"
+	"${FILESDIR}/${PN}-64.1-data_archive_generation.patch"
 )
 
 src_prepare() {
 	default
+	eapply -p3 "${FILESDIR}/${PN}-64.2-extern_c.patch"
 
 	local variable
 

@@ -6,7 +6,7 @@ EAPI=6
 inherit flag-o-matic toolchain-funcs multilib prefix
 
 # Official patchlevel
-# See ftp://ftp.cwru.edu/pub/bash/bash-4.4-patches/
+# See ftp://ftp.cwru.edu/pub/bash/bash-5.0-patches/
 PLEVEL=${PV##*_p}
 MY_PV=${PV/_p*}
 MY_PV=${MY_PV/_/-}
@@ -34,7 +34,7 @@ patches() {
 }
 
 # The version of readline this bash normally ships with.
-READLINE_VER="7.0"
+READLINE_VER="8.0"
 
 DESCRIPTION="The standard GNU Bourne again shell"
 HOMEPAGE="http://tiswww.case.edu/php/chet/bash/bashtop.html"
@@ -46,7 +46,7 @@ fi
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="afs bashlogger examples mem-scramble +net nls plugins +readline"
 
 DEPEND="
@@ -62,6 +62,14 @@ RDEPEND="
 #DEPEND+=" virtual/yacc"
 
 S="${WORKDIR}/${MY_P}"
+
+PATCHES=(
+	# Patches from Chet sent to bashbug ml
+	"${FILESDIR}"/${PN}-5.0-history-zero-length.patch
+	"${FILESDIR}"/${PN}-5.0-history-append.patch
+	"${FILESDIR}"/${PN}-5.0-syslog-history-extern.patch
+	"${FILESDIR}"/${PN}-5.0-assignment-preceding-builtin.patch
+)
 
 pkg_setup() {
 	if is-flag -malign-double ; then #7332
@@ -83,9 +91,6 @@ src_prepare() {
 	# Include official patches
 	[[ ${PLEVEL} -gt 0 ]] && eapply -p0 $(patches -s)
 
-	eapply "${FILESDIR}/${PN}-4.4-jobs_overflow.patch" #644720
-	eapply "${FILESDIR}/${PN}-4.4-set-SHOBJ_STATUS.patch" #644720
-
 	# Clean out local libs so we know we use system ones w/releases.
 	if is_release ; then
 		rm -rf lib/{readline,termcap}/*
@@ -100,6 +105,7 @@ src_prepare() {
 	sed -i -r '/^(HS|RL)USER/s:=.*:=:' doc/Makefile.in || die
 	touch -r . doc/*
 
+	eapply -p0 "${PATCHES[@]}"
 	eapply_user
 }
 

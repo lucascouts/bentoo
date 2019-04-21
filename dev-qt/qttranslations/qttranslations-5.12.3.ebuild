@@ -4,17 +4,16 @@
 EAPI=6
 inherit qt5-build
 
-DESCRIPTION="Network authorization library for the Qt5 framework"
-LICENSE="GPL-3"
+DESCRIPTION="Translation files for the Qt5 framework"
 
 if [[ ${QT5_BUILD_TYPE} == release ]]; then
-	KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~ppc ~ppc64 ~sparc ~x86 ~amd64-fbsd"
 fi
 
 IUSE=""
 
 DEPEND="
+	~dev-qt/linguist-tools-${PV}
 	~dev-qt/qtcore-${PV}
-	~dev-qt/qtnetwork-${PV}
 "
-RDEPEND="${DEPEND}"
+RDEPEND=""
