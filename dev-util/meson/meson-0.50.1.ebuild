@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 PYTHON_COMPAT=( python3_{5,6,7} )
 
 if [[ ${PV} = *9999* ]]; then
@@ -32,10 +32,6 @@ DEPEND="${RDEPEND}
 		virtual/pkgconfig
 	)
 "
-
-PATCHES=(
-	"${FILESDIR}/meson-0.49-python3.5-tests.patch"
-)
 
 python_prepare_all() {
 	# ASAN and sandbox both want control over LD_PRELOAD
