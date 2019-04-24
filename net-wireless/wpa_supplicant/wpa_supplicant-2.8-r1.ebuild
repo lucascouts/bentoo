@@ -18,7 +18,7 @@ else
 fi
 
 SLOT="0"
-IUSE="ap bindist dbus eap-sim eapol_test fasteap +hs2-0 libressl macsec p2p privsep ps3 qt5 readline selinux smartcard tdls uncommon-eap-types wimax wps kernel_linux kernel_FreeBSD"
+IUSE="ap bindist dbus eap-sim eapol_test fasteap +fils +hs2-0 libressl macsec p2p privsep ps3 qt5 readline selinux smartcard tdls uncommon-eap-types wimax wps kernel_linux kernel_FreeBSD"
 
 CDEPEND="dbus? ( sys-apps/dbus )
 	kernel_linux? (
@@ -116,12 +116,6 @@ src_prepare() {
 	# bug (320097)
 	eapply "${FILESDIR}/${PN}-2.6-do-not-call-dbus-functions-with-NULL-path.patch"
 
-	# fix undefined reference to remove_ie()
-	eapply "${FILESDIR}/${P}-fix-undefined-remove-ie.patch"
-
-	# bug (672632)
-	eapply "${FILESDIR}/${P}-libressl.patch"
-
 	# bug (640492)
 	sed -i 's#-Werror ##' wpa_supplicant/Makefile || die
 }
@@ -144,6 +138,8 @@ src_configure() {
 	Kconfig_style_config OCV
 	Kconfig_style_config TLSV11
 	Kconfig_style_config TLSV12
+	Kconfig_style_config GETRANDOM
+	Kconfig_style_config MBO
 
 	# Basic authentication methods
 	# NOTE: we don't set GPSK or SAKE as they conflict
@@ -219,18 +215,18 @@ src_configure() {
 	Kconfig_style_config FST
 	if ! use bindist || use libressl; then
 		Kconfig_style_config EAP_PWD
-		Kconfig_style_config FILS
-		Kconfig_style_config FILS_SK_PFS
+		if use fils; then
+			Kconfig_style_config FILS
+			Kconfig_style_config FILS_SK_PFS
+		fi
 		# Enabling mesh networks.
 		Kconfig_style_config MESH
 		#WPA3
 		Kconfig_style_config OWE
 		Kconfig_style_config SAE
 		Kconfig_style_config DPP
-		Kconfig_style_config SUITEB192
-	fi
-	if ! use bindist && ! use libressl; then
 		Kconfig_style_config SUITEB
+		Kconfig_style_config SUITEB192
 	fi
 
 	if use smartcard ; then
@@ -254,6 +250,7 @@ src_configure() {
 		if use macsec ; then
 			#requires something, no idea what
 			#Kconfig_style_config DRIVER_MACSEC_QCA
+			Kconfig_style_config DRIVER_MACSEC_LINUX
 			Kconfig_style_config MACSEC
 		fi
 
@@ -388,7 +385,7 @@ src_install() {
 		insinto /etc/dbus-1/system.d
 		newins dbus-wpa_supplicant.conf wpa_supplicant.conf
 		insinto /usr/share/dbus-1/system-services
-		doins fi.epitest.hostap.WPASupplicant.service fi.w1.wpa_supplicant1.service
+		doins fi.w1.wpa_supplicant1.service
 		popd > /dev/null || die
 
 		# This unit relies on dbus support, bug 538600.
@@ -418,11 +415,6 @@ pkg_postinst() {
 			ewarn "Using bindist use flag presently breaks WPA3 (specifically SAE, OWE, DPP, and FILS)."
 			ewarn "This is incredibly undesirable"
 		fi
-	fi
-	if use libressl; then
-		ewarn "Libressl doesn't support SUITEB (part of WPA3)"
-		ewarn "but it does support SUITEB192 (the upgraded strength version of the same)"
-		ewarn "You probably don't care.  Patches welcome"
 	fi
 
 	# Mea culpa, feel free to remove that after some time --mgorny.
