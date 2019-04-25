@@ -4,7 +4,7 @@
 EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
-USE_RUBY="ruby25 ruby24 ruby23"
+USE_RUBY="ruby26 ruby25 ruby24"
 DISTUTILS_OPTIONAL=1
 WANT_AUTOMAKE="none"
 GENTOO_DEPEND_ON_PERL="no"
@@ -21,7 +21,7 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="Subversion GPL-2"
 SLOT="0"
 [[ "${PV}" = *_rc* ]] || \
-KEYWORDS="~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="apache2 berkdb ctypes-python debug doc +dso extras gnome-keyring +http java kwallet nls perl python ruby sasl test vim-syntax"
 
 COMMON_DEPEND="
@@ -126,6 +126,9 @@ pkg_setup() {
 		echo -ne "\a"
 	fi
 
+	# https://issues.apache.org/jira/browse/SVN-4813#comment-16813739
+	append-cppflags -P
+
 	if use debug ; then
 		append-cppflags -DSVN_DEBUG -DAP_DEBUG
 	fi
@@ -151,7 +154,7 @@ pkg_setup() {
 
 src_prepare() {
 	eapply "${WORKDIR}/patches"
-	eapply "${FILESDIR}"/${PN}-1.9.7-fix-wc-queries-test-test.patch
+	eapply "${FILESDIR}"/${PN}-1.11.1-allow-apr-1.7.0+.patch
 	eapply_user
 
 	fperms +x build/transform_libtool_scripts.sh
@@ -200,6 +203,7 @@ src_configure() {
 		--without-jikes
 		--disable-mod-activation
 		--disable-static
+		--enable-svnxx
 	)
 
 	if use python || use perl || use ruby; then
@@ -243,7 +247,7 @@ src_configure() {
 	#version 1.7.7 again tries to link against the older installed version and fails, when trying to
 	#compile for x86 on amd64, so workaround this issue again
 	#check newer versions, if this is still/again needed
-	myconf+=( --disable-disallowing-of-undefined-references )
+	#myconf+=( --disable-disallowing-of-undefined-references )
 
 	# for build-time scripts
 	if use ctypes-python || use python || use test; then

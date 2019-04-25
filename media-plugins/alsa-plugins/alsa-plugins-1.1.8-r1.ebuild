@@ -47,6 +47,9 @@ multilib_src_configure() {
 	use debug || append-cppflags -DNDEBUG
 
 	local myeconfargs=(
+		# default does not contain $prefix: bug #673464
+		--with-alsalconfdir="${EPREFIX}"/etc/alsa/conf.d
+
 		--with-speex="$(usex speex lib no)"
 		$(use_enable arcam_av arcamav)
 		$(use_enable ffmpeg libav)
