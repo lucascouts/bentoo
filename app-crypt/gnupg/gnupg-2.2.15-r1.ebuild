@@ -30,13 +30,13 @@ DEPEND="!app-crypt/dirmngr
 	smartcard? ( usb? ( virtual/libusb:1 ) )
 	ssl? ( >=net-libs/gnutls-3.0:0= )
 	sys-libs/zlib
-	tofu? ( >=dev-db/sqlite-3.7 )
-	virtual/mta"
+	tofu? ( >=dev-db/sqlite-3.7 )"
 
 RDEPEND="${DEPEND}
 	app-crypt/pinentry
 	nls? ( virtual/libintl )
-	selinux? ( sec-policy/selinux-gpg )"
+	selinux? ( sec-policy/selinux-gpg )
+	wks-server? ( virtual/mta )"
 
 BDEPEND="virtual/pkgconfig
 	doc? ( sys-apps/texinfo )
@@ -51,6 +51,7 @@ DOCS=(
 
 PATCHES=(
 	"${FILESDIR}/${PN}-2.1.20-gpgscm-Use-shorter-socket-path-lengts-to-improve-tes.patch"
+	"${FILESDIR}/${PN}-2.2.14-quiet-sending.patch"
 )
 
 src_configure() {
@@ -76,6 +77,15 @@ src_configure() {
 	[[ ${CC} == *clang ]] && \
 		export gl_cv_absolute_stdint_h=/usr/include/stdint.h
 
+	# Hardcode mailprog to /usr/libexec/sendmail even if it does not exist.
+	# As of GnuPG 2.3, the mailprog substitution is used for the binary called
+	# by wks-client & wks-server; and if it's autodetected but not not exist at
+	# build time, then then 'gpg-wks-client --send' functionality will not
+	# work. This has an unwanted side-effect in stage3 builds: there was a
+	# [R]DEPEND on virtual/mta, which also brought in virtual/logger, bloating
+	# the build where the install guide previously make the user chose the
+	# logger & mta early in the install.
+
 	econf \
 		"${myconf[@]}" \
 		$(use_enable bzip2) \
@@ -87,6 +97,7 @@ src_configure() {
 		$(use_enable wks-server wks-tools) \
 		$(use_with ldap) \
 		$(use_with readline) \
+		--with-mailprog=/usr/libexec/sendmail \
 		--disable-ntbtls \
 		--enable-all-tests \
 		--enable-gpg \
@@ -133,4 +144,10 @@ src_install() {
 	use doc && dodoc doc/gnupg.html/* doc/*.png
 
 	systemd_douserunit doc/examples/systemd-user/*.{service,socket}
+}
+
+pkg_postinst() {
+	elog "See https://wiki.gentoo.org/wiki/GnuPG for documentation on gnupg"
+	elog
+	elog "If you wish to use 'gpg-wks-client --send', you must install an MTA!"
 }
