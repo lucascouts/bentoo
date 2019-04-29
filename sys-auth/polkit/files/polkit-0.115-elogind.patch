@@ -1,0 +1,185 @@
+diff '--exclude=.git' -urN a/configure.ac b/configure.ac
+--- a/configure.ac	2018-09-23 18:57:28.584356966 -0500
++++ b/configure.ac	2018-09-23 18:53:59.284280159 -0500
+@@ -128,11 +128,12 @@
+ 
+ AM_CONDITIONAL(BUILD_TEST, [test "x$enable_test" = "xyes"])
+ 
+-dnl ---------------------------------------------------------------------------
+-dnl - Select wether to use libsystemd-login or ConsoleKit for session tracking
+-dnl ---------------------------------------------------------------------------
++dnl -----------------------------------------------------------------------------------
++dnl - Select wether to use libsystemd-login, elogind or ConsoleKit for session tracking
++dnl -----------------------------------------------------------------------------------
+ 
+ have_libsystemd=no
++have_elogind=no
+ SESSION_TRACKING=ConsoleKit
+ 
+ AC_ARG_ENABLE([libsystemd-login],
+@@ -166,6 +167,29 @@
+   fi
+ fi
+ 
++AC_ARG_ENABLE([libelogind],
++              [AS_HELP_STRING([--enable-libelogind[=@<:@auto/yes/no@:>@]], [Use libelogind (auto/yes/no)])],
++              [enable_libelogind=$enableval],
++              [enable_libelogind=auto])
++if test "$enable_libelogind" != "no"; then
++  PKG_CHECK_MODULES([LIBELOGIND],
++    [libelogind],
++    [have_libelogind=yes],
++    [have_libelogind=no])
++  if test "$have_libelogind" = "yes"; then
++    SESSION_TRACKING=libelogind
++    AC_DEFINE([HAVE_LIBELOGIND], 1, [Define to 1 if libelogind is available])
++    save_LIBS=$LIBS
++    LIBS=$LIBELOGIND_LIBS
++    AC_CHECK_FUNCS(sd_uid_get_display)
++    LIBS=$save_LIBS
++  else
++    if test "$enable_libelogind" = "yes"; then
++      AC_MSG_ERROR([libelogind support requested but libelogind not found])
++    fi
++  fi
++fi
++
+ AS_IF([test "x$cross_compiling" != "xyes" ], [
+   AS_IF([test "$have_libsystemd" = "yes"], [
+     AS_IF([test ! -d /sys/fs/cgroup/systemd/ ], [
+@@ -190,6 +214,10 @@
+ AC_SUBST(LIBSYSTEMD_LIBS)
+ AM_CONDITIONAL(HAVE_LIBSYSTEMD, [test "$have_libsystemd" = "yes"], [Using libsystemd])
+ 
++AC_SUBST(LIBELOGIND_CFLAGS)
++AC_SUBST(LIBELOGIND_LIBS)
++AM_CONDITIONAL(HAVE_LIBELOGIND, [test "$have_libelogind" = "yes"], [Using libelogind])
++
+ dnl ---------------------------------------------------------------------------
+ dnl - systemd unit / service files
+ dnl ---------------------------------------------------------------------------
+diff '--exclude=.git' -urN a/src/polkit/Makefile.am b/src/polkit/Makefile.am
+--- a/src/polkit/Makefile.am	2018-04-03 15:57:57.000000000 -0500
++++ b/src/polkit/Makefile.am	2018-09-23 18:53:59.284280159 -0500
+@@ -86,19 +86,26 @@
+ libpolkit_gobject_1_la_SOURCES += \
+ 	polkitunixsession-systemd.c		polkitunixsession.h
+ else
++if HAVE_LIBELOGIND
++libpolkit_gobject_1_la_SOURCES += \
++	polkitunixsession-systemd.c		polkitunixsession.h
++else
+ libpolkit_gobject_1_la_SOURCES += \
+ 	polkitunixsession.c			polkitunixsession.h
+ endif
++endif
+ 
+ libpolkit_gobject_1_la_CFLAGS =                                        	\
+         -D_POLKIT_COMPILATION                                  		\
+         $(GLIB_CFLAGS)							\
+ 	$(LIBSYSTEMD_CFLAGS)						\
++	$(LIBELOGIND_CFLAGS)						\
+         $(NULL)
+ 
+ libpolkit_gobject_1_la_LIBADD =                               		\
+         $(GLIB_LIBS)							\
+ 	$(LIBSYSTEMD_LIBS)						\
++	$(LIBELOGIND_LIBS)						\
+         $(NULL)
+ 
+ libpolkit_gobject_1_la_LDFLAGS = -export-symbols-regex '(^polkit_.*)'
+diff '--exclude=.git' -urN a/src/polkit/polkitunixsession-systemd.c b/src/polkit/polkitunixsession-systemd.c
+--- a/src/polkit/polkitunixsession-systemd.c	2018-04-03 15:57:57.000000000 -0500
++++ b/src/polkit/polkitunixsession-systemd.c	2018-09-23 18:53:59.284280159 -0500
+@@ -30,7 +30,11 @@
+ #include "polkiterror.h"
+ #include "polkitprivate.h"
+ 
++#ifdef HAVE_LIBSYSTEMD
+ #include <systemd/sd-login.h>
++#else
++#include <elogind/sd-login.h>
++#endif /* HAVE_LIBSYSTEMD versus HAVE_ELOGIND */
+ 
+ /**
+  * SECTION:polkitunixsession
+diff '--exclude=.git' -urN a/src/polkitbackend/Makefile.am b/src/polkitbackend/Makefile.am
+--- a/src/polkitbackend/Makefile.am	2018-04-03 15:57:57.000000000 -0500
++++ b/src/polkitbackend/Makefile.am	2018-09-23 18:56:19.140663477 -0500
+@@ -42,15 +42,21 @@
+ libpolkit_backend_1_la_SOURCES += \
+ 	polkitbackendsessionmonitor.h		polkitbackendsessionmonitor-systemd.c
+ else
++if HAVE_LIBELOGIND
++libpolkit_backend_1_la_SOURCES += \
++	polkitbackendsessionmonitor.h		polkitbackendsessionmonitor-systemd.c
++else
+ libpolkit_backend_1_la_SOURCES += \
+ 	polkitbackendsessionmonitor.h		polkitbackendsessionmonitor.c
+ endif
++endif
+ 
+ libpolkit_backend_1_la_CFLAGS =                                        	\
+         -D_POLKIT_COMPILATION                                  		\
+         -D_POLKIT_BACKEND_COMPILATION                                  	\
+         $(GLIB_CFLAGS)							\
+ 	$(LIBSYSTEMD_CFLAGS)						\
++	$(LIBELOGIND_CFLAGS)						\
+ 	$(LIBJS_CFLAGS)							\
+         $(NULL)
+ 
+@@ -59,6 +65,7 @@
+ libpolkit_backend_1_la_LIBADD =                               		\
+         $(GLIB_LIBS)							\
+ 	$(LIBSYSTEMD_LIBS)						\
++	$(LIBELOGIND_LIBS)						\
+ 	$(top_builddir)/src/polkit/libpolkit-gobject-1.la		\
+ 	$(EXPAT_LIBS)							\
+ 	$(LIBJS_LIBS)							\
+diff '--exclude=.git' -urN a/src/polkitbackend/polkitbackendjsauthority.cpp b/src/polkitbackend/polkitbackendjsauthority.cpp
+--- a/src/polkitbackend/polkitbackendjsauthority.cpp	2018-04-03 15:57:57.000000000 -0500
++++ b/src/polkitbackend/polkitbackendjsauthority.cpp	2018-09-23 18:53:59.285280154 -0500
+@@ -43,6 +43,10 @@
+ #include <systemd/sd-login.h>
+ #endif /* HAVE_LIBSYSTEMD */
+ 
++#ifdef HAVE_LIBELOGIND
++#include <elogind/sd-login.h>
++#endif /* HAVE_LIBELOGIND */
++
+ #include <js/Initialization.h>
+ #include <jsapi.h>
+ 
+@@ -783,7 +787,7 @@
+       g_assert_not_reached ();
+     }
+ 
+-#ifdef HAVE_LIBSYSTEMD
++#if defined(HAVE_LIBSYSTEMD) || defined(HAVE_LIBELOGIND)
+   if (sd_pid_get_session (pid, &session_str) == 0)
+     {
+       if (sd_session_get_seat (session_str, &seat_str) == 0)
+@@ -791,7 +795,7 @@
+           /* do nothing */
+         }
+     }
+-#endif /* HAVE_LIBSYSTEMD */
++#endif /* HAVE_LIBSYSTEMD or HAVE_LIBELOGIND */
+ 
+   g_assert (POLKIT_IS_UNIX_USER (user_for_subject));
+   uid = polkit_unix_user_get_uid (POLKIT_UNIX_USER (user_for_subject));
+diff '--exclude=.git' -urN a/src/polkitbackend/polkitbackendsessionmonitor-systemd.c b/src/polkitbackend/polkitbackendsessionmonitor-systemd.c
+--- a/src/polkitbackend/polkitbackendsessionmonitor-systemd.c	2018-06-26 08:18:16.000000000 -0500
++++ b/src/polkitbackend/polkitbackendsessionmonitor-systemd.c	2018-09-23 18:53:59.285280154 -0500
+@@ -25,7 +25,11 @@
+ #include <grp.h>
+ #include <string.h>
+ #include <glib/gstdio.h>
++#ifdef HAVE_LIBSYSTEMD
+ #include <systemd/sd-login.h>
++#else
++#include <elogind/sd-login.h>
++#endif /* HAVE_LIBSYSTEMD versus HAVE_LIBELOGIND */
+ #include <stdlib.h>
+ 
+ #include <polkit/polkit.h>
