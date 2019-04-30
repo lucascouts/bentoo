@@ -1,0 +1,12 @@
+--- a/runtime/filetype.vim
++++ b/runtime/filetype.vim
+@@ -113,6 +113,9 @@
+ au BufNewFile,BufRead .htaccess,/etc/httpd/*.conf		 setf apache
+ au BufNewFile,BufRead httpd.conf*,srm.conf*,access.conf*,apache.conf*,apache2.conf*,/etc/apache2/*.conf*,/etc/httpd/conf.d/*.conf* call s:StarSetf('apache')
+ 
++" Gentoo apache config file locations (Gentoo bug #83565)
++au BufNewFile,BufRead /etc/apache2/{modules,vhosts}.d/*.conf call s:StarSetf('apache')
++
+ " XA65 MOS6510 cross assembler
+ au BufNewFile,BufRead *.a65			setf a65
+ 

@@ -1,0 +1,17 @@
+--- a/runtime/ftplugin/ada.vim
++++ b/runtime/ftplugin/ada.vim
+@@ -126,9 +126,11 @@
+    endif
+ endif
+ 
+-if ! exists("current_compiler")			||
+-   \ current_compiler != g:ada_default_compiler
+-   execute "compiler " . g:ada_default_compiler
++if exists("g:ada_default_compiler")
++   if ! exists("current_compiler")  ||
++	 \ current_compiler != g:ada_default_compiler
++      execute "compiler " . g:ada_default_compiler
++   endif
+ endif
+ 
+ " Section: Folding {{{1

@@ -1,0 +1,20 @@
+--- a/src/configure.ac	2017-04-28 23:45:46.000000000 +1000
++++ b/src/configure.ac	2017-04-29 01:03:47.915292512 +1000
+@@ -3303,7 +3303,7 @@
+ # include <stddef.h>
+ #endif
+ main() {char *s; s=(char *)tgoto("%p1%d", 0, 1); exit(0); }],
+-			  res="OK", res="FAIL", res="FAIL")
++			  res="OK", res="FAIL", res="OK")
+       if test "$res" = "OK"; then
+ 	break
+       fi
+@@ -3373,7 +3373,7 @@
+     ],[
+       vim_cv_tgent=non-zero
+     ],[
+-      AC_MSG_ERROR(failed to compile test program.)
++      vim_cv_tgent=zero
+     ])
+   ])
+ 
