@@ -11,9 +11,9 @@ SLOT="5"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 IUSE="bluetooth +browser-integration consolekit crypt +desktop-portal discover
 +display-manager elogind grub gtk +handbook +legacy-systray networkmanager pam
-plymouth +pm-utils pulseaudio +sddm sdk systemd +wallpapers"
+plymouth +pm-utils pulseaudio +sddm sdk +wallpapers"
 
-REQUIRED_USE="?? ( consolekit elogind systemd )"
+REQUIRED_USE="?? ( consolekit elogind )"
 
 RDEPEND="
 	>=kde-plasma/breeze-${PV}:${SLOT}
