@@ -10,12 +10,12 @@ HOMEPAGE="https://www.syslinux.org/"
 # Final releases in 6.xx/$PV.tar.* (literal "xx")
 # Testing releases in Testing/$PV/$PV.tar.*
 SRC_URI_DIR=${PV:0:1}.xx
-SRC_URI_TESTING=Testing/${PV:0:4}
+SRC_URI_TESTING=${PV}
 [[ ${PV/_alpha} != $PV ]] && SRC_URI_DIR=$SRC_URI_TESTING
 [[ ${PV/_beta} != $PV ]] && SRC_URI_DIR=$SRC_URI_TESTING
 [[ ${PV/_pre} != $PV ]] && SRC_URI_DIR=$SRC_URI_TESTING
 [[ ${PV/_rc} != $PV ]] && SRC_URI_DIR=$SRC_URI_TESTING
-SRC_URI="mirror://kernel/linux/utils/boot/syslinux/${SRC_URI_DIR}/${P/_/-}.tar.xz"
+SRC_URI="https://www.zytor.com/pub/syslinux/Testing/6.04/${P/_/-}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
