@@ -58,8 +58,9 @@ pkg_setup() {
 
 src_prepare() {
 	if full_archive; then
-		eapply "${FILESDIR}/${PN}-3.27.0-full_archive-build.patch"
-		eapply "${FILESDIR}/${PN}-3.27.2-full_archive-tests.patch"
+		eapply "${FILESDIR}/${PN}-3.28.0-full_archive-build.patch"
+		eapply "${FILESDIR}/${PN}-3.28.0-full_archive-segmentation_fault_fixes.patch"
+		eapply "${FILESDIR}/${PN}-3.28.0-full_archive-tests.patch"
 
 		eapply_user
 
@@ -68,6 +69,7 @@ src_prepare() {
 		sed -e "s/AC_CHECK_FUNCS(.*)/AC_CHECK_FUNCS([fdatasync fullfsync gmtime_r isnan localtime_r localtime_s malloc_usable_size posix_fallocate pread pread64 pwrite pwrite64 strchrnul usleep utime])/" -i configure.ac || die "sed failed"
 	else
 		eapply "${FILESDIR}/${PN}-3.25.0-nonfull_archive-build.patch"
+		eapply "${FILESDIR}/${PN}-3.28.0-nonfull_archive-segmentation_fault_fixes.patch"
 
 		eapply_user
 
