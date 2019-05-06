@@ -1,28 +1,25 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 PYTHON_COMPAT=( python2_7 )
 GNOME2_EAUTORECONF=yes
 
-MY_PV="${PV/_rc/-RC}"
-MY_P="${PN}-${MY_PV}"
-
-inherit versionator virtualx autotools gnome2 multilib python-single-r1 ltprune
+inherit eapi7-ver virtualx autotools gnome2 multilib python-single-r1
 
 DESCRIPTION="GNU Image Manipulation Program"
 HOMEPAGE="https://www.gimp.org/"
-SRC_URI="mirror://gimp/v$(get_version_component_range 1-2)/${MY_P}.tar.bz2"
+SRC_URI="mirror://gimp/v$(ver_cut 1-2)/${P}.tar.bz2"
 LICENSE="GPL-3 LGPL-3"
 SLOT="2"
 KEYWORDS="~amd64 ~x86"
 
 LANGS="am ar ast az be bg br ca ca@valencia cs csb da de dz el en_CA en_GB eo es et eu fa fi fr ga gl gu he hi hr hu id is it ja ka kk km kn ko lt lv mk ml ms my nb nds ne nl nn oc pa pl pt pt_BR ro ru rw si sk sl sr sr@latin sv ta te th tr tt uk vi xh yi zh_CN zh_HK zh_TW"
-IUSE="alsa aalib altivec aqua debug doc openexr gnome heif postscript jpeg2k cpu_flags_x86_mmx mng python smp cpu_flags_x86_sse udev unwind vector-icons webp wmf xpm"
+IUSE="alsa aalib altivec aqua debug doc openexr gnome heif postscript jpeg2k cpu_flags_x86_mmx mng python cpu_flags_x86_sse udev unwind vector-icons webp wmf xpm"
 
 RDEPEND=">=dev-libs/glib-2.56.0:2
 	>=dev-libs/atk-2.2.0
-	>=x11-libs/gtk+-2.24.10:2
+	>=x11-libs/gtk+-2.24.32:2
 	>=x11-libs/gdk-pixbuf-2.31:2
 	>=x11-libs/cairo-1.12.2
 	>=x11-libs/pango-1.29.4
@@ -37,8 +34,8 @@ RDEPEND=">=dev-libs/glib-2.56.0:2
 	dev-libs/libxml2
 	dev-libs/libxslt
 	x11-themes/hicolor-icon-theme
-	>=media-libs/babl-0.1.58
-	>=media-libs/gegl-0.4.12:0.4[cairo]
+	>=media-libs/babl-0.1.62
+	>=media-libs/gegl-0.4.14:0.4[cairo]
 	aalib? ( media-libs/aalib )
 	alsa? ( media-libs/alsa-lib )
 	aqua? ( x11-libs/gtk-mac-integration )
@@ -48,7 +45,7 @@ RDEPEND=">=dev-libs/glib-2.56.0:2
 	>=media-libs/lcms-2.8:2
 	mng? ( media-libs/libmng )
 	openexr? ( >=media-libs/openexr-1.6.1:= )
-	>=app-text/poppler-0.44[cairo]
+	>=app-text/poppler-0.50[cairo]
 	>=app-text/poppler-data-0.4.7
 	>=media-libs/libpng-1.6.25:0=
 	python?	(
@@ -86,8 +83,6 @@ DOCS="AUTHORS ChangeLog* HACKING NEWS README*"
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
-S="${WORKDIR}/${MY_P}"
-
 pkg_setup() {
 	if use python; then
 		python-single-r1_pkg_setup
@@ -104,7 +99,23 @@ src_prepare() {
 	fgrep -q GIMP_DISABLE_DEPRECATED configure || die #615144, self-test
 }
 
+_adjust_sandbox() {
+	# Bugs #569738 and #591214
+	local nv
+	for nv in /dev/nvidia-uvm /dev/nvidiactl /dev/nvidia{0..9} ; do
+		# We do not check for existence as they may show up later
+		# https://bugs.gentoo.org/show_bug.cgi?id=569738#c21
+		addwrite "${nv}"
+	done
+
+	addwrite /dev/dri/  # bugs #574038 and #684886
+	addwrite /dev/ati/  # bug #589198
+	addwrite /proc/mtrr  # bug #589198
+}
+
 src_configure() {
+	_adjust_sandbox
+
 	local myconf=(
 		GEGL="${EPREFIX}"/usr/bin/gegl-0.4
 		GDBUS_CODEGEN="${EPREFIX}"/bin/false
@@ -128,7 +139,7 @@ src_configure() {
 		$(use_with webp)
 		$(use_with heif libheif)
 		$(use_enable python)
-		$(use_enable smp mp)
+		--enable-mp
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_with udev gudev)
 		$(use_with unwind libunwind)
@@ -143,17 +154,6 @@ src_configure() {
 }
 
 src_compile() {
-	# Bugs #569738 and #591214
-	local nv
-	for nv in /dev/nvidia-uvm /dev/nvidiactl /dev/nvidia{0..9} ; do
-		# We do not check for existence as they may show up later
-		# https://bugs.gentoo.org/show_bug.cgi?id=569738#c21
-		addwrite "${nv}"
-	done
-	addwrite /dev/dri/  # bug #574038
-	addwrite /dev/ati/  # bug 589198
-	addwrite /proc/mtrr  # bug 589198
-
 	export XDG_DATA_DIRS="${EPREFIX}"/usr/share  # bug 587004
 	gnome2_src_compile
 }
@@ -203,7 +203,7 @@ src_install() {
 	# precedence on PDF documents by default
 	mv "${ED%/}"/usr/share/applications/{,zzz-}gimp.desktop || die
 
-	prune_libtool_files --all
+	find "${D}" -name '*.la' -type f -delete || die
 
 	# Prevent dead symlink gimp-console.1 from downstream man page compression (bug #433527)
 	local gimp_app_version=$(get_version_component_range 1-2)
