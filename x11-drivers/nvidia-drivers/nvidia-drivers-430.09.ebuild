@@ -6,7 +6,7 @@ inherit eutils flag-o-matic linux-info linux-mod multilib-minimal nvidia-driver 
 	portability toolchain-funcs unpacker user udev
 
 DESCRIPTION="NVIDIA Accelerated Graphics Driver"
-HOMEPAGE="http://www.nvidia.com/"
+HOMEPAGE="https://www.nvidia.com/"
 
 AMD64_FBSD_NV_PACKAGE="NVIDIA-FreeBSD-x86_64-${PV}"
 AMD64_NV_PACKAGE="NVIDIA-Linux-x86_64-${PV}"
@@ -86,11 +86,11 @@ nvidia_drivers_versions_check() {
 		die "Unexpected \${DEFAULT_ABI} = ${DEFAULT_ABI}"
 	fi
 
-	if use kernel_linux && kernel_is ge 5 1; then
+	if use kernel_linux && kernel_is ge 5 2; then
 		ewarn "Gentoo supports kernels which are supported by NVIDIA"
 		ewarn "which are limited to the following kernels:"
-		ewarn "<sys-kernel/gentoo-sources-5.1"
-		ewarn "<sys-kernel/vanilla-sources-5.1"
+		ewarn "<sys-kernel/gentoo-sources-5.2"
+		ewarn "<sys-kernel/vanilla-sources-5.2"
 		ewarn ""
 		ewarn "You are free to utilize epatch_user to provide whatever"
 		ewarn "support you feel is appropriate, but will not receive"
