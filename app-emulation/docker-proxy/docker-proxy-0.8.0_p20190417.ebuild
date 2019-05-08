@@ -7,7 +7,7 @@ EGO_PN="github.com/docker/libnetwork"
 if [[ ${PV} == *9999 ]]; then
 	inherit golang-vcs
 else
-	EGIT_COMMIT="c9029898e32f7c89bbb81511fbb721df252ce61a"
+	EGIT_COMMIT="872f0a83c98add6cae255c8859e29532febc0039"
 	SRC_URI="https://${EGO_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc64"
 	inherit golang-vcs-snapshot
