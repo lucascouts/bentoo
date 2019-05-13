@@ -1,9 +1,9 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI=7
 
-inherit flag-o-matic multilib toolchain-funcs
+inherit flag-o-matic systemd toolchain-funcs udev
 
 DESCRIPTION="Standard EXT2/EXT3/EXT4 filesystem utilities"
 HOMEPAGE="http://e2fsprogs.sourceforge.net/"
@@ -13,20 +13,22 @@ SRC_URI="mirror://sourceforge/e2fsprogs/${P}.tar.xz
 
 LICENSE="GPL-2 BSD"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 -x86-fbsd ~amd64-linux ~x86-linux ~m68k-mint"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 -x86-fbsd ~amd64-linux ~x86-linux ~m68k-mint"
 IUSE="fuse nls static-libs elibc_FreeBSD"
 
 RDEPEND="~sys-libs/${PN}-libs-${PV}
 	>=sys-apps/util-linux-2.16
 	fuse? ( sys-fs/fuse:0 )
 	nls? ( virtual/libintl )"
-DEPEND="${RDEPEND}
+DEPEND="${RDEPEND}"
+BDEPEND="
 	nls? ( sys-devel/gettext )
 	virtual/pkgconfig
-	sys-apps/texinfo"
+	sys-apps/texinfo
+"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-1.41.8-makefile.patch
+	"${FILESDIR}"/${PN}-1.44.6-parallel_install.patch
 	"${FILESDIR}"/${PN}-1.40-fbsd.patch
 	"${FILESDIR}"/${PN}-1.42.13-fix-build-cflags.patch #516854
 
@@ -39,8 +41,6 @@ src_prepare() {
 	fi
 
 	default
-
-	eapply -R "${FILESDIR}"/${PN}-1.44.4-fix_make_install_for_subset.patch
 
 	cp doc/RelNotes/v${PV}.txt ChangeLog || die "Failed to copy Release Notes"
 
@@ -71,7 +71,10 @@ src_configure() {
 	append-cppflags -D_GNU_SOURCE
 
 	local myeconfargs=(
-		--with-root-prefix="${EPREFIX%/}/"
+		--with-root-prefix="${EPREFIX}/"
+		--with-crond-dir="${EPREFIX}/etc/cron.d"
+		--with-systemd-unit-dir="$(systemd_get_systemunitdir)"
+		--with-udev-rules-dir="${EPREFIX}$(get_udevdir)/rules.d"
 		--enable-symlink-install
 		--enable-elf-shlibs
 		$(tc-has-tls || echo --disable-tls)
@@ -108,8 +111,8 @@ src_install() {
 	# econf above (i.e. multilib) will screw up the default #276465
 	emake \
 		STRIP=: \
-		root_libdir="${EPREFIX%/}/usr/$(get_libdir)" \
-		DESTDIR="${D%/}" \
+		root_libdir="${EPREFIX}/usr/$(get_libdir)" \
+		DESTDIR="${D}" \
 		install install-libs
 
 	einstalldocs
@@ -134,7 +137,7 @@ src_install() {
 
 		# filefrag is linux only
 		rm \
-			"${ED%/}"/usr/sbin/filefrag \
-			"${ED%/}"/usr/share/man/man8/filefrag.8 || die
+			"${ED}"/usr/sbin/filefrag \
+			"${ED}"/usr/share/man/man8/filefrag.8 || die
 	fi
 }
