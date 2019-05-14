@@ -28,5 +28,3 @@ DEPEND="
 	x11-libs/xcb-util-keysyms
 "
 RDEPEND="${DEPEND}"
-
-PATCHES=( "${FILESDIR}"/${P}-runtime-crashfix{,1}.patch )

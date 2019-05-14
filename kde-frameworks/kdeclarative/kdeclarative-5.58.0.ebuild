@@ -29,5 +29,3 @@ DEPEND="
 	media-libs/libepoxy
 "
 RDEPEND="${DEPEND}"
-
-PATCHES=( "${FILESDIR}/${P}-fix-plotter-crash.patch" )
