@@ -10,23 +10,23 @@
 EAPI="6"
 SLOT="8"
 
-inherit check-reqs gnome2-utils java-pkg-2 java-vm-2 multiprocessing pax-utils prefix versionator
+inherit check-reqs flag-o-matic java-pkg-2 java-vm-2 multiprocessing pax-utils prefix versionator xdg-utils
 
 ICEDTEA_VER=$(get_version_component_range 1-3)
 ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="cfc35c4598d9.tar.xz"
-JAXP_TARBALL="1c01fbb460ba.tar.xz"
-JAXWS_TARBALL="cf4d2b27895c.tar.xz"
-JDK_TARBALL="34ade0cd2dd5.tar.xz"
-LANGTOOLS_TARBALL="78414f4f0172.tar.xz"
-OPENJDK_TARBALL="9edccdd36f81.tar.xz"
-NASHORN_TARBALL="3cb2fe2b1b7d.tar.xz"
-HOTSPOT_TARBALL="a24b4e46303e.tar.xz"
-SHENANDOAH_TARBALL="1e8639cc8075.tar.xz"
-AARCH32_TARBALL="5caf41da4f93.tar.xz"
+CORBA_TARBALL="fa1553d2f23e.tar.xz"
+JAXP_TARBALL="7a977b82f34c.tar.xz"
+JAXWS_TARBALL="752d9e54c69a.tar.xz"
+JDK_TARBALL="bfaa5c6df4a8.tar.xz"
+LANGTOOLS_TARBALL="fb494039358f.tar.xz"
+OPENJDK_TARBALL="f0482b9b7f7b.tar.xz"
+NASHORN_TARBALL="93462e8b4f4f.tar.xz"
+HOTSPOT_TARBALL="3f9a60eb8ef0.tar.xz"
+SHENANDOAH_TARBALL="adb62c0031b8.tar.xz"
+AARCH32_TARBALL="57f4048a925b.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -45,14 +45,14 @@ AARCH32_GENTOO_TARBALL="icedtea-${ICEDTEA_BRANCH}-aarch32-${AARCH32_TARBALL}"
 CACAO_GENTOO_TARBALL="icedtea-${CACAO_TARBALL}"
 JAMVM_GENTOO_TARBALL="icedtea-${JAMVM_TARBALL}"
 
-DROP_URL="http://icedtea.classpath.org/download/drops"
+DROP_URL="https://icedtea.classpath.org/download/drops"
 ICEDTEA_URL="${DROP_URL}/icedtea${SLOT}/${ICEDTEA_VER}"
 
 DESCRIPTION="A harness to build OpenJDK using Free Software build tools and dependencies"
-HOMEPAGE="http://icedtea.classpath.org"
+HOMEPAGE="https://icedtea.classpath.org"
 SRC_PKG="${ICEDTEA_PKG}.tar.xz"
 SRC_URI="
-	http://icedtea.classpath.org/download/source/${SRC_PKG}
+	https://icedtea.classpath.org/download/source/${SRC_PKG}
 	${ICEDTEA_URL}/openjdk.tar.xz -> ${OPENJDK_GENTOO_TARBALL}
 	${ICEDTEA_URL}/corba.tar.xz -> ${CORBA_GENTOO_TARBALL}
 	${ICEDTEA_URL}/jaxp.tar.xz -> ${JAXP_GENTOO_TARBALL}
@@ -232,6 +232,8 @@ src_configure() {
 	# In-tree JIT ports are available for amd64, arm, arm64, ppc64 (be&le), SPARC and x86.
 	if { use amd64 || use arm || use arm64 || use ppc64 || use sparc || use x86; }; then
 		hotspot_port="yes"
+		# Work around stack alignment issue, bug #647954.
+		use x86 && append-flags -mincoming-stack-boundary=2
 	fi
 
 	# Always use HotSpot as the primary VM if available. #389521 #368669 #357633 ...
@@ -372,14 +374,12 @@ src_install() {
 	java-vm_sandbox-predict /proc/self/coredump_filter
 }
 
-pkg_preinst() { gnome2_icon_savelist; }
-
 pkg_postinst() {
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 	java-vm-2_pkg_postinst
 }
 
 pkg_postrm() {
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 	java-vm-2_pkg_postrm
 }

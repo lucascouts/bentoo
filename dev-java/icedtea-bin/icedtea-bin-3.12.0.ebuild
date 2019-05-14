@@ -5,7 +5,7 @@ EAPI=6
 
 # Don't block arm. See bug #600134.
 #MULTILIB_COMPAT=( abi_ppc_64 abi_x86_{32,64} )
-KEYWORDS="-* amd64 ~arm ~arm64 ppc64 x86"
+KEYWORDS="-* ~amd64 ~ppc64 ~x86"
 
 inherit java-vm-2 multilib-build toolchain-funcs
 
@@ -19,13 +19,11 @@ abi_uri() {
 BASE_URI="https://dev.gentoo.org/~gyakovlev/distfiles"
 SRC_URI="doc? ( ${BASE_URI}/${PN}-doc-${PV}.tar.xz )
 	source? ( ${BASE_URI}/${PN}-src-${PV}.tar.xz )
-	multilib? ( amd64? ( abi_x86_32? ( ${BASE_URI}/${PN}-core-${PV}-r1-x86.tar.xz ) ) )
+	multilib? ( amd64? ( abi_x86_32? ( ${BASE_URI}/${PN}-core-${PV}-x86.tar.xz ) ) )
 	big-endian? ( $(abi_uri ppc64) )
 	!big-endian? ( $(abi_uri ppc64le ppc64) )
 	$(abi_uri amd64)
-	$(abi_uri arm)
-	$(abi_uri arm64)
-	$(abi_uri x86 x86 1)"
+	$(abi_uri x86)"
 
 DESCRIPTION="A Gentoo-made binary build of the IcedTea JDK"
 HOMEPAGE="http://icedtea.classpath.org"
@@ -38,20 +36,20 @@ REQUIRED_USE="gtk? ( !headless-awt ) nsplugin? ( !headless-awt )"
 RESTRICT="preserve-libs strip"
 QA_PREBUILT="opt/.*"
 
-RDEPEND=">=dev-libs/glib-2.42:2%
-	>=media-libs/fontconfig-2.11:1.0%
-	>=media-libs/freetype-2.5.5:2%
+RDEPEND=">=dev-libs/glib-2.58:2%
+	>=media-libs/fontconfig-2.13:1.0%
+	>=media-libs/freetype-2.9.1:2%
 	>=media-libs/lcms-2.9:2%
-	>=sys-libs/zlib-1.2.8-r1%
+	>=sys-libs/zlib-1.2.11-r1%
 	virtual/jpeg:62%
 	alsa? ( >=media-libs/alsa-lib-1.0% )
 	cups? ( >=net-print/cups-2.0% )
 	gtk? (
-		>=dev-libs/atk-2.16.0%
-		>=x11-libs/cairo-1.14.2%
+		>=dev-libs/atk-2.28.1%
+		>=x11-libs/cairo-1.16.0%
 		x11-libs/gdk-pixbuf:2%
 		>=x11-libs/gtk+-2.24:2%
-		>=x11-libs/pango-1.36%
+		>=x11-libs/pango-1.42%
 	)
 	!headless-awt? (
 		media-libs/giflib:0/7%
@@ -60,12 +58,12 @@ RDEPEND=">=dev-libs/glib-2.42:2%
 		>=x11-libs/libXcomposite-0.4%
 		>=x11-libs/libXext-1.3%
 		>=x11-libs/libXi-1.7%
-		>=x11-libs/libXrender-0.9.8%
+		>=x11-libs/libXrender-0.9.10%
 		>=x11-libs/libXtst-1.2%
 	)"
 
-RDEPEND=">=sys-devel/gcc-6.4.0[multilib?]
-	>=sys-libs/glibc-2.26[multilib?]
+RDEPEND=">=sys-devel/gcc-8.2.0[multilib?]
+	>=sys-libs/glibc-2.28[multilib?]
 	virtual/ttf-fonts
 	selinux? ( sec-policy/selinux-java )
 	multilib? ( ${RDEPEND//%/[${MULTILIB_USEDEP}]} )
@@ -119,6 +117,11 @@ multilib_src_install() {
 		if use source; then
 			cp ${P}/src.zip "${ddest}" || die
 		fi
+
+		# use system-wide cacert store
+		mv "${ddest}"/jre/lib/security/cacerts \
+			"${ddest}"/jre/lib/security/cacerts.orig || die
+		dosym "${EPREFIX}"/etc/ssl/certs/java/cacerts "${dest}"/jre/lib/security/cacerts
 
 		# Use default VMHANDLE.
 		java-vm_install-env "${FILESDIR}/icedtea-bin.env.sh"
