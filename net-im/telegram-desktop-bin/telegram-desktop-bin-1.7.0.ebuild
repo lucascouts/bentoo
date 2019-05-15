@@ -22,10 +22,10 @@ QA_PREBUILT="usr/lib/${PN}/Telegram"
 RDEPEND="
 	dev-libs/glib:2
 	dev-libs/gobject-introspection
+	>=media-libs/fontconfig-2.13
 	>=sys-apps/dbus-1.4.20
 	x11-libs/libX11
 	>=x11-libs/libxcb-1.10[xkb]
-	>=media-libs/fontconfig-2.13
 "
 
 S="${WORKDIR}/Telegram"
