@@ -64,16 +64,25 @@ src_install() {
 	local rustc=rustc-bin-${PV}
 	local rustdoc=rustdoc-bin-${PV}
 	local rustgdb=rust-gdb-bin-${PV}
+	local rustgdbgui=rust-gdbgui-bin-${PV}
 	local rustlldb=rust-lldb-bin-${PV}
 
 	mv "${D}/opt/${P}/bin/rustc" "${D}/opt/${P}/bin/${rustc}" || die
 	mv "${D}/opt/${P}/bin/rustdoc" "${D}/opt/${P}/bin/${rustdoc}" || die
 	mv "${D}/opt/${P}/bin/rust-gdb" "${D}/opt/${P}/bin/${rustgdb}" || die
+	mv "${D}/opt/${P}/bin/rust-gdbgui" "${D}/opt/${P}/bin/${rustgdbgui}" || die
 	mv "${D}/opt/${P}/bin/rust-lldb" "${D}/opt/${P}/bin/${rustlldb}" || die
+
+	dosym "${rustc}" "/opt/${P}/bin/rustc"
+	dosym "${rustdoc}" "/opt/${P}/bin/rustdoc"
+	dosym "${rustgdb}" "/opt/${P}/bin/rust-gdb"
+	dosym "${rustgdbgui}" "/opt/${P}/bin/rust-gdbgui"
+	dosym "${rustlldb}" "/opt/${P}/bin/rust-lldb"
 
 	dosym "../../opt/${P}/bin/${rustc}" "/usr/bin/${rustc}"
 	dosym "../../opt/${P}/bin/${rustdoc}" "/usr/bin/${rustdoc}"
 	dosym "../../opt/${P}/bin/${rustgdb}" "/usr/bin/${rustgdb}"
+	dosym "../../opt/${P}/bin/${rustgdbgui}" "/usr/bin/${rustgdbgui}"
 	dosym "../../opt/${P}/bin/${rustlldb}" "/usr/bin/${rustlldb}"
 
 	local cargo=cargo-bin-${PV}
@@ -89,12 +98,15 @@ src_install() {
 	else
 		mv "${D}/opt/${P}/bin/cargo" "${D}/opt/${P}/bin/${cargo}" || die
 	fi
+	dosym "${cargo}" "/opt/${P}/bin/cargo"
 	dosym "../../opt/${P}/bin/${cargo}" "/usr/bin/${cargo}"
 	if use clippy; then
 		local clippy_driver=clippy-driver-bin-${PV}
 		local cargo_clippy=cargo-clippy-bin-${PV}
 		mv "${D}/opt/${P}/bin/clippy-driver" "${D}/opt/${P}/bin/${clippy_driver}" || die
 		mv "${D}/opt/${P}/bin/cargo-clippy" "${D}/opt/${P}/bin/${cargo_clippy}" || die
+		dosym "${clippy_driver}" "/opt/${P}/bin/clippy-driver"
+		dosym "${cargo_clippy}" "/opt/${P}/bin/cargo-clippy"
 		dosym "../../opt/${P}/bin/${clippy_driver}" "/usr/bin/${clippy_driver}"
 		dosym "../../opt/${P}/bin/${cargo_clippy}" "/usr/bin/${cargo_clippy}"
 	fi
@@ -103,6 +115,8 @@ src_install() {
 		local cargo_fmt=cargo-fmt-bin-${PV}
 		mv "${D}/opt/${P}/bin/rustfmt" "${D}/opt/${P}/bin/${rustfmt}" || die
 		mv "${D}/opt/${P}/bin/cargo-fmt" "${D}/opt/${P}/bin/${cargo_fmt}" || die
+		dosym "${rustfmt}" "/opt/${P}/bin/rustfmt"
+		dosym "${cargo_fmt}" "/opt/${P}/bin/cargo-fmt"
 		dosym "../../opt/${P}/bin/${rustfmt}" "/usr/bin/${rustfmt}"
 		dosym "../../opt/${P}/bin/${cargo_fmt}" "/usr/bin/${cargo_fmt}"
 	fi
@@ -116,6 +130,7 @@ src_install() {
 	cat <<-EOF > "${T}/provider-${P}"
 	/usr/bin/rustdoc
 	/usr/bin/rust-gdb
+	/usr/bin/rust-gdbgui
 	/usr/bin/rust-lldb
 	EOF
 	echo /usr/bin/cargo >> "${T}/provider-${P}"
