@@ -10,10 +10,12 @@ inherit linux-info toolchain-funcs mount-boot
 
 COLLECTION_SNAPSHOT="${PV##*_p}"
 INTEL_SNAPSHOT="${PV/_p*}"
-NUM="28087"
+#NUM="28087"
+#https://downloadcenter.intel.com/Detail_Desc.aspx?DwnldID=${NUM}
+#https://downloadmirror.intel.com/${NUM}/eng/microcode-${INTEL_SNAPSHOT}.tgz
 DESCRIPTION="Intel IA32/IA64 microcode update data"
-HOMEPAGE="http://inertiawar.com/microcode/ https://downloadcenter.intel.com/Detail_Desc.aspx?DwnldID=${NUM}"
-SRC_URI="https://downloadmirror.intel.com/${NUM}/eng/microcode-${INTEL_SNAPSHOT}.tgz
+HOMEPAGE="https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files http://inertiawar.com/microcode/"
+SRC_URI="https://github.com/intel/Intel-Linux-Processor-Microcode-Data-Files/archive/microcode-${INTEL_SNAPSHOT}.tar.gz
 	https://dev.gentoo.org/~whissi/dist/intel-microcode/intel-microcode-collection-${COLLECTION_SNAPSHOT}.tar.xz"
 
 LICENSE="intel-ucode"
@@ -50,6 +52,13 @@ pkg_pretend() {
 
 src_prepare() {
 	default
+
+	if cd Intel-Linux-Processor-Microcode-Data* &>/dev/null; then
+		# new tarball format from GitHub
+		mv * ../ || die "Failed to move Intel-Linux-Processor-Microcode-Data*"
+		cd .. || die
+		rm -r Intel-Linux-Processor-Microcode-Data* || die
+	fi
 
 	# Prevent "invalid file format" errors from iucode_tool
 	rm -f "${S}"/intel-ucod*/list || die
