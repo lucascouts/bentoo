@@ -3,15 +3,15 @@
 
 EAPI="7"
 
-PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6,3_7} )
+PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
 PYTHON_REQ_USE="ncurses,readline"
 
 PLOCALES="bg de_DE fr_FR hu it tr zh_CN"
 
 FIRMWARE_ABI_VERSION="2.11.1-r50"
 
-inherit eutils flag-o-matic linux-info toolchain-funcs multilib python-r1 \
-	user udev fcaps readme.gentoo-r1 pax-utils l10n
+inherit eutils linux-info toolchain-funcs multilib python-r1 \
+	user udev fcaps readme.gentoo-r1 pax-utils l10n xdg-utils
 
 if [[ ${PV} = *9999* ]]; then
 	EGIT_REPO_URI="git://git.qemu.org/qemu.git"
@@ -19,10 +19,7 @@ if [[ ${PV} = *9999* ]]; then
 	SRC_URI=""
 else
 	SRC_URI="http://wiki.qemu-project.org/download/${P}.tar.xz"
-	KEYWORDS="amd64 ~arm64 ~ppc ~ppc64 ~x86 ~x86-fbsd"
-
-	# Gentoo specific patchsets:
-	SRC_URI+=" https://dev.gentoo.org/~tamiko/distfiles/${P}-patches-r1.tar.xz"
+	KEYWORDS="~amd64 ~arm64 ~ppc ~ppc64 ~x86 ~x86-fbsd"
 fi
 
 DESCRIPTION="QEMU + Kernel-based Virtual Machine userland tools"
@@ -36,8 +33,6 @@ IUSE="accessibility +aio alsa bzip2 capstone +caps +curl debug
 	pulseaudio python rbd sasl +seccomp sdl selinux smartcard snappy
 	spice ssh static static-user systemtap tci test usb usbredir vde
 	+vhost-net virgl virtfs +vnc vte xattr xen xfs"
-
-RESTRICT=strip
 
 COMMON_TARGETS="aarch64 alpha arm cris hppa i386 m68k microblaze microblazeel
 	mips mips64 mips64el mipsel nios2 or1k ppc ppc64 riscv32 riscv64 s390x
@@ -97,7 +92,7 @@ SOFTMMU_TOOLS_DEPEND="
 	capstone? ( dev-libs/capstone:= )
 	caps? ( sys-libs/libcap-ng[static-libs(+)] )
 	curl? ( >=net-misc/curl-7.15.4[static-libs(+)] )
-	fdt? ( >=sys-apps/dtc-1.4.2[static-libs(+)] )
+	fdt? ( >=sys-apps/dtc-1.5.0[static-libs(+)] )
 	glusterfs? ( >=sys-cluster/glusterfs-3.4.0[static-libs(+)] )
 	gnutls? (
 		dev-libs/nettle:=[static-libs(+)]
@@ -176,6 +171,7 @@ PPC64_FIRMWARE_DEPEND="
 BDEPEND="
 	${PYTHON_DEPS}
 	dev-lang/perl
+	dev-python/sphinx
 	sys-apps/texinfo
 	virtual/pkgconfig
 	gtk? ( nls? ( sys-devel/gettext ) )
@@ -208,7 +204,8 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-2.5.0-cflags.patch
 	"${FILESDIR}"/${PN}-2.5.0-sysmacros.patch
 	"${FILESDIR}"/${PN}-2.11.1-capstone_include_path.patch
-	"${WORKDIR}"/patches
+	"${FILESDIR}"/${P}-sanitize-interp_info.patch
+	"${FILESDIR}"/${PN}-3.1.0-md-clear-md-no.patch
 )
 
 QA_PREBUILT="
@@ -363,11 +360,6 @@ src_prepare() {
 	check_targets IUSE_SOFTMMU_TARGETS softmmu
 	check_targets IUSE_USER_TARGETS linux-user
 
-	# Alter target makefiles to accept CFLAGS set via flag-o
-	sed -i -r \
-		-e 's/^(C|OP_C|HELPER_C)FLAGS=/\1FLAGS+=/' \
-		Makefile Makefile.target || die
-
 	default
 
 	# Fix ld and objcopy being called directly
@@ -488,7 +480,6 @@ qemu_src_configure() {
 		conf_opts+=(
 			--audio-drv-list="${audio_opts}"
 		)
-		use sdl && conf_opts+=( --with-sdlabi=2.0 )
 	fi
 
 	case ${buildtype} in
@@ -600,7 +591,7 @@ src_test() {
 }
 
 qemu_python_install() {
-	python_domodule "${S}/scripts/qmp/qmp.py"
+	python_domodule "${S}/python/qemu/qmp.py"
 
 	python_doscript "${S}/scripts/kvm/vmxcap"
 	python_doscript "${S}/scripts/qmp/qmp-shell"
@@ -679,10 +670,7 @@ src_install() {
 		emake DESTDIR="${ED}" install
 
 		# This might not exist if the test failed. #512010
-		if [[ -e check-report.html ]]; then
-			docinto html
-			dodoc check-report.html
-		fi
+		[[ -e check-report.html ]] && dohtml check-report.html
 
 		if use kernel_linux; then
 			udev_newrules "${FILESDIR}"/65-kvm.rules-r1 65-kvm.rules
@@ -708,6 +696,9 @@ src_install() {
 	cd "${S}"
 	dodoc Changelog MAINTAINERS docs/specs/pci-ids.txt
 	newdoc pc-bios/README README.pc-bios
+
+	# Disallow stripping of prebuilt firmware files.
+	dostrip -x ${QA_PREBUILT}
 
 	if [[ -n ${softmmu_targets} ]]; then
 		# Remove SeaBIOS since we're using the SeaBIOS packaged one
@@ -772,6 +763,8 @@ pkg_postinst() {
 		udev_reload
 	fi
 
+	xdg_icon_cache_update
+
 	[[ -f ${EROOT}/usr/libexec/qemu-bridge-helper ]] && \
 		fcaps cap_net_admin /usr/libexec/qemu-bridge-helper
 
@@ -810,4 +803,8 @@ pkg_info() {
 		echo "    USE=''"
 	fi
 	echo "  $(best_version sys-firmware/sgabios)"
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
 }
