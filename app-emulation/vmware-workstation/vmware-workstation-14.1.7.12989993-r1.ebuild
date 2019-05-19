@@ -7,10 +7,10 @@ inherit eapi7-ver eutils readme.gentoo-r1 gnome2-utils pam systemd xdg-utils
 
 MY_PN="VMware-Workstation-Full"
 MY_PV=$(ver_cut 1-3)
-PV_MODULES="330.$(ver_cut 2-3)"
+PV_MODULES="331.$(ver_cut 2-3)"
 PV_BUILD=$(ver_cut 4)
 MY_P="${MY_PN}-${MY_PV}-${PV_BUILD}"
-VMWARE_FUSION_VER="11.$(ver_cut 2-3)/10952296" # https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/
+VMWARE_FUSION_VER="10.1.6/12989998" # https://softwareupdate.vmware.com/cds/vmw-desktop/fusion/
 SYSTEMD_UNITS_TAG="gentoo-02"
 
 DESCRIPTION="Emulate a complete PC without the performance overhead of most emulators"
@@ -141,7 +141,7 @@ BUNDLED_LIB_DEPENDS="
 	net-misc/curl
 	sys-apps/dbus
 	sys-apps/pcsc-lite
-	sys-fs/fuse
+	sys-fs/fuse:0
 	sys-libs/zlib
 	virtual/jpeg:62
 	x11-libs/cairo[glib]
@@ -180,7 +180,7 @@ RDEPEND="
 	dev-libs/icu
 	dev-libs/json-c
 	dev-libs/nettle:0/6.2
-	<gnome-base/dconf-0.30.1
+	gnome-base/dconf
 	gnome-base/gconf
 	gnome-base/libgnome-keyring
 	media-gfx/graphite2
@@ -200,7 +200,6 @@ RDEPEND="
 	x11-libs/startup-notification
 	x11-libs/xcb-util
 	x11-themes/hicolor-icon-theme
-	bundled-libs? ( media-libs/tiff:3 )
 	!bundled-libs? ( ${BUNDLED_LIB_DEPENDS} )
 	!app-emulation/vmware-player
 	!app-emulation/vmware-tools
