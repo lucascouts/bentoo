@@ -8,7 +8,7 @@ inherit kde5
 
 DESCRIPTION="Backend implementation for xdg-desktop-portal that is using Qt/KDE Frameworks"
 LICENSE="LGPL-2+"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="amd64 ~arm ~arm64 x86"
 IUSE=""
 
 # TODO: Needed for screencast portal
@@ -34,3 +34,5 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	sys-apps/xdg-desktop-portal
 "
+
+PATCHES=( "${FILESDIR}/${P}-appchooser.patch" )
