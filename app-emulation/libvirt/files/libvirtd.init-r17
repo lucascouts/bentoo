@@ -29,6 +29,8 @@ start_pre() {
 
 	checkpath --directory /etc/libvirt/lxc || return 1
 	checkpath --directory /etc/libvirt/nwfilter || return 1
-	checkpath --directory /etc/libvirt/qemu || return 1
-	checkpath --directory /etc/libvirt/storage || return 1
+	[ -L /etc/libvirt/qemu ] ||
+		checkpath --directory /etc/libvirt/qemu || return 1
+	[ -L /etc/libvirt/storage ] ||
+		checkpath --directory /etc/libvirt/storage || return 1
 }

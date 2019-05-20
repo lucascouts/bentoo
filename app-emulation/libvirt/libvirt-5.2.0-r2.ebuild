@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{4,5,6,7} )
+PYTHON_COMPAT=( python3_{5,6,7} )
 
 inherit autotools bash-completion-r1 eutils linux-info python-any-r1 readme.gentoo-r1 systemd user
 
@@ -11,7 +11,7 @@ if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://libvirt.org/git/libvirt.git"
 	SRC_URI=""
-	KEYWORDS=""
+	KEYWORDS="amd64"
 	SLOT="0"
 else
 	# Versions with 4 numbers are stable updates:
@@ -20,7 +20,7 @@ else
 	else
 		SRC_URI="https://libvirt.org/sources/${P}.tar.xz"
 	fi
-	KEYWORDS="~amd64 ~arm64 ~x86"
+	KEYWORDS="amd64 ~arm64 ~x86"
 	SLOT="0/${PV}"
 fi
 
@@ -128,6 +128,7 @@ PATCHES=(
 	"${FILESDIR}"/${PN}-5.2.0-do-not-use-sysconf.patch
 	"${FILESDIR}"/${PN}-1.2.16-fix_paths_in_libvirt-guests_sh.patch
 	"${FILESDIR}"/${PN}-5.0.0-fix-paths-for-apparmor.patch
+	"${FILESDIR}"/${PN}-5.2.0-md-clear.patch
 )
 
 pkg_setup() {
@@ -240,7 +241,7 @@ src_prepare() {
 	fi
 
 	# Tweak the init script:
-	cp "${FILESDIR}/libvirtd.init-r16" "${S}/libvirtd.init" || die
+	cp "${FILESDIR}/libvirtd.init-r17" "${S}/libvirtd.init" || die
 	sed -e "s/USE_FLAG_FIREWALLD/$(usex firewalld 'need firewalld' '')/" \
 		-e "s/USE_FLAG_AVAHI/$(usex zeroconf 'use avahi-daemon' '')/" \
 		-e "s/USE_FLAG_ISCSI/$(usex iscsi 'use iscsid' '')/" \
