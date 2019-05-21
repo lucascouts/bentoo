@@ -1,19 +1,19 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit autotools flag-o-matic pam qmake-utils readme.gentoo-r1 systemd vala xdg-utils
+inherit autotools flag-o-matic pam qmake-utils readme.gentoo-r1 systemd user vala xdg-utils
 
 DESCRIPTION="A lightweight display manager"
-HOMEPAGE="https://www.freedesktop.org/wiki/Software/LightDM"
+HOMEPAGE="https://github.com/CanonicalLtd/lightdm"
 SRC_URI="https://github.com/CanonicalLtd/lightdm/releases/download/${PV}/${P}.tar.xz
 	mirror://gentoo/introspection-20110205.m4.tar.bz2"
 
 LICENSE="GPL-3 LGPL-3"
 SLOT="0"
-KEYWORDS="amd64 arm ~arm64 ppc ppc64 x86"
-IUSE="audit +gnome +gtk +introspection qt5 vala"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86"
+IUSE="audit +gnome +gtk +introspection non_root qt5 vala"
 
 COMMON_DEPEND="
 	>=dev-libs/glib-2.44.0:2
@@ -33,17 +33,29 @@ COMMON_DEPEND="
 RDEPEND="${COMMON_DEPEND}
 	>=sys-auth/pambase-20101024-r2"
 DEPEND="${COMMON_DEPEND}
+	gnome? ( gnome-base/gnome-common )
+"
+BDEPEND="
 	dev-util/gtk-doc-am
 	dev-util/intltool
 	sys-devel/gettext
 	virtual/pkgconfig
-	gnome? ( gnome-base/gnome-common )
 	vala? ( $(vala_depend) )
 "
 PDEPEND="gtk? ( x11-misc/lightdm-gtk-greeter )"
 
 DOCS=( NEWS )
 RESTRICT="test"
+
+pkg_setup() {
+	export LIGHTDM_USER=${LIGHTDM_USER:-lightdm}
+	if use non_root ; then
+		enewgroup ${LIGHTDM_USER}
+		enewgroup video # Just in case it hasn't been created yet
+		enewuser ${LIGHTDM_USER} -1 -1 /var/lib/${LIGHTDM_USER} ${LIGHTDM_USER},video
+		esethome ${LIGHTDM_USER} /var/lib/${LIGHTDM_USER}
+	fi
+}
 
 src_prepare() {
 	xdg_environment_reset
@@ -79,7 +91,7 @@ src_configure() {
 	local _greeter _session _user
 	_greeter=${LIGHTDM_GREETER:=lightdm-gtk-greeter}
 	_session=${LIGHTDM_SESSION:=gnome}
-	_user=${LIGHTDM_USER:=root}
+	_user="$(usex non_root "${LIGHTDM_USER}" root)"
 	# Let user know how lightdm is configured
 	einfo "Gentoo configuration"
 	einfo "Default greeter: ${_greeter}"
@@ -111,8 +123,8 @@ src_install() {
 
 	# Delete apparmor profiles because they only work with Ubuntu's
 	# apparmor package. Bug #494426
-	if [[ -d ${ED%/}/etc/apparmor.d ]]; then
-		rm -r "${ED%/}/etc/apparmor.d" || die \
+	if [[ -d ${ED}/etc/apparmor.d ]]; then
+		rm -r "${ED}/etc/apparmor.d" || die \
 			"Failed to remove apparmor profiles"
 	fi
 
@@ -121,13 +133,13 @@ src_install() {
 	doins "${FILESDIR}"/Xsession
 	fperms +x /etc/${PN}/Xsession
 	# /var/lib/lightdm-data could be useful. Bug #522228
-	dodir /var/lib/lightdm-data
+	keepdir /var/lib/${PN}-data
 
-	find "${ED}" \( -name '*.a' -o -name "*.la" \) -delete || die
-	rm -rf "${ED%/}"/etc/init
+	find "${ED}" -type f \( -name '*.a' -o -name "*.la" \) -delete || die
+	rm -r "${ED}"/etc/init || die
 
 	# Remove existing pam file. We will build a new one. Bug #524792
-	rm -rf "${ED%/}"/etc/pam.d/${PN}{,-greeter}
+	rm -r "${ED}"/etc/pam.d/${PN}{,-greeter} || die
 	pamd_mimic system-local-login ${PN} auth account password session #372229
 	pamd_mimic system-local-login ${PN}-greeter auth account password session #372229
 	dopamd "${FILESDIR}"/${PN}-autologin #390863, #423163
