@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit multilib-minimal
+inherit flag-o-matic multilib-minimal
 
 DESCRIPTION="Open codec for interactive speech and music transmission over the Internet"
 HOMEPAGE="https://opus-codec.org/"
@@ -29,6 +29,10 @@ multilib_src_configure() {
 	for i in ${INTRINSIC_FLAGS} ; do
 		use ${i} && myeconfargs+=( --enable-intrinsics )
 	done
+	if is-flagq -ffast-math || is-flagq -Ofast; then
+		myeconfargs+=( "--enable-float-approx" )
+	fi
+
 	ECONF_SOURCE="${S}" econf "${myeconfargs[@]}"
 }
 
