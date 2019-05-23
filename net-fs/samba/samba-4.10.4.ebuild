@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-PYTHON_COMPAT=( python3_{4,5,6,7} )
+PYTHON_COMPAT=( python3_{5,6,7} )
 PYTHON_REQ_USE='threads(+),xml(+)'
 
 inherit python-single-r1 waf-utils multilib-minimal linux-info systemd pam
@@ -23,8 +23,9 @@ LICENSE="GPL-3"
 
 SLOT="0"
 
-IUSE="acl addc addns ads ceph client cluster cups debug dmapi fam gnutls gpg iprint json ldap
-pam python quota selinux syslog system-heimdal +system-mitkrb5 systemd test winbind zeroconf"
+IUSE="acl addc addns ads ceph client cluster cups debug dmapi fam gnutls gpg
+iprint json ldap pam profiling-data python quota selinux syslog system-heimdal
++system-mitkrb5 systemd test winbind zeroconf"
 
 MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/samba-4.0/policy.h
@@ -133,6 +134,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-4.4.0-pam.patch"
 	"${FILESDIR}/${PN}-4.5.1-compile_et_fix.patch"
 	"${FILESDIR}/${PN}-4.9.2-timespec.patch"
+	"${FILESDIR}/${PN}-4.10.0-disable_gnutls_build_fix.patch"
 )
 
 #CONFDIR="${FILESDIR}/$(get_version_component_range 1-2)"
@@ -218,6 +220,7 @@ multilib_src_configure() {
 		$(use_enable gnutls)
 		$(use_with debug lttng)
 		$(use_with ldap)
+		$(use_with profiling-data)
 	)
 
 	multilib_is_native_abi && myconf+=( --with-shared-modules=${SHAREDMODS} )
