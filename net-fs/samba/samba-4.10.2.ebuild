@@ -15,7 +15,7 @@ SRC_PATH="stable"
 
 SRC_URI="mirror://samba/${SRC_PATH}/${MY_P}.tar.gz"
 [[ ${PV} = *_rc* ]] || \
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 
 DESCRIPTION="Samba Suite Version 4"
 HOMEPAGE="https://www.samba.org/"
@@ -23,9 +23,8 @@ LICENSE="GPL-3"
 
 SLOT="0"
 
-IUSE="acl addc addns ads ceph client cluster cups debug dmapi fam gnutls gpg
-iprint json ldap pam profiling-data python quota selinux syslog system-heimdal
-+system-mitkrb5 systemd test winbind zeroconf"
+IUSE="acl addc addns ads ceph client cluster cups debug dmapi fam gnutls gpg iprint json ldap
+pam python quota selinux syslog system-heimdal +system-mitkrb5 systemd test winbind zeroconf"
 
 MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/samba-4.0/policy.h
@@ -220,7 +219,6 @@ multilib_src_configure() {
 		$(use_enable gnutls)
 		$(use_with debug lttng)
 		$(use_with ldap)
-		$(use_with profiling-data)
 	)
 
 	multilib_is_native_abi && myconf+=( --with-shared-modules=${SHAREDMODS} )
