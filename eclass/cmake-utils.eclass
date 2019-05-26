@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: cmake-utils.eclass
@@ -50,12 +50,10 @@ _CMAKE_UTILS_ECLASS=1
 # Set to enable in-source build.
 
 # @ECLASS-VARIABLE: CMAKE_MAKEFILE_GENERATOR
-# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Specify a makefile generator to be used by cmake.
 # At this point only "emake" and "ninja" are supported.
-# In EAPI 7 and above, the default is set to "ninja",
-# whereas in EAPIs below 7, it is set to "emake".
+: ${CMAKE_MAKEFILE_GENERATOR:=emake}
 
 # @ECLASS-VARIABLE: CMAKE_MIN_VERSION
 # @DESCRIPTION:
@@ -114,32 +112,20 @@ esac
 inherit toolchain-funcs ninja-utils flag-o-matic multiprocessing xdg-utils
 
 case ${EAPI} in
-	[56])
-		: ${CMAKE_MAKEFILE_GENERATOR:=emake}
-		inherit eutils multilib
-		;;
-	*)
-		: ${CMAKE_MAKEFILE_GENERATOR:=ninja}
-		;;
+	5|6) inherit eutils multilib ;;
 esac
 
 EXPORT_FUNCTIONS src_prepare src_configure src_compile src_test src_install
 
-if [[ ${WANT_CMAKE} ]]; then
-	if [[ ${EAPI} != [56] ]]; then
-		die "\${WANT_CMAKE} has been removed and is a no-op now"
-	else
-		eqawarn "\${WANT_CMAKE} has been removed and is a no-op now"
-	fi
-fi
+[[ ${WANT_CMAKE} ]] && eqawarn "\${WANT_CMAKE} has been removed and is a no-op now"
 [[ ${PREFIX} ]] && die "\${PREFIX} has been removed and is a no-op now"
 
 case ${CMAKE_MAKEFILE_GENERATOR} in
 	emake)
-		BDEPEND="sys-devel/make"
+		DEPEND="sys-devel/make"
 		;;
 	ninja)
-		BDEPEND="dev-util/ninja"
+		DEPEND="dev-util/ninja"
 		;;
 	*)
 		eerror "Unknown value for \${CMAKE_MAKEFILE_GENERATOR}"
@@ -148,13 +134,8 @@ case ${CMAKE_MAKEFILE_GENERATOR} in
 esac
 
 if [[ ${PN} != cmake ]]; then
-	BDEPEND+=" >=dev-util/cmake-${CMAKE_MIN_VERSION}"
+	DEPEND+=" >=dev-util/cmake-${CMAKE_MIN_VERSION}"
 fi
-
-case ${EAPI} in
-	7) ;;
-	*) DEPEND=" ${BDEPEND}" ;;
-esac
 
 # Internal functions used by cmake-utils_use_*
 _cmake_use_me_now() {
@@ -214,13 +195,8 @@ _cmake_check_build_dir() {
 		# Respect both the old variable and the new one, depending
 		# on which one was set by the ebuild.
 		if [[ ! ${BUILD_DIR} && ${CMAKE_BUILD_DIR} ]]; then
-			if [[ ${EAPI} != [56] ]]; then
-				eerror "The CMAKE_BUILD_DIR variable has been renamed to BUILD_DIR."
-				die "The ebuild must be migrated to BUILD_DIR."
-			else
-				eqawarn "The CMAKE_BUILD_DIR variable has been renamed to BUILD_DIR."
-				eqawarn "Please migrate the ebuild to use the new one."
-			fi
+			eqawarn "The CMAKE_BUILD_DIR variable has been renamed to BUILD_DIR."
+			eqawarn "Please migrate the ebuild to use the new one."
 
 			# In the next call, both variables will be set already
 			# and we'd have to know which one takes precedence.
@@ -235,7 +211,7 @@ _cmake_check_build_dir() {
 	fi
 
 	# Backwards compatibility for getting the value.
-	[[ ${EAPI} == [56] ]] && CMAKE_BUILD_DIR=${BUILD_DIR}
+	CMAKE_BUILD_DIR=${BUILD_DIR}
 
 	mkdir -p "${BUILD_DIR}" || die
 	echo ">>> Working in BUILD_DIR: \"$BUILD_DIR\""
@@ -419,17 +395,13 @@ _cmake_modify-cmakelists() {
 	grep -qs "<<< Gentoo configuration >>>" "${CMAKE_USE_DIR}"/CMakeLists.txt && return 0
 
 	# Comment out all set (<some_should_be_user_defined_variable> value)
-	find "${CMAKE_USE_DIR}" -name CMakeLists.txt -exec sed \
-		-e '/^[[:space:]]*set[[:space:]]*([[:space:]]*CMAKE_BUILD_TYPE[[:space:]].*)/I{s/^/#_cmake_modify_IGNORE /g}' \
-		-e '/^[[:space:]]*set[[:space:]]*([[:space:]]*CMAKE_COLOR_MAKEFILE[[:space:]].*)/I{s/^/#_cmake_modify_IGNORE /g}' \
-		-e '/^[[:space:]]*set[[:space:]]*([[:space:]]*CMAKE_INSTALL_PREFIX[[:space:]].*)/I{s/^/#_cmake_modify_IGNORE /g}' \
-		-e '/^[[:space:]]*set[[:space:]]*([[:space:]]*CMAKE_VERBOSE_MAKEFILE[[:space:]].*)/I{s/^/#G_cmake_modify_IGNORE /g}' \
-		-i {} + || die "${LINENO}: failed to disable hardcoded settings"
-	local x
-	for x in $(find "${CMAKE_USE_DIR}" -name CMakeLists.txt -exec grep -l "^#_cmake_modify_IGNORE" {} +;); do
-		einfo "Hardcoded definition(s) removed in $(echo "${x}" | cut -c $((${#CMAKE_USE_DIR}+2))-):"
-		einfo "$(grep -se '^#_cmake_modify_IGNORE' ${x} | cut -c 22-99)"
-	done
+	# TODO Add QA checker - inform when variable being checked for below is set in CMakeLists.txt
+	find "${CMAKE_USE_DIR}" -name CMakeLists.txt \
+		-exec sed -i -e '/^[[:space:]]*[sS][eE][tT][[:space:]]*([[:space:]]*CMAKE_BUILD_TYPE.*)/{s/^/#IGNORE /g}' {} + \
+		-exec sed -i -e '/^[[:space:]]*[sS][eE][tT][[:space:]]*([[:space:]]*CMAKE_COLOR_MAKEFILE.*)/{s/^/#IGNORE /g}' {} + \
+		-exec sed -i -e '/^[[:space:]]*[sS][eE][tT][[:space:]]*([[:space:]]*CMAKE_INSTALL_PREFIX.*)/{s/^/#IGNORE /g}' {} + \
+		-exec sed -i -e '/^[[:space:]]*[sS][eE][tT][[:space:]]*([[:space:]]*CMAKE_VERBOSE_MAKEFILE.*)/{s/^/#IGNORE /g}' {} + \
+		|| die "${LINENO}: failed to disable hardcoded settings"
 
 	# NOTE Append some useful summary here
 	cat >> "${CMAKE_USE_DIR}"/CMakeLists.txt <<- _EOF_ || die
@@ -523,11 +495,7 @@ cmake-utils_src_configure() {
 	debug-print-function ${FUNCNAME} "$@"
 
 	if [[ ! ${_CMAKE_UTILS_SRC_PREPARE_HAS_RUN} ]]; then
-		if [[ ${EAPI} != [56] ]]; then
-			die "FATAL: cmake-utils_src_prepare has not been run"
-		else
-			eqawarn "cmake-utils_src_prepare has not been run, please open a bug on https://bugs.gentoo.org/"
-		fi
+		eqawarn "cmake-utils_src_prepare has not been run, please open a bug on https://bugs.gentoo.org/"
 	fi
 
 	[[ ${EAPI} == 5 ]] && _cmake_cleanup_cmake
@@ -649,7 +617,6 @@ cmake-utils_src_configure() {
 	if [[ ${EAPI} != [56] ]]; then
 		cat >> "${common_config}" <<- _EOF_ || die
 			SET (CMAKE_INSTALL_DOCDIR "${EPREFIX}/usr/share/doc/${PF}" CACHE PATH "")
-			SET (BUILD_SHARED_LIBS ON CACHE BOOLEAN "")
 		_EOF_
 	fi
 

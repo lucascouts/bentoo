@@ -4,7 +4,7 @@
 # @ECLASS: golang-base.eclass
 # @MAINTAINER:
 # William Hubbs <williamh@gentoo.org>
-# @SUPPORTED_EAPIS: 5 6 7
+# @SUPPORTED_EAPIS: 5 6
 # @BLURB: Eclass that provides base functions for Go packages.
 # @DESCRIPTION:
 # This eclass provides base functions for software written in the Go
@@ -12,7 +12,7 @@
 # dev-lang/go.
 
 case "${EAPI:-0}" in
-	5|6|7)
+	5|6)
 		;;
 	*)
 		die "${ECLASS}: Unsupported eapi (EAPI=${EAPI})"
@@ -23,18 +23,12 @@ if [[ -z ${_GOLANG_BASE} ]]; then
 
 _GOLANG_BASE=1
 
-GO_DEPEND=">=dev-lang/go-1.10"
-if [[ ${EAPI:-0} == [56] ]]; then
-	DEPEND="${GO_DEPEND}"
-else
-	BDEPEND="${GO_DEPEND}"
-fi
+DEPEND=">=dev-lang/go-1.9"
 
 # Do not complain about CFLAGS etc since go projects do not use them.
 QA_FLAGS_IGNORED='.*'
 
-# Upstream does not support stripping go packages
-RESTRICT="strip"
+STRIP_MASK="*.a"
 
 # @ECLASS-VARIABLE: EGO_PN
 # @REQUIRED

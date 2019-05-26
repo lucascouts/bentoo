@@ -1,4 +1,4 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: waf-utils.eclass
@@ -84,20 +84,13 @@ waf-utils_src_configure() {
 	[[ -z ${NO_WAF_LIBDIR} ]] && libdir=(--libdir="${EPREFIX}/usr/$(get_libdir)")
 
 	tc-export AR CC CPP CXX RANLIB
+	echo "CCFLAGS=\"${CFLAGS}\" LINKFLAGS=\"${CFLAGS} ${LDFLAGS}\" \"${WAF_BINARY}\" --prefix=${EPREFIX}/usr ${libdir[@]} $@ configure"
 
-	local CMD=(
-		CCFLAGS="${CFLAGS}"
-		LINKFLAGS="${CFLAGS} ${LDFLAGS}"
-		PKGCONFIG="$(tc-getPKG_CONFIG)"
-		"${WAF_BINARY}"
-		"--prefix=${EPREFIX}/usr"
-		"${libdir[@]}"
-		"${@}"
-		configure
-	)
-
-	echo "${CMD[@]@Q}" >&2
-	env "${CMD[@]}" || die "configure failed"
+	CCFLAGS="${CFLAGS}" LINKFLAGS="${CFLAGS} ${LDFLAGS}" "${WAF_BINARY}" \
+		"--prefix=${EPREFIX}/usr" \
+		"${libdir[@]}" \
+		"${@}" \
+		configure || die "configure failed"
 }
 
 # @FUNCTION: waf-utils_src_compile

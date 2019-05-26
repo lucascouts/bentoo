@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: fortran-2.eclass
@@ -8,7 +8,7 @@
 # @AUTHOR:
 # Author Justin Lecher <jlec@gentoo.org>
 # Test functions provided by Sebastien Fabbro and Kacper Kowalik
-# @SUPPORTED_EAPIS: 4 5 6 7
+# @SUPPORTED_EAPIS: 4 5 6
 # @BLURB: Simplify fortran compiler management
 # @DESCRIPTION:
 # If you need a fortran compiler, then you should be inheriting this eclass.
@@ -27,15 +27,12 @@
 #
 # FORTRAN_NEED_OPENMP=1
 
-inherit toolchain-funcs
+inherit eutils toolchain-funcs
+
 case ${EAPI:-0} in
-	# not used in the eclass, but left for backward compatibility with legacy users
-	4|5|6) inherit eutils ;;
-	7) ;;
+	4|5|6) EXPORT_FUNCTIONS pkg_setup ;;
 	*) die "EAPI=${EAPI} is not supported" ;;
 esac
-
-EXPORT_FUNCTIONS pkg_setup
 
 if [[ ! ${_FORTRAN_2_CLASS} ]]; then
 
@@ -95,7 +92,7 @@ unset _f_use
 fortran_int64_abi_fflags() {
 	debug-print-function ${FUNCNAME} "${@}"
 
-	local _FC=$(tc-getFC)
+	_FC=$(tc-getFC)
 	if [[ ${_FC} == *gfortran* ]]; then
 		echo "-fdefault-integer-8"
 	elif [[ ${_FC} == ifort ]]; then
@@ -115,17 +112,17 @@ _fortran_write_testsuite() {
 	local filebase=${T}/test-fortran
 
 	# f77 code
-	cat <<- EOF > "${filebase}.f" || die
+	cat <<- EOF > "${filebase}.f"
 	       end
 	EOF
 
 	# f90/95 code
-	cat <<- EOF > "${filebase}.f90" || die
+	cat <<- EOF > "${filebase}.f90"
 	end
 	EOF
 
 	# f2003 code
-	cat <<- EOF > "${filebase}.f03" || die
+	cat <<- EOF > "${filebase}.f03"
 	       procedure(), pointer :: p
 	       end
 	EOF
@@ -173,7 +170,7 @@ _fortran-has-openmp() {
 	local ret
 	local _fc=$(tc-getFC)
 
-	cat <<- EOF > "${fcode}" || die
+	cat <<- EOF > "${fcode}"
 	       call omp_get_num_threads
 	       end
 	EOF
@@ -182,7 +179,7 @@ _fortran-has-openmp() {
 		${_fc} ${flag} "${fcode}" -o "${fcode}.x" \
 			&>> "${T}"/_fortran_compile_test.log
 		ret=$?
-		[[ ${ret} == 0 ]] && break
+		(( ${ret} )) || break
 	done
 
 	rm -f "${fcode}.x"
@@ -196,12 +193,12 @@ _fortran-has-openmp() {
 _fortran_die_msg() {
 	debug-print-function ${FUNCNAME} "${@}"
 
-	eerror
+	echo
 	eerror "Please install currently selected gcc version with USE=fortran."
 	eerror "If you intend to use a different compiler then gfortran, please"
 	eerror "set FC variable accordingly and take care that the necessary"
 	eerror "fortran dialects are supported."
-	eerror
+	echo
 	die "Currently no working fortran compiler is available (see ${T}/_fortran_compile_test.log for information)"
 }
 
@@ -253,7 +250,7 @@ _fortran-2_pkg_setup() {
 	for _f_use in ${FORTRAN_NEEDED}; do
 	case ${_f_use} in
 		always)
-			_fortran_test_function && break 2
+			_fortran_test_function && break
 			;;
 		no)
 			einfo "Forcing fortran support off"
@@ -261,7 +258,7 @@ _fortran-2_pkg_setup() {
 			;;
 		*)
 			if use ${_f_use}; then
-				_fortran_test_function && break 2
+				_fortran_test_function && break
 			else
 				unset FC
 				unset F77

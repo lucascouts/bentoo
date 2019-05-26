@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: ruby-ng-gnome2.eclass
@@ -45,7 +45,7 @@ else
 	RUBY_S=ruby-gnome2-all-${PV}/${subbinding}
 fi
 SRC_URI="mirror://sourceforge/ruby-gnome2/ruby-gnome2-all-${PV}.tar.gz"
-HOMEPAGE="https://ruby-gnome2.osdn.jp/"
+HOMEPAGE="http://ruby-gnome2.sourceforge.jp/"
 LICENSE="Ruby"
 SLOT="0"
 
