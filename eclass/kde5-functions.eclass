@@ -1,10 +1,10 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: kde5-functions.eclass
 # @MAINTAINER:
 # kde@gentoo.org
-# @SUPPORTED_EAPIS: 6
+# @SUPPORTED_EAPIS: 6 7
 # @BLURB: Common ebuild functions for packages based on KDE Frameworks 5.
 # @DESCRIPTION:
 # This eclass contains functions shared by the other KDE eclasses and forms
@@ -18,6 +18,7 @@ _KDE5_FUNCTIONS_ECLASS=1
 inherit toolchain-funcs
 
 case ${EAPI} in
+	7) ;;
 	6) inherit eapi7-ver ;;
 	*) die "EAPI=${EAPI:-0} is not supported" ;;
 esac
@@ -37,56 +38,38 @@ case ${CATEGORY} in
 		[[ ${KDE_BUILD_TYPE} = live ]] && : ${FRAMEWORKS_MINIMAL:=9999}
 		;;
 	kde-plasma)
-		if [[ ${PV} = 5.13.5 ]]; then
-			: ${FRAMEWORKS_MINIMAL:=5.46.0}
-			: ${KDE_APPS_MINIMAL:=17.12.3}
-		fi
-		if [[ ${KDE_BUILD_TYPE} = live && ${PV} != 5.??.49* ]]; then
-			: ${FRAMEWORKS_MINIMAL:=9999}
-		fi
-		: ${QT_MINIMAL:=5.11.1}
-		;;
-	kde-apps)
-		[[ ${PV} = 18.04.3 ]] && : ${FRAMEWORKS_MINIMAL:=5.46.0}
+		[[ ${PV} = 5.15.5 ]] && : ${QT_MINIMAL:=5.11.1}
+		[[ ${PV} = 5.16* ]] && : ${FRAMEWORKS_MINIMAL:=5.58.0}
+		[[ ${KDE_BUILD_TYPE} = live ]] && : ${FRAMEWORKS_MINIMAL:=9999}
+		: ${QT_MINIMAL:=5.12.3}
 		;;
 esac
 
 # @ECLASS-VARIABLE: QT_MINIMAL
 # @DESCRIPTION:
 # Minimum version of Qt to require. This affects add_qt_dep.
-: ${QT_MINIMAL:=5.9.4}
+: ${QT_MINIMAL:=5.11.1}
 
 # @ECLASS-VARIABLE: FRAMEWORKS_MINIMAL
 # @DESCRIPTION:
 # Minimum version of Frameworks to require. This affects add_frameworks_dep.
-: ${FRAMEWORKS_MINIMAL:=5.50.0}
+: ${FRAMEWORKS_MINIMAL:=5.57.0}
 
 # @ECLASS-VARIABLE: PLASMA_MINIMAL
 # @DESCRIPTION:
 # Minimum version of Plasma to require. This affects add_plasma_dep.
-: ${PLASMA_MINIMAL:=5.12.5}
+: ${PLASMA_MINIMAL:=5.14.5}
 
 # @ECLASS-VARIABLE: KDE_APPS_MINIMAL
 # @DESCRIPTION:
 # Minimum version of KDE Applications to require. This affects add_kdeapps_dep.
-: ${KDE_APPS_MINIMAL:=18.04.3}
+: ${KDE_APPS_MINIMAL:=18.12.3}
 
 # @ECLASS-VARIABLE: KDE_GCC_MINIMAL
 # @DEFAULT_UNSET
 # @DESCRIPTION:
 # Minimum version of active GCC to require. This is checked in kde5.eclass in
 # kde5_pkg_pretend and kde5_pkg_setup.
-
-# @ECLASS-VARIABLE: KDEBASE
-# @DEFAULT_UNSET
-# @DESCRIPTION:
-# This gets set to a non-zero value when a package is considered a
-# kdevelop ebuild.
-if [[ ${KMNAME-${PN}} = kdevelop ]]; then
-	KDEBASE=kdevelop
-fi
-
-debug-print "${ECLASS}: ${KDEBASE} ebuild recognized"
 
 # @FUNCTION: _check_gcc_version
 # @INTERNAL
@@ -141,7 +124,7 @@ _add_category_dep() {
 
 	if [[ -n ${slot} ]] ; then
 		slot=":${slot}"
-	elif [[ ${SLOT%\/*} = 4 || ${SLOT%\/*} = 5 ]] && ! has kde5-meta-pkg ${INHERITED} ; then
+	elif [[ ${SLOT%\/*} = 5 ]] ; then
 		slot=":${SLOT%\/*}"
 	fi
 
@@ -267,10 +250,10 @@ add_qt_dep() {
 	local slot=${4}
 
 	if [[ -z ${version} ]]; then
-		if [[ ${1} = qtwebkit && $(ver_cut 2 ${QT_MINIMAL}) -ge 9 ]]; then
-			version=5.9.1 # no more upstream release, need bug #624404
-		else
-			version=${QT_MINIMAL}
+		version=${QT_MINIMAL}
+		if [[ ${1} = qtwebkit ]]; then
+			version=5.9.1
+			[[ ${EAPI} != 6 ]] && die "${FUNCNAME} is disallowed for 'qtwebkit' in EAPI 7 and later"
 		fi
 	fi
 	if [[ -z ${slot} ]]; then
@@ -288,6 +271,7 @@ add_qt_dep() {
 # If the version equals 9999, "live" is returned.
 # If no version is specified, ${PV} is used.
 get_kde_version() {
+	[[ ${EAPI} != 6 ]] && die "${FUNCNAME} is banned in EAPI 7 and later"
 	local ver=${1:-${PV}}
 	local major=$(ver_cut 1 ${ver})
 	local minor=$(ver_cut 2 ${ver})
@@ -306,6 +290,7 @@ get_kde_version() {
 # Output KDE lingua flag name(s) (without prefix(es)) appropriate for
 # given l10n(s).
 kde_l10n2lingua() {
+	[[ ${EAPI} != 6 ]] && die "${FUNCNAME} is banned in EAPI 7 and later"
 	local l
 	for l; do
 		case ${l} in

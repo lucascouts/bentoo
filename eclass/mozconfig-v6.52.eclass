@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2015 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 #
-# @ECLASS: mozconfig-v6.60.eclass
+# @ECLASS: mozconfig-v6.52.eclass
 # @MAINTAINER:
 # mozilla team <mozilla@gentoo.org>
 # @SUPPORTED_EAPIS: 5 6 7
@@ -27,9 +27,10 @@ case ${EAPI} in
 		;;
 esac
 
-inherit flag-o-matic toolchain-funcs mozcoreconf-v6
+inherit flag-o-matic toolchain-funcs mozcoreconf-v5
 
 # @ECLASS-VARIABLE: MOZCONFIG_OPTIONAL_WIFI
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Set this variable before the inherit line, when an ebuild needs to provide
 # optional necko-wifi support via IUSE="wifi".  Currently this would include
@@ -40,6 +41,7 @@ inherit flag-o-matic toolchain-funcs mozcoreconf-v6
 # Set the variable to any value if the use flag should exist but not be default-enabled.
 
 # @ECLASS-VARIABLE: MOZCONFIG_OPTIONAL_JIT
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Set this variable before the inherit line, when an ebuild needs to provide
 # deterministic jit support via IUSE="jit".  The upstream default will be used
@@ -50,6 +52,7 @@ inherit flag-o-matic toolchain-funcs mozcoreconf-v6
 # Set the variable to any value if the use flag should exist but not be default-enabled.
 
 # @ECLASS-VARIABLE: MOZCONFIG_OPTIONAL_GTK3
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Set this variable before the inherit line, when an ebuild can provide
 # optional gtk3 support via IUSE="force-gtk3".  Currently this would include
@@ -62,6 +65,7 @@ inherit flag-o-matic toolchain-funcs mozcoreconf-v6
 # MOZCONFIG_OPTIONAL_GTK2ONLY.
 
 # @ECLASS-VARIABLE: MOZCONFIG_OPTIONAL_GTK2ONLY
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Set this variable before the inherit line, when an ebuild can provide
 # optional gtk2-only support via IUSE="gtk2".
@@ -74,34 +78,46 @@ inherit flag-o-matic toolchain-funcs mozcoreconf-v6
 # Set the variable to "enabled" if the use flag should be enabled by default.
 # Set the variable to any value if the use flag should exist but not be default-enabled.
 
+# @ECLASS-VARIABLE: MOZCONFIG_OPTIONAL_QT5
+# @DEFAULT_UNSET
+# @DESCRIPTION:
+# Set this variable before the inherit line, when an ebuild can provide
+# optional qt5 support via IUSE="qt5".  Currently this would include
+# ebuilds for firefox, but thunderbird and seamonkey could follow in the future.
+#
+# Leave the variable UNSET if qt5 support should not be available.
+# Set the variable to "enabled" if the use flag should be enabled by default.
+# Set the variable to any value if the use flag should exist but not be default-enabled.
+
 # use-flags common among all mozilla ebuilds
-IUSE="${IUSE} clang dbus debug neon pulseaudio selinux startup-notification system-harfbuzz
- system-icu system-jpeg system-libevent system-sqlite system-libvpx"
+IUSE="${IUSE} dbus debug +jemalloc neon pulseaudio selinux startup-notification system-cairo
+	system-harfbuzz system-icu system-jpeg system-libevent system-sqlite system-libvpx"
 
 # some notes on deps:
 # gtk:2 minimum is technically 2.10 but gio support (enabled by default) needs 2.14
 # media-libs/mesa needs to be 10.2 or above due to a bug with flash+vdpau
 
-RDEPEND=">=app-text/hunspell-1.5.4:=
+RDEPEND=">=app-text/hunspell-1.2:=
 	dev-libs/atk
 	dev-libs/expat
 	>=x11-libs/cairo-1.10[X]
 	>=x11-libs/gtk+-2.18:2
 	x11-libs/gdk-pixbuf
 	>=x11-libs/pango-1.22.0
-	>=media-libs/libpng-1.6.34:0=[apng]
+	>=media-libs/libpng-1.6.25:0=[apng]
 	>=media-libs/mesa-10.2:*
 	media-libs/fontconfig
 	>=media-libs/freetype-2.4.10
 	kernel_linux? ( !pulseaudio? ( media-libs/alsa-lib ) )
+	pulseaudio? ( || ( media-sound/pulseaudio
+		>=media-sound/apulse-0.1.9 ) )
 	virtual/freedesktop-icon-theme
 	dbus? ( >=sys-apps/dbus-0.60
 		>=dev-libs/dbus-glib-0.72 )
 	startup-notification? ( >=x11-libs/startup-notification-0.8 )
-	>=x11-libs/pixman-0.19.2
 	>=dev-libs/glib-2.26:2
 	>=sys-libs/zlib-1.2.3
-	>=virtual/libffi-3.0.10:=
+	>=virtual/libffi-3.0.10
 	virtual/ffmpeg
 	x11-libs/libX11
 	x11-libs/libXcomposite
@@ -110,15 +126,13 @@ RDEPEND=">=app-text/hunspell-1.5.4:=
 	x11-libs/libXfixes
 	x11-libs/libXrender
 	x11-libs/libXt
-	system-icu? ( >=dev-libs/icu-59.1:= )
+	system-cairo? ( >=x11-libs/cairo-1.12[X,xcb] >=x11-libs/pixman-0.19.2 )
+	system-icu? ( >=dev-libs/icu-58.1:= )
 	system-jpeg? ( >=media-libs/libjpeg-turbo-1.2.1 )
 	system-libevent? ( >=dev-libs/libevent-2.0:0=[threads] )
-	system-sqlite? ( >=dev-db/sqlite-3.23.1:3[secure-delete,debug=] )
-	system-libvpx? (
-		>=media-libs/libvpx-1.5.0:0=[postproc]
-		<media-libs/libvpx-1.8:0=[postproc]
-	)
-	system-harfbuzz? ( >=media-libs/harfbuzz-1.4.2:0= >=media-gfx/graphite2-1.3.9-r1 )
+	system-sqlite? ( >=dev-db/sqlite-3.17.0:3[secure-delete,debug=] )
+	system-libvpx? ( >=media-libs/libvpx-1.5.0:0=[postproc] )
+	system-harfbuzz? ( >=media-libs/harfbuzz-1.3.3:0= >=media-gfx/graphite2-1.3.8 )
 "
 
 if [[ -n ${MOZCONFIG_OPTIONAL_GTK3} ]]; then
@@ -136,9 +150,6 @@ elif [[ -n ${MOZCONFIG_OPTIONAL_GTK2ONLY} ]]; then
 		IUSE+=" gtk2"
 	fi
 	RDEPEND+=" !gtk2? ( >=x11-libs/gtk+-3.4.0:3 )"
-else
-	# no gtk3 related dep set by optional use flags, force it
-	RDEPEND+="  >=x11-libs/gtk+-3.4.0:3"
 fi
 if [[ -n ${MOZCONFIG_OPTIONAL_WIFI} ]]; then
 	if [[ ${MOZCONFIG_OPTIONAL_WIFI} = "enabled" ]]; then
@@ -156,43 +167,9 @@ fi
 
 DEPEND="app-arch/zip
 	app-arch/unzip
-	>=sys-devel/binutils-2.30
+	>=sys-devel/binutils-2.16.1
 	sys-apps/findutils
-	|| (
-		(
-			sys-devel/clang:8
-			!clang? ( sys-devel/llvm:8 )
-			clang? (
-				=sys-devel/lld-8*
-				sys-devel/llvm:8[gold]
-			)
-		)
-		(
-			sys-devel/clang:7
-			!clang? ( sys-devel/llvm:7 )
-			clang? (
-				=sys-devel/lld-7*
-				sys-devel/llvm:7[gold]
-			)
-		)
-		(
-			sys-devel/clang:6
-			!clang? ( sys-devel/llvm:6 )
-			clang? (
-				=sys-devel/lld-6*
-				sys-devel/llvm:6[gold]
-			)
-		)
-	)
 	pulseaudio? ( media-sound/pulseaudio )
-	elibc_glibc? (
-		virtual/cargo
-		virtual/rust
-	)
-	elibc_musl? (
-		virtual/cargo
-		virtual/rust
-	)
 	${RDEPEND}"
 
 RDEPEND+="
@@ -218,45 +195,10 @@ RDEPEND+="
 # }
 
 mozconfig_config() {
-	if use clang && ! tc-is-clang ; then
-		# Force clang
-		einfo "Enforcing the use of clang due to USE=clang ..."
-		CC=${CHOST}-clang
-		CXX=${CHOST}-clang++
-		strip-unsupported-flags
-	elif ! use clang && ! tc-is-gcc ; then
-		# Force gcc
-		einfo "Enforcing the use of gcc due to USE=-clang ..."
-		CC=${CHOST}-gcc
-		CXX=${CHOST}-g++
-		strip-unsupported-flags
-	fi
-
 	# Migrated from mozcoreconf-2
 	mozconfig_annotate 'system_libs' \
 		--with-system-zlib \
 		--with-system-bz2
-
-	# Stylo is horribly broken on arm, renders GUI unusable
-	use arm && mozconfig_annotate 'breaks UI on arm' --disable-stylo
-
-	# Must pass release in order to properly select linker
-	mozconfig_annotate 'Enable by Gentoo' --enable-release
-
-	# Set correct update channel, bug 677722
-	if [[ -n "${MOZ_ESR}" ]] ; then
-		mozconfig_annotate 'set update channel to ESR' --enable-update-channel=esr
-	fi
-
-	# Avoid auto-magic on linker
-	if use clang ; then
-		# This is upstream's default
-		mozconfig_annotate "forcing ld=lld due to USE=clang" --enable-linker=lld
-	elif tc-ld-is-gold ; then
-		mozconfig_annotate "linker is set to gold" --enable-linker=gold
-	else
-		mozconfig_annotate "linker is set to bfd" --enable-linker=bfd
-	fi
 
 	if has bindist ${IUSE}; then
 		mozconfig_use_enable !bindist official-branding
@@ -306,12 +248,14 @@ mozconfig_config() {
 	mozconfig_annotate '' --prefix="${EPREFIX}"/usr
 	mozconfig_annotate '' --libdir="${EPREFIX}"/usr/$(get_libdir)
 	mozconfig_annotate 'Gentoo default' --enable-system-hunspell
+	mozconfig_annotate '' --disable-gnomeui
+	mozconfig_annotate '' --enable-gio
 	mozconfig_annotate '' --disable-crashreporter
 	mozconfig_annotate 'Gentoo default' --with-system-png
 	mozconfig_annotate '' --enable-system-ffi
+	mozconfig_annotate 'Gentoo default to honor system linker' --disable-gold
 	mozconfig_annotate '' --disable-gconf
 	mozconfig_annotate '' --with-intl-api
-	mozconfig_annotate '' --enable-system-pixman
 
 	# skia has no support for big-endian platforms
 	if [[ $(tc-endian) == "big" ]]; then
@@ -320,23 +264,46 @@ mozconfig_config() {
 		mozconfig_annotate '' --enable-skia
 	fi
 
-	# default toolkit is cairo-gtk3, optional use flags can change this
-	local toolkit="cairo-gtk3"
+	# default toolkit is cairo-gtk2, optional use flags can change this
+	local toolkit="cairo-gtk2"
 	local toolkit_comment=""
 	if [[ -n ${MOZCONFIG_OPTIONAL_GTK3} ]]; then
-		if ! use force-gtk3; then
-			toolkit="cairo-gtk2"
+		if use force-gtk3; then
+			toolkit="cairo-gtk3"
 			toolkit_comment="force-gtk3 use flag"
 		fi
 	fi
 	if [[ -n ${MOZCONFIG_OPTIONAL_GTK2ONLY} ]]; then
-		if use gtk2 ; then
-			toolkit="cairo-gtk2"
+		if ! use gtk2 ; then
+			toolkit="cairo-gtk3"
 		else
 			toolkit_comment="gtk2 use flag"
 		fi
 	fi
+	if [[ -n ${MOZCONFIG_OPTIONAL_QT5} ]]; then
+		if use qt5; then
+			toolkit="cairo-qt"
+			toolkit_comment="qt5 use flag"
+			# need to specify these vars because the qt5 versions are not found otherwise,
+			# and setting --with-qtdir overrides the pkg-config include dirs
+			local i
+			for i in qmake moc rcc; do
+				echo "export HOST_${i^^}=\"$(qt5_get_bindir)/${i}\"" \
+					>> "${S}"/.mozconfig || die
+			done
+			echo 'unset QTDIR' >> "${S}"/.mozconfig || die
+			mozconfig_annotate '+qt5' --disable-gio
+		fi
+	fi
 	mozconfig_annotate "${toolkit_comment}" --enable-default-toolkit=${toolkit}
+
+	# Use jemalloc unless libc is not glibc >= 2.4
+	# at this time the minimum glibc in the tree is 2.9 so we should be safe.
+	if use elibc_glibc && use jemalloc; then
+		# We must force-enable jemalloc 4 via .mozconfig
+		echo "export MOZ_JEMALLOC4=1" >> "${S}"/.mozconfig || die
+		mozconfig_annotate '' --enable-replace-malloc
+	fi
 
 	# Instead of the standard --build= and --host=, mozilla uses --host instead
 	# of --build, and --target intstead of --host.
@@ -351,6 +318,7 @@ mozconfig_config() {
 		mozconfig_annotate '-pulseaudio' --enable-alsa
 	fi
 
+	mozconfig_use_enable system-cairo
 	mozconfig_use_enable system-sqlite
 	mozconfig_use_with system-jpeg
 	mozconfig_use_with system-icu
@@ -358,22 +326,13 @@ mozconfig_config() {
 	mozconfig_use_with system-harfbuzz
 	mozconfig_use_with system-harfbuzz system-graphite2
 
-	if use clang ; then
-		# https://bugzilla.mozilla.org/show_bug.cgi?id=1423822
-		mozconfig_annotate 'elf-hack is broken when using Clang' --disable-elf-hack
-	fi
-
 	# Modifications to better support ARM, bug 553364
 	if use neon ; then
 		mozconfig_annotate '' --with-fpu=neon
-
-		if ! tc-is-clang ; then
-			# thumb options aren't supported when using clang, bug 666966
-			mozconfig_annotate '' --with-thumb=yes
-			mozconfig_annotate '' --with-thumb-interwork=no
-		fi
+		mozconfig_annotate '' --with-thumb=yes
+		mozconfig_annotate '' --with-thumb-interwork=no
 	fi
-	if [[ ${CHOST} == armv*h* ]] ; then
+	if [[ ${CHOST} == armv* ]] ; then
 		mozconfig_annotate '' --with-float-abi=hard
 		if ! use system-libvpx ; then
 			sed -i -e "s|softfp|hard|" \
