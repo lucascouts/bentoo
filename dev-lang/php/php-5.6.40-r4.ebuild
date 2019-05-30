@@ -5,7 +5,7 @@ EAPI="7"
 
 inherit autotools flag-o-matic systemd
 
-PATCH_V="7.1.29bp"
+PATCH_V="7.1.30bp"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://secure.php.net/"
@@ -239,10 +239,10 @@ src_prepare() {
 	eapply "${patchdir}/"
 
 	# Copy test binaries from patches
-	cp "${patchdir}/bug77540.jpg" \
-		"${patchdir}/bug77753.tiff" "${patchdir}/bug77831.tiff" \
-		"${patchdir}/bug77950.tiff" \
-		"${patchdir}/bug77563.jpg" "ext/exif/tests/" || die
+	local ext_src
+	for ext_src in exif iconv ; do
+		cp "${patchdir}/${ext_src}/"* "ext/${ext_src}/tests/" || die
+	done
 
 	# Change PHP branding
 	# Get the alpha/beta/rc version
