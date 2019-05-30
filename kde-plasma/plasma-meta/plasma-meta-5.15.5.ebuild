@@ -8,12 +8,12 @@ HOMEPAGE="https://kde.org/plasma-desktop"
 
 LICENSE="metapackage"
 SLOT="5"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="amd64 ~arm arm64 x86"
 IUSE="bluetooth +browser-integration consolekit crypt +desktop-portal discover
 +display-manager elogind grub gtk +handbook +legacy-systray networkmanager pam
-plymouth +pm-utils pulseaudio +sddm sdk +wallpapers"
+plymouth +pm-utils pulseaudio +sddm sdk systemd +wallpapers"
 
-REQUIRED_USE="?? ( consolekit elogind )"
+REQUIRED_USE="?? ( consolekit elogind systemd )"
 
 RDEPEND="
 	>=kde-plasma/breeze-${PV}:${SLOT}
@@ -44,9 +44,9 @@ RDEPEND="
 	>=kde-plasma/powerdevil-${PV}:${SLOT}
 	>=kde-plasma/systemsettings-${PV}:${SLOT}
 	>=kde-plasma/user-manager-${PV}:${SLOT}
-	sys-apps/dbus[elogind?]
-	sys-auth/polkit[elogind?]
-	sys-fs/udisks:2[elogind?]
+	sys-apps/dbus[elogind?,systemd?]
+	sys-auth/polkit[elogind?,systemd?]
+	sys-fs/udisks:2[elogind?,systemd?]
 	bluetooth? ( >=kde-plasma/bluedevil-${PV}:${SLOT} )
 	browser-integration? ( >=kde-plasma/plasma-browser-integration-${PV}:${SLOT} )
 	consolekit? (
@@ -59,7 +59,7 @@ RDEPEND="
 	display-manager? (
 		sddm? (
 			>=kde-plasma/sddm-kcm-${PV}:${SLOT}
-			x11-misc/sddm[consolekit?,elogind?]
+			x11-misc/sddm[consolekit?,elogind?,systemd?]
 		)
 		!sddm? ( x11-misc/lightdm )
 	)
@@ -72,11 +72,11 @@ RDEPEND="
 	legacy-systray? ( >=kde-plasma/xembed-sni-proxy-${PV}:${SLOT} )
 	networkmanager? (
 		>=kde-plasma/plasma-nm-${PV}:${SLOT}
-		net-misc/networkmanager[consolekit?,elogind?]
+		net-misc/networkmanager[consolekit?,elogind?,systemd?]
 	)
 	pam? (
 		>=kde-plasma/kwallet-pam-${PV}:${SLOT}
-		sys-auth/pambase[consolekit?,elogind?]
+		sys-auth/pambase[consolekit?,elogind?,systemd?]
 	)
 	plymouth? (
 		>=kde-plasma/breeze-plymouth-${PV}:${SLOT}
@@ -91,6 +91,7 @@ pkg_postinst() {
 	local i selected use_pkg_map=(
 		consolekit:sys-auth/consolekit
 		elogind:sys-auth/elogind
+		systemd:sys-apps/systemd
 	)
 	for i in ${use_pkg_map[@]}; do
 		use ${i%:*} && selected="${i%:*}"
