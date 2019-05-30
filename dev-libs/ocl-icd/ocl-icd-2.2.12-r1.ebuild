@@ -1,9 +1,9 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
-USE_RUBY="ruby24 ruby25"
+USE_RUBY="ruby24 ruby25 ruby26"
 inherit autotools flag-o-matic multilib-minimal ruby-single
 
 DESCRIPTION="Alternative to vendor specific OpenCL ICD loaders"
@@ -11,11 +11,11 @@ HOMEPAGE="https://github.com/OCL-dev/ocl-icd"
 SRC_URI="https://github.com/OCL-dev/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="BSD-2"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="~amd64 ~x86"
 
 IUSE="+khronos-headers"
 
-DEPEND="${RUBY_DEPS}"
+BDEPEND="${RUBY_DEPS}"
 RDEPEND="app-eselect/eselect-opencl"
 
 src_prepare() {
