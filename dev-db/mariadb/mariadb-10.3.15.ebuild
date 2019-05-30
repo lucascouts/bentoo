@@ -656,6 +656,7 @@ src_test() {
 	done
 
 	for t in main.mysql_client_test main.mysql_client_test_nonblock \
+		main.mysql main.gis_notembedded \
 		main.mysql_client_test_comp rpl.rpl_extra_col_master_myisam ; do
 			_disable_test  "$t" "False positives in Gentoo"
 	done
@@ -814,11 +815,11 @@ pkg_config() {
 
 		unset tmp_mysqld_password_source
 	fi
-	MYSQL_TMPDIR="$(_getoptval mysqld tmpdir)"
+	MYSQL_TMPDIR="$(_getoptval mysqld tmpdir | tail -n1)"
 	# These are dir+prefix
-	MYSQL_RELAY_LOG="$(_getoptval mysqld relay-log)"
+	MYSQL_RELAY_LOG="$(_getoptval mysqld relay-log | tail -n1)"
 	MYSQL_RELAY_LOG=${MYSQL_RELAY_LOG%/*}
-	MYSQL_LOG_BIN="$(_getoptval mysqld log-bin)"
+	MYSQL_LOG_BIN="$(_getoptval mysqld log-bin | tail -n1)"
 	MYSQL_LOG_BIN=${MYSQL_LOG_BIN%/*}
 
 	if [[ ! -d "${ROOT}/$MYSQL_TMPDIR" ]]; then
