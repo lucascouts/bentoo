@@ -4,7 +4,7 @@
 EAPI=7
 
 KDE_TEST="forceoptional"
-QT_MINIMAL="5.11.3"
+QT_MINIMAL="5.12.3"
 VIRTUALX_REQUIRED="test"
 PYTHON_COMPAT=( python3_{5,6,7} )
 inherit kde5 python-single-r1
@@ -15,13 +15,11 @@ if [[ ${KDE_BUILD_TYPE} = release ]]; then
 fi
 
 DESCRIPTION="Free digital painting application. Digital Painting, Creative Freedom!"
-HOMEPAGE="https://www.kde.org/applications/graphics/krita/ https://krita.org/"
+HOMEPAGE="https://kde.org/applications/graphics/krita/ https://krita.org/"
 LICENSE="GPL-3"
 IUSE="color-management fftw gif +gsl heif +jpeg openexr pdf qtmedia +raw tiff vc"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-# FIXME: drop qtgui subslot operator when QTBUG is fixed or QT_MINIMAL >= 5.12.0:
-# https://bugreports.qt.io/browse/QTBUG-72488
 BDEPEND="
 	dev-cpp/eigen:3
 	dev-lang/perl
@@ -52,6 +50,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	$(add_qt_dep qtx11extras)
 	$(add_qt_dep qtxml)
 	dev-libs/boost:=
+	dev-libs/quazip
 	dev-python/PyQt5[${PYTHON_USEDEP}]
 	dev-python/sip[${PYTHON_USEDEP}]
 	media-gfx/exiv2:=
@@ -88,11 +87,7 @@ RDEPEND="${COMMON_DEPEND}
 # bug 630508
 RESTRICT+=" test"
 
-PATCHES=(
-	"${FILESDIR}/${PN}-4.0.3-tests-optional.patch"
-	"${FILESDIR}/${P}-qt-5.12-fix-unsupported-composition-mode.patch"
-	"${FILESDIR}/${P}-fix-pre-5.12-tablet-support.patch"
-)
+PATCHES=( "${FILESDIR}/${P}-tests-optional.patch" )
 
 pkg_setup() {
 	python-single-r1_pkg_setup
