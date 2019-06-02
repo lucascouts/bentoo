@@ -3,7 +3,7 @@
 
 EAPI=6
 
-USE_RUBY="ruby23 ruby24 ruby25 ruby26"
+USE_RUBY="ruby24 ruby25 ruby26"
 
 inherit ruby-ng prefix
 
@@ -29,7 +29,7 @@ ruby_add_bdepend "
 all_ruby_prepare() {
 
 	mkdir -p lib/rubygems/defaults || die
-	cp "${FILESDIR}/gentoo-defaults.rb" lib/rubygems/defaults/operating_system.rb || die
+	cp "${FILESDIR}/gentoo-defaults-3.rb" lib/rubygems/defaults/operating_system.rb || die
 
 	eprefixify lib/rubygems/defaults/operating_system.rb
 
@@ -38,18 +38,18 @@ all_ruby_prepare() {
 	sed -i -e '/assert_self_install_permissions/,/^  end/ s/^.*RUBY_INSTALL_NAME.*//' test/rubygems/test_gem.rb || die
 
 	# Skip tests for default gems that all fail
-	sed -i -e '/test_default_gems_use_full_paths/,/^  end/ s:^:#:' test/rubygems/test_gem.rb || die
-	sed -i -e '/test_execute_ignore_default_gem_verbose/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_cleanup_command.rb || die
-	sed -i -e '/test_execute_default_gem/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_contents_command.rb test/rubygems/test_gem_commands_pristine_command.rb || die
-	sed -i -e '/test_execute_\(default_details\|show_default_gems\)/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_query_command.rb || die
-	sed -i -e '/test_execute_all/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_uninstall_command.rb || die
-	sed -i -e '/\(test_default_gem\|test_check_executable_overwrite\|test_require_works_after_cleanup\)/,/^  end/ s:^:#:' \
-		test/rubygems/test_{gem_installer,require}.rb || die
-	sed -i -e '/test_\(load_default_gem\|default_spec_stub\|self_stubs\)/,/^  end/ s:^:#:' test/rubygems/test_gem_specification.rb || die
-	sed -i -e '/test_uninstall_default_gem/,/^  end/ s:^:#:' test/rubygems/test_gem_uninstaller.rb || die
-	rm -f test/rubygems/test_gem_indexer.rb || die
-	sed -i -e '/test_\(require_when_gem_defined\|realworld_default_gem\)/,/^  end/ s:^:#:' test/rubygems/test_require.rb || die
-	rm -f test/rubygems/test_gem_commands_setup_command.rb || die
+#	sed -i -e '/test_default_gems_use_full_paths/,/^  end/ s:^:#:' test/rubygems/test_gem.rb || die
+#	sed -i -e '/test_execute_ignore_default_gem_verbose/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_cleanup_command.rb || die
+#	sed -i -e '/test_execute_default_gem/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_contents_command.rb test/rubygems/test_gem_commands_pristine_command.rb || die
+#	sed -i -e '/test_execute_\(default_details\|show_default_gems\)/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_query_command.rb || die
+#	sed -i -e '/test_execute_all/,/^  end/ s:^:#:' test/rubygems/test_gem_commands_uninstall_command.rb || die
+#	sed -i -e '/\(test_default_gem\|test_check_executable_overwrite\|test_require_works_after_cleanup\)/,/^  end/ s:^:#:' \
+#		test/rubygems/test_{gem_installer,require}.rb || die
+#	sed -i -e '/test_\(load_default_gem\|default_spec_stub\|self_stubs\)/,/^  end/ s:^:#:' test/rubygems/test_gem_specification.rb || die
+#	sed -i -e '/test_uninstall_default_gem/,/^  end/ s:^:#:' test/rubygems/test_gem_uninstaller.rb || die
+#	rm -f test/rubygems/test_gem_indexer.rb || die
+#	sed -i -e '/test_\(require_when_gem_defined\|realworld_default_gem\)/,/^  end/ s:^:#:' test/rubygems/test_require.rb || die
+#	rm -f test/rubygems/test_gem_commands_setup_command.rb || die
 
 	# Avoid tests playing tricks with ruby engine that don't seem to
 	# work for us.
