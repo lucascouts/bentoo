@@ -71,8 +71,6 @@ RDEPEND="${COMMON_DEPEND}
 	kipi? ( media-plugins/kipi-plugins:5 )
 "
 
-PATCHES=( "${FILESDIR}/${P}-exiv2-0.27.1.patch" )
-
 src_prepare() {
 	kde5_src_prepare
 	if ! use mpris; then

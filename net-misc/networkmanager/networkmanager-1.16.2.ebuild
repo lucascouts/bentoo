@@ -5,7 +5,7 @@ EAPI=6
 GNOME_ORG_MODULE="NetworkManager"
 GNOME2_LA_PUNT="yes"
 VALA_USE_DEPEND="vapigen"
-PYTHON_COMPAT=( python{2_7,3_4,3_5,3_6,3_7} )
+PYTHON_COMPAT=( python{2_7,3_5,3_6,3_7} )
 
 inherit bash-completion-r1 gnome2 linux-info multilib python-any-r1 systemd \
 	user readme.gentoo-r1 vala virtualx udev multilib-minimal
@@ -40,7 +40,7 @@ COMMON_DEPEND="
 	>=net-misc/curl-7.24
 	net-misc/iputils
 	sys-apps/util-linux[${MULTILIB_USEDEP}]
-	sys-libs/readline:0=
+	sys-libs/readline:0=[${MULTILIB_USEDEP}]
 	>=virtual/libudev-175:=[${MULTILIB_USEDEP}]
 	audit? ( sys-process/audit )
 	bluetooth? ( >=net-wireless/bluez-5 )
@@ -177,6 +177,8 @@ multilib_src_configure() {
 		$(multilib_native_enable concheck)
 		--with-crypto=$(usex nss nss gnutls)
 		--with-session-tracking=$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind $(multilib_native_usex consolekit consolekit no)))
+		# ConsoleKit has no build-time dependency, so use it as the default case.
+		# There is no off switch, and we do not support upower.
 		--with-suspend-resume=$(multilib_native_usex systemd systemd $(multilib_native_usex elogind elogind consolekit))
 		$(multilib_native_use_with audit libaudit)
 		$(multilib_native_use_enable bluetooth bluez5-dun)
@@ -331,7 +333,7 @@ pkg_postinst() {
 		fi
 	fi
 
-	# NM shows lots of errors making nmcli neither unusable, bug #528748 upstream bug #690457
+	# NM shows lots of errors making nmcli almost unusable, bug #528748 upstream bug #690457
 	if grep -r "psk-flags=1" "${EROOT}"/etc/NetworkManager/; then
 		ewarn "You have psk-flags=1 setting in above files, you will need to"
 		ewarn "either reconfigure affected networks or, at least, set the flag"
