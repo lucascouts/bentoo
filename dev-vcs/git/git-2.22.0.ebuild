@@ -45,7 +45,7 @@ if [[ ${PV} != *9999 ]]; then
 			${SRC_URI_KORG}/${PN}-htmldocs-${DOC_VER}.tar.${SRC_URI_SUFFIX}
 			)"
 	[[ "${PV}" = *_rc* ]] || \
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 fi
 
 LICENSE="GPL-2"
@@ -69,6 +69,7 @@ CDEPEND="
 		webdav? ( dev-libs/expat )
 	)
 	emacs? ( virtual/emacs )
+	iconv? ( virtual/libiconv )
 "
 
 RDEPEND="${CDEPEND}
@@ -136,11 +137,11 @@ REQUIRED_USE="
 
 PATCHES=(
 	# bug #350330 - automagic CVS when we don't want it is bad.
-	"${FILESDIR}"/git-2.18.0_rc1-optional-cvs.patch
+	"${FILESDIR}"/git-2.22.0_rc0-optional-cvs.patch
 
 	"${FILESDIR}"/git-2.2.0-svn-fe-linking.patch
+
 	# Make submodule output quiet
-	"${FILESDIR}"/git-2.21.0-quiet-submodules.patch
 	"${FILESDIR}"/git-2.21.0-quiet-submodules-testcase.patch
 )
 
@@ -167,7 +168,7 @@ exportmakeopts() {
 		$(usex perl 'INSTALLDIRS=vendor NO_PERL_CPAN_FALLBACKS=YesPlease' NO_PERL=YesPlease)
 		$(usex python '' NO_PYTHON=YesPlease)
 		$(usex subversion '' NO_SVN_TESTS=YesPlease)
-		$(usex threads THREADED_DELTA_SEARCH=YesPlease NO_PTHREAD=YesPlease)
+		$(usex threads '' NO_PTHREAD=YesPlease)
 		$(usex tk '' NO_TCLTK=YesPlease)
 	)
 
@@ -244,8 +245,10 @@ exportmakeopts() {
 
 	# Bug 290465:
 	# builtin-fetch-pack.c:816: error: 'struct stat' has no member named 'st_mtim'
-	[[ "${CHOST}" == *-uclibc* ]] && \
+	if [[ "${CHOST}" == *-uclibc* ]] ; then
 		myopts+=( NO_NSEC=YesPlease )
+		use iconv && myopts+=( NEEDS_LIBICONV=YesPlease )
+	fi
 
 	export MY_MAKEOPTS="${myopts[@]}"
 	export EXTLIBS="${extlibs[@]}"
@@ -366,9 +369,10 @@ src_compile() {
 		use iconv && use !elibc_glibc && nlsiconv+=( -liconv )
 		git_emake EXTLIBS="${EXTLIBS} ${nlsiconv[@]}" \
 			|| die "emake svn-fe failed"
+		git_emake svn-fe.1 || die "emake svn-fe.1 failed"
 		if use doc ; then
-			git_emake svn-fe.{1,html} \
-				|| die "emake svn-fe.1 svn-fe.html failed"
+			git_emake svn-fe.html \
+				|| die "svn-fe.html failed"
 		fi
 		popd &>/dev/null || die
 	fi
@@ -380,8 +384,8 @@ src_compile() {
 	fi
 
 	pushd contrib/subtree &>/dev/null || die
-	git_emake
-	use doc && git_emake doc
+	git_emake git-subtree{,.1}
+	use doc && git_emake git-subtree.html
 	popd &>/dev/null || die
 
 	pushd contrib/diff-highlight &>/dev/null || die
@@ -397,9 +401,7 @@ src_compile() {
 }
 
 src_install() {
-	git_emake \
-		install || \
-		die "make install failed"
+	git_emake install || die "make install failed"
 
 	if [[ ${CHOST} == *-darwin* ]]; then
 		dobin contrib/credential/osxkeychain/git-credential-osxkeychain
@@ -449,9 +451,9 @@ src_install() {
 
 	# git-subtree
 	pushd contrib/subtree &>/dev/null || die
-	git_emake install || die "Failed to emake install git-subtree"
+	git_emake install install-man || die "Failed to emake install install-man git-subtree"
 	if use doc ; then
-		git_emake install-man install-doc || die "Failed to emake install-doc install-mangit-subtree"
+		git_emake install-html || die "Failed to emake install-html git-subtree"
 	fi
 	newdoc README README.git-subtree
 	dodoc git-subtree.txt
@@ -486,9 +488,9 @@ src_install() {
 	if use subversion ; then
 		pushd contrib/svn-fe &>/dev/null || die
 		dobin svn-fe
+		doman svn-fe.1
 		dodoc svn-fe.txt
 		if use doc ; then
-			doman svn-fe.1
 			docinto html
 			dodoc svn-fe.html
 		fi
