@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{4,5,6,7}} )
+PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 inherit autotools flag-o-matic linux-info python-any-r1 readme.gentoo-r1 systemd virtualx user multilib-minimal
 
 DESCRIPTION="A message bus system, a simple way for applications to talk to each other"
@@ -13,16 +13,14 @@ SRC_URI="https://dbus.freedesktop.org/releases/dbus/${P}.tar.gz"
 LICENSE="|| ( AFL-2.1 GPL-2 )"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
-IUSE="debug doc elogind selinux static-libs systemd test user-session X"
+IUSE="debug doc elogind kernel_linux selinux static-libs systemd test user-session X"
 
 REQUIRED_USE="?? ( elogind systemd )"
 
-# autoconf-archive-2019.01.06 blocker added for bug #674830
-# Please check on bumps if the blocker is still necessary.
 BDEPEND="
 	app-text/xmlto
 	app-text/docbook-xml-dtd:4.4
-	<sys-devel/autoconf-archive-2019.01.06
+	sys-devel/autoconf-archive
 	virtual/pkgconfig
 	doc? ( app-doc/doxygen )
 "
@@ -92,6 +90,13 @@ src_prepare() {
 	eautoreconf
 }
 
+src_configure() {
+	local rundir=$(usex kernel_linux /run /var/run)
+	sed -e "s;@rundir@;${EPREFIX}${rundir};g" "${FILESDIR}"/dbus.initd.in \
+		> "${T}"/dbus.initd || die
+	multilib-minimal_src_configure
+}
+
 multilib_src_configure() {
 	local docconf myconf testconf
 
@@ -127,8 +132,8 @@ multilib_src_configure() {
 		--disable-modular-tests
 		$(use_enable debug stats)
 		--with-session-socket-dir="${EPREFIX}"/tmp
-		--with-system-pid-file="${EPREFIX}"/var/run/dbus.pid
-		--with-system-socket="${EPREFIX}"/var/run/dbus/system_bus_socket
+		--with-system-pid-file="${EPREFIX}${rundir}"/dbus.pid
+		--with-system-socket="${EPREFIX}${rundir}"/dbus/system_bus_socket
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
 		--with-dbus-user=messagebus
 		$(use_with X x)
@@ -213,7 +218,7 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	newinitd "${FILESDIR}"/dbus.initd-r1 dbus
+	newinitd "${T}"/dbus.initd dbus
 
 	if use X; then
 		# dbus X session script (#77504)
