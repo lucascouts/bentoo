@@ -1,7 +1,7 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 #FIXME: Adds Python 3.x support after the following upstream issue is resolved:
 #    https://github.com/HelloZeroNet/ZeroNet/issues/149
@@ -169,8 +169,12 @@ src_install() {
 	fi
 
 	# Dynamically create and install a shell script launching ZeroNet with the
-	# currently selected Python version, configured by the configuration file
-	# created below.
+	# currently selected Python version, configured by the system-wide
+	# configuration file created below.
+	#
+	# Note that ZeroNet comes bundled with a largely useless "start.py" script,
+	# which unhelpfully opens the local ZeroNet console in a "default browser"
+	# after starting ZeroNet. Unsurprisingly, we ignore this script entirely.
 	cat <<EOF > "${T}"/${PN}
 #!/usr/bin/env sh
 exec ${PYTHON} ${ZERONET_PYTHON_OPTIONS} "${ZERONET_MODULE_DIR}/${PN}.py" --config_file "${ZERONET_CONF_FILE}" "\${@}"
@@ -213,24 +217,22 @@ depend() {
 
 start() {
 	ebegin "Starting ZeroNet"
-	start-stop-daemon --start --user ${PN} --pidfile "${ZERONET_PID_FILE}" \
-		--quiet --background --make-pidfile \
-		--exec "${ZERONET_SCRIPT_FILE}" main
 
-	# Exit successfully only if a ZeroNet process with this PID is running.
-	sleep 2
-	[ -e "${ZERONET_PID_FILE}" -a -e /proc/\$(cat "${ZERONET_PID_FILE}") ]
+	# Note that we wait 2000ms (i.e., 2s) after daemonizing ZeroNet to validate
+	# that ZeroNet successfully daemonized.
+	start-stop-daemon --start --user ${PN} --pidfile "${ZERONET_PID_FILE}" \
+		--background --make-pidfile --progress --wait 2000 \
+		--exec "${ZERONET_SCRIPT_FILE}" main
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping ZeroNet"
 	start-stop-daemon --stop --user ${PN} --pidfile "${ZERONET_PID_FILE}" \
-		--quiet --retry SIGTERM/20 SIGKILL/20 --progress \
+		--progress --retry TERM/10/KILL/20 \
 		--exec "${ZERONET_SCRIPT_FILE}"
 	eend $?
 }
-
 EOF
 	newinitd "${T}"/${PN}.initd ${PN}
 

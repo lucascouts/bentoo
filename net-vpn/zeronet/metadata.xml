@@ -35,7 +35,7 @@ Features
 		<bugs-to>https://github.com/HelloZeroNet/ZeroNet/issues</bugs-to>
 	</upstream>
 	<use>
-        <flag name="debug">Enable debugging (recommended for zite development)</flag>
+		<flag name="debug">Enable debugging (recommended for zite development)</flag>
 		<flag name="tor"  >Enable Tor-based anonymization (highly recommended)</flag>
 		<flag name="meek" >Enable meek-based Tor block circumvention</flag>
 	</use>
