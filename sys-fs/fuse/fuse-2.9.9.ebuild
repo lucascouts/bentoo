@@ -1,8 +1,8 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-inherit ltprune libtool linux-info udev toolchain-funcs
+EAPI=7
+inherit libtool linux-info udev toolchain-funcs
 
 DESCRIPTION="An interface for filesystems implemented in userspace"
 HOMEPAGE="https://github.com/libfuse/libfuse"
@@ -10,12 +10,12 @@ SRC_URI="https://github.com/libfuse/libfuse/releases/download/${P}/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-linux ~x86-linux"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-linux ~x86-linux"
 IUSE="examples kernel_linux kernel_FreeBSD static-libs"
 
 PDEPEND="kernel_FreeBSD? ( sys-fs/fuse4bsd )"
 DEPEND="virtual/pkgconfig"
-RDEPEND="sys-fs/fuse-common"
+RDEPEND=">=sys-fs/fuse-common-3.3.0-r1"
 
 pkg_setup() {
 	if use kernel_linux ; then
@@ -23,7 +23,7 @@ pkg_setup() {
 			die "Your kernel is too old."
 		fi
 		CONFIG_CHECK="~FUSE_FS"
-		FUSE_FS_WARNING="You need to have FUSE module built to use user-mode utils"
+		WARNING_FUSE_FS="You need to have FUSE module built to use user-mode utils"
 		linux-info_pkg_setup
 	fi
 }
@@ -61,13 +61,11 @@ src_install() {
 		doins include/fuse_kernel.h
 	fi
 
-	prune_libtool_files
+	find "${ED}" -name '*.la' -delete || die
 
 	# installed via fuse-common
-	rm -r "${ED%/}"/{etc,$(get_udevdir)} || die
-	rm "${ED%/}"/usr/share/man/man8/mount.fuse.* || die
-	rm "${ED%/}"/sbin/mount.fuse || die
+	rm -r "${ED}"/{etc,$(get_udevdir)} || die
 
 	# handled by the device manager
-	rm -r "${D%/}"/dev || die
+	rm -r "${D}"/dev || die
 }
