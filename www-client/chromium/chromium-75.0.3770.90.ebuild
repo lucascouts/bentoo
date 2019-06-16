@@ -28,7 +28,7 @@ COMMON_DEPEND="
 	>=dev-libs/atk-2.26
 	dev-libs/expat:=
 	dev-libs/glib:2
-	system-icu? ( >=dev-libs/icu-59:= )
+	system-icu? ( >=dev-libs/icu-64:= )
 	>=dev-libs/libxml2-2.9.4-r3:=[icu]
 	dev-libs/libxslt:=
 	dev-libs/nspr:=
@@ -97,7 +97,7 @@ BDEPEND="
 		dev-lang/yasm
 	)
 	dev-lang/perl
-	dev-util/gn
+	<dev-util/gn-0.1583
 	dev-vcs/git
 	>=dev-util/gperf-3.0.3
 	>=dev-util/ninja-1.7.2
@@ -112,7 +112,7 @@ BDEPEND="
 : ${CHROMIUM_FORCE_CLANG=no}
 
 if [[ ${CHROMIUM_FORCE_CLANG} == yes ]]; then
-	BDEPEND+=" >=sys-devel/clang-5"
+	BDEPEND+=" >=sys-devel/clang-7"
 fi
 
 if ! has chromium_pkg_die ${EBUILD_DEATH_HOOKS}; then
@@ -136,17 +136,21 @@ are not displayed properly:
 To fix broken icons on the Downloads page, you should install an icon
 theme that covers the appropriate MIME types, and configure this as your
 GTK+ icon theme.
+
+For native file dialogs in KDE, install kde-apps/kdialog.
 "
 
 PATCHES=(
-	"${FILESDIR}"/chromium-compiler-r8.patch
-	"${FILESDIR}"/chromium-widevine-r4.patch
-	"${FILESDIR}"/chromium-fix-char_traits.patch
-	"${FILESDIR}"/chromium-74-e1b1f3a.patch
-	"${FILESDIR}"/chromium-74-c2c467f.patch
-	"${FILESDIR}"/chromium-74-2f28731.patch
-	"${FILESDIR}"/chromium-74-7685422.patch
-	"${FILESDIR}"/quiche-00f47df.patch
+	"${FILESDIR}/chromium-compiler-r9.patch"
+	"${FILESDIR}/chromium-widevine-r4.patch"
+	"${FILESDIR}/chromium-fix-char_traits.patch"
+	"${FILESDIR}/chromium-75-fix-gn-gen.patch"
+	"${FILESDIR}/chromium-75-gcc-angle-fix.patch"
+	"${FILESDIR}/chromium-75-unique_ptr.patch"
+	"${FILESDIR}/chromium-75-lss.patch"
+	"${FILESDIR}/chromium-75-noexcept.patch"
+	"${FILESDIR}/chromium-75-llvm8.patch"
+	"${FILESDIR}/chromium-75-pure-virtual.patch"
 )
 
 pre_build_checks() {
@@ -222,6 +226,7 @@ src_prepare() {
 		third_party/angle/third_party/vulkan-tools
 		third_party/angle/third_party/vulkan-validation-layers
 		third_party/apple_apsl
+		third_party/axe-core
 		third_party/blink
 		third_party/boringssl
 		third_party/boringssl/src/third_party/fiat
@@ -250,10 +255,10 @@ src_prepare() {
 		third_party/crc32c
 		third_party/cros_system_api
 		third_party/dav1d
+		third_party/dawn
 		third_party/devscripts
 		third_party/dom_distiller_js
 		third_party/emoji-segmenter
-		third_party/fips181
 		third_party/flatbuffers
 		third_party/flot
 		third_party/freetype
@@ -307,6 +312,7 @@ src_prepare() {
 		third_party/pdfium/third_party/libtiff
 		third_party/pdfium/third_party/skia_shared
 		third_party/perfetto
+		third_party/pffft
 		third_party/ply
 		third_party/polymer
 		third_party/protobuf
@@ -358,8 +364,8 @@ src_prepare() {
 		third_party/adobe
 		third_party/speech-dispatcher
 		third_party/usb_ids
-		third_party/yasm/run_yasm.py
 		third_party/xdg-utils
+		third_party/yasm/run_yasm.py
 	)
 	if ! use system-ffmpeg; then
 		keeplibs+=( third_party/ffmpeg third_party/opus )
@@ -550,9 +556,6 @@ src_configure() {
 	# Disable fatal linker warnings, bug 506268.
 	myconf_gn+=" fatal_linker_warnings=false"
 
-	# https://bugs.gentoo.org/588596
-	#append-cxxflags $(test-flags-CXX -fno-delete-null-pointer-checks)
-
 	# Bug 491582.
 	export TMPDIR="${WORKDIR}/temp"
 	mkdir -p -m 755 "${TMPDIR}" || die
@@ -591,9 +594,6 @@ src_compile() {
 	python_setup
 
 	#"${EPYTHON}" tools/clang/scripts/update.py --force-local-build --gcc-toolchain /usr --skip-checkout --use-system-cmake --without-android || die
-
-	# Work around broken deps
-	#eninja -C out/Release gen/ui/accessibility/ax_enums.mojom{,-shared}.h
 
 	# Build mksnapshot and pax-mark it.
 	local x
