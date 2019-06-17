@@ -7,10 +7,11 @@ inherit toolchain-funcs flag-o-matic
 
 DESCRIPTION="/sbin/init - parent of all processes"
 HOMEPAGE="https://savannah.nongnu.org/projects/sysvinit"
-SRC_URI="mirror://nongnu/${PN}/${P}.tar.xz"
+SRC_URI="mirror://nongnu/${PN}/${P/_/-}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
+[[ "${PV}" == *beta* ]] || \
 KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
 IUSE="selinux ibm static kernel_FreeBSD"
 
@@ -25,10 +26,12 @@ RDEPEND="${CDEPEND}
 	!<sys-apps/openrc-0.13
 "
 
+S="${WORKDIR}/${P/_*}"
+
 PATCHES=(
 	"${FILESDIR}/${PN}-2.86-kexec.patch" #80220
 	"${FILESDIR}/${PN}-2.86-shutdown-single.patch" #158615
-	"${FILESDIR}/${PN}-2.88-shutdown-h.patch" #449354
+	"${FILESDIR}/${PN}-2.92_beta-shutdown-h.patch" #449354
 )
 
 src_prepare() {
@@ -98,6 +101,8 @@ src_install() {
 
 	# dead symlink
 	rm "${ED%/}"/usr/bin/lastb || die
+
+	newinitd "${FILESDIR}"/bootlogd.initd bootlogd
 }
 
 pkg_postinst() {
@@ -114,4 +119,9 @@ pkg_postinst() {
 
 	elog "The last/lastb/mesg/mountpoint/sulogin/utmpdump/wall tools have been moved to"
 	elog "sys-apps/util-linux. The pidof tool has been moved to sys-process/procps."
+
+	# Required for new bootlogd service
+	if [[ ! -e "${EROOT%/}/var/log/boot" ]] ; then
+		touch "${EROOT%/}/var/log/boot"
+	fi
 }

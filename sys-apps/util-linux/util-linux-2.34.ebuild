@@ -1,10 +1,9 @@
-# Copyright 1999-2019 Gentoo Authors and others
-# Copyright 2018 Sony Interactive Entertainment Inc.
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6,7} )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 
 inherit toolchain-funcs libtool flag-o-matic bash-completion-r1 \
 	pam python-r1 multilib-minimal multiprocessing systemd
@@ -17,7 +16,7 @@ if [[ ${PV} == 9999 ]] ; then
 	EGIT_REPO_URI="https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git"
 else
 	[[ "${PV}" = *_rc* ]] || \
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~amd64-linux ~x86-linux"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~amd64-linux ~x86-linux"
 	SRC_URI="mirror://kernel/linux/utils/util-linux/v${PV:0:4}/${MY_P}.tar.xz"
 fi
 
@@ -26,11 +25,13 @@ HOMEPAGE="https://www.kernel.org/pub/linux/utils/util-linux/ https://github.com/
 
 LICENSE="GPL-2 LGPL-2.1 BSD-4 MIT public-domain"
 SLOT="0"
-IUSE="build caps +cramfs fdformat kill ncurses nls pam python +readline selinux slang static-libs +suid systemd test tty-helpers udev unicode userland_GNU"
+IUSE="build caps +cramfs fdformat hardlink kill ncurses nls pam python +readline selinux slang static-libs +suid systemd test tty-helpers udev unicode userland_GNU"
 
 # Most lib deps here are related to programs rather than our libs,
 # so we rarely need to specify ${MULTILIB_USEDEP}.
-RDEPEND="caps? ( sys-libs/libcap-ng )
+DEPEND="
+	virtual/os-headers
+	caps? ( sys-libs/libcap-ng )
 	cramfs? ( sys-libs/zlib:= )
 	ncurses? ( >=sys-libs/ncurses-5.2-r2:0=[unicode?] )
 	nls? ( virtual/libintl[${MULTILIB_USEDEP}] )
@@ -41,12 +42,13 @@ RDEPEND="caps? ( sys-libs/libcap-ng )
 	slang? ( sys-libs/slang )
 	!build? ( systemd? ( sys-apps/systemd ) )
 	udev? ( virtual/libudev:= )"
-DEPEND="${RDEPEND}
+BDEPEND="
 	virtual/pkgconfig
 	nls? ( sys-devel/gettext )
 	test? ( sys-devel/bc )
-	virtual/os-headers"
-RDEPEND+="
+"
+RDEPEND="${DEPEND}
+	hardlink? ( !app-arch/hardlink )
 	kill? (
 		!sys-apps/coreutils[kill]
 		!sys-process/procps[kill]
@@ -62,15 +64,6 @@ RDEPEND+="
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 S="${WORKDIR}/${MY_P}"
-
-PATCHES=(
-	# In glibc-2.29+, a lot of changes were made to arch-specific
-	# handling of `struct termios', which breaks atleast MIPS.
-	# The below patch from upstream fixes this, and should be
-	# in the next release.
-	# See: https://git.kernel.org/pub/scm/utils/util-linux/util-linux.git/commit/?id=963413a1adf6767ab17712097e288e1a346f63a7
-	"${FILESDIR}/${PN}-2.33.1-fix-struct_termios-check.patch"
-)
 
 src_prepare() {
 	default
@@ -159,8 +152,8 @@ multilib_src_configure() {
 		$(use_enable nls)
 		$(use_enable unicode widechar)
 		$(use_enable static-libs static)
-		$(use_with selinux)
 		$(use_with ncurses tinfo)
+		$(use_with selinux)
 	)
 	# build programs only on GNU, on *BSD we want libraries only
 	if multilib_is_native_abi && use userland_GNU; then
@@ -182,6 +175,7 @@ multilib_src_configure() {
 			$(use_enable caps setpriv)
 			$(use_enable cramfs)
 			$(use_enable fdformat)
+			$(use_enable hardlink)
 			$(use_enable tty-helpers mesg)
 			$(use_enable tty-helpers wall)
 			$(use_enable tty-helpers write)
@@ -247,15 +241,15 @@ python_install() {
 }
 
 multilib_src_install() {
-	if multilib_is_native_abi && use python; then
-		python_foreach_impl python_install
-	fi
-
 	emake DESTDIR="${D}" install
 
 	if multilib_is_native_abi && use userland_GNU; then
 		# need the libs in /
 		gen_usr_ldscript -a blkid fdisk mount smartcols uuid
+	fi
+
+	if multilib_is_native_abi && use python; then
+		python_foreach_impl python_install
 	fi
 }
 
@@ -268,7 +262,7 @@ multilib_src_install_all() {
 	if ! use userland_GNU; then
 		# manpage collisions
 		# TODO: figure out a good way to keep them
-		rm "${ED%/}"/usr/share/man/man3/uuid* || die
+		rm "${ED}"/usr/share/man/man3/uuid* || die
 	fi
 
 	if use pam; then
