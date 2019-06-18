@@ -11,8 +11,8 @@ SRC_URI="ftp://ftp.invisible-island.net/${PN}/${P}.tgz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ia64 ~mips ppc ppc64 ~s390 ~sh ~sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
-IUSE="+openpty toolbar truetype unicode Xaw3d xinerama"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+IUSE="+openpty sixel toolbar truetype unicode Xaw3d xinerama"
 
 BDEPEND="virtual/pkgconfig
 	x11-base/xorg-proto"
@@ -70,6 +70,7 @@ src_configure() {
 		--with-utempter
 		--with-x
 		$(use_enable openpty)
+		$(use_enable sixel sixel-graphics)
 		$(use_enable toolbar)
 		$(use_enable truetype freetype)
 		$(use_enable unicode luit)
@@ -94,5 +95,5 @@ src_install() {
 	fperms 0755 /usr/bin/xterm
 
 	# restore the navy blue
-	sed -i -e "s:blue2$:blue:" "${D}${DEFAULTS_DIR}"/XTerm-color || die
+	sed -i -e 's:blue2$:blue:' "${ED}${DEFAULTS_DIR}"/XTerm-color || die
 }
