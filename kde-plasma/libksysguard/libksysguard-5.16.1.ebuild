@@ -39,7 +39,7 @@ DEPEND="${RDEPEND}
 	X? ( x11-base/xorg-proto )
 "
 
-PATCHES=( "${FILESDIR}/${P}-no-detailed-mem-message.patch" )
+PATCHES=( "${FILESDIR}/${PN}-5.16.0-no-detailed-mem-message.patch" )
 
 src_configure() {
 	local mycmakeargs=(
