@@ -1,19 +1,19 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 
 PLOCALES="af cs de en es fa fr hr hu it ko nb pl pt_BR ro ru sk sl sv tr zh_CN
 		 zh_TW"
 
 inherit flag-o-matic l10n linux-info multilib pam prefix python-single-r1 \
-		systemd user versionator
+		systemd user
 
 KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 
-SLOT=$(get_major_version)
+SLOT=$(ver_cut 1)
 
 MY_PV=${PV/_/}
 S="${WORKDIR}/${PN}-${MY_PV}"
@@ -24,8 +24,9 @@ LICENSE="POSTGRESQL GPL-2"
 DESCRIPTION="PostgreSQL RDBMS"
 HOMEPAGE="http://www.postgresql.org/"
 
-IUSE="doc kerberos kernel_linux ldap libressl llvm nls pam perl python +readline
-	  selinux +server systemd ssl static-libs tcl threads uuid xml zlib"
+IUSE="debug doc icu kerberos kernel_linux ldap libressl llvm nls pam
+	  perl python +readline selinux +server systemd ssl static-libs tcl
+	  threads uuid xml zlib"
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
@@ -33,10 +34,13 @@ CDEPEND="
 >=app-eselect/eselect-postgresql-2.0
 sys-apps/less
 virtual/libintl
+icu? ( dev-libs/icu:= )
 kerberos? ( virtual/krb5 )
 ldap? ( net-nds/openldap )
-llvm? ( sys-devel/llvm:=
-	sys-devel/clang:= )
+llvm? (
+	sys-devel/llvm:=
+	sys-devel/clang:=
+)
 pam? ( virtual/pam )
 perl? ( >=dev-lang/perl-5.8:= )
 python? ( ${PYTHON_DEPS} )
@@ -151,7 +155,9 @@ src_configure() {
 		--sysconfdir="${PO}/etc/postgresql-${SLOT}" \
 		--with-system-tzdata="${PO}/usr/share/zoneinfo" \
 		$(use_enable !alpha spinlocks) \
+		$(use_enable debug) \
 		$(use_enable threads thread-safety) \
+		$(use_with icu) \
 		$(use_with kerberos gssapi) \
 		$(use_with ldap) \
 		$(use_with llvm) \
@@ -227,16 +233,18 @@ src_install() {
 	insinto /etc/postgresql-${SLOT}
 	newins src/bin/psql/psqlrc.sample psqlrc
 
-	use static-libs || find "${ED}" -name '*.a' -delete
+	# Don't delete libpg{port,common}.a (Bug #571046). They're always
+	# needed by extensions utilizing PGXS.
+	use static-libs || \
+		find "${ED}" -name '*.a' ! -name libpgport.a ! -name libpgcommon.a \
+			 -delete
 
+	# Make slot specific links to programs
 	local f bn
 	for f in $(find "${ED}/usr/$(get_libdir)/postgresql-${SLOT}/bin" \
 					-mindepth 1 -maxdepth 1)
 	do
 		bn=$(basename "${f}")
-		# Temporarily tack on tmp to workaround a file collision
-		# issue. This is only necessary for 9.7 and earlier. 10 never
-		# had this issue.
 		dosym "../$(get_libdir)/postgresql-${SLOT}/bin/${bn}" \
 			  "/usr/bin/${bn}${SLOT/.}"
 	done
@@ -385,9 +393,9 @@ pkg_config() {
 
 	einfo "Creating the data directory ..."
 	if [[ ${EUID} == 0 ]] ; then
-		mkdir -p "${DATA_DIR}"
-		chown -Rf postgres:postgres "${DATA_DIR}"
-		chmod 0700 "${DATA_DIR}"
+		mkdir -p "$(dirname ${DATA_DIR%/})" || die "Couldn't parent dirs"
+		mkdir -m 0700 "${DATA_DIR%/}" || die "Couldn't make DATA_DIR"
+		chown -h postgres:postgres "${DATA_DIR%/}" || die "Couldn't chown"
 	fi
 
 	einfo "Initializing the database ..."
