@@ -5,7 +5,7 @@
 
 EAPI=7
 
-inherit bash-completion-r1 xdg-utils-r1
+inherit bash-completion-r1 xdg-utils
 
 DESCRIPTION="Phoronix's comprehensive, cross-platform testing and benchmark suite"
 HOMEPAGE="http://www.phoronix-test-suite.com"
