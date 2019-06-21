@@ -51,7 +51,11 @@ MULTILIB_WRAPPED_HEADERS=(
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-0.19.7-disable-libintl.patch #564168
+	"${FILESDIR}"/${PN}-0.20-parallel_install.patch #685530
+	"${FILESDIR}"/${PN}-0.20-avoid_eautomake.patch
 )
+
+QA_SONAME_NO_SYMLINK=".*/preloadable_libintl.so"
 
 pkg_setup() {
 	mono-env_pkg_setup
@@ -110,7 +114,7 @@ multilib_src_configure() {
 }
 
 multilib_src_install() {
-	default
+	emake -j1 DESTDIR="${D}" install
 
 	if multilib_is_native_abi ; then
 		dosym msgfmt /usr/bin/gmsgfmt #43435
@@ -119,14 +123,7 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	if ! use nls ; then
-		rm -r "${ED}"/usr/share/locale || die
-	fi
-	if ! use static-libs ; then
-		find "${ED}" -type f -name "*.la" -delete || die
-	fi
-
-	rm -f "${ED}"/usr/share/locale/locale.alias "${ED}"/usr/lib/charset.alias
+	find "${ED}" -type f -name "*.la" -delete || die
 
 	if use java ; then
 		java-pkg_dojar "${ED}"/usr/share/${PN}/*.jar
@@ -134,7 +131,6 @@ multilib_src_install_all() {
 		rm "${ED}"/usr/share/${PN}/*.class || die
 		if use doc ; then
 			java-pkg_dojavadoc "${ED}"/usr/share/doc/${PF}/javadoc2
-			rm -r"${ED}"/usr/share/doc/${PF}/javadoc2 || die
 		fi
 	fi
 
