@@ -9,7 +9,6 @@ inherit flag-o-matic gnome2 multilib virtualx multilib-minimal
 
 DESCRIPTION="Gimp ToolKit +"
 HOMEPAGE="https://www.gtk.org/"
-SRC_URI+=" https://dev.gentoo.org/~leio/distfiles/${P}-patchset.tar.xz"
 
 LICENSE="LGPL-2+"
 SLOT="3"
@@ -43,7 +42,7 @@ COMMON_DEPEND="
 		>=net-libs/rest-0.7[${MULTILIB_USEDEP}]
 		>=dev-libs/json-glib-1.0[${MULTILIB_USEDEP}] )
 	colord? ( >=x11-misc/colord-0.1.9:0=[${MULTILIB_USEDEP}] )
-	cups? ( >=net-print/cups-1.2[${MULTILIB_USEDEP}] )
+	cups? ( >=net-print/cups-2.0[${MULTILIB_USEDEP}] )
 	introspection? ( >=dev-libs/gobject-introspection-1.39:= )
 	wayland? (
 		>=dev-libs/wayland-1.9.91[${MULTILIB_USEDEP}]
@@ -123,11 +122,8 @@ src_prepare() {
 		strip_builddir SRC_SUBDIRS examples Makefile.{am,in}
 	fi
 
-	# Select patches from origin/gtk-3-24 on 2019-04-20
-	eapply "${WORKDIR}"/patches
-
 	# gtk-update-icon-cache is installed by dev-util/gtk-update-icon-cache
-	eapply "${FILESDIR}"/${P}-update-icon-cache.patch
+	eapply "${FILESDIR}"/${PN}-3.24.8-update-icon-cache.patch
 
 	# Fix broken autotools logic
 	eapply "${FILESDIR}"/${PN}-3.22.20-libcloudproviders-automagic.patch
@@ -136,33 +132,48 @@ src_prepare() {
 }
 
 multilib_src_configure() {
-	# need libdir here to avoid a double slash in a path that libtool doesn't
-	# grok so well during install (// between $EPREFIX and usr ...)
-	# cloudprovider is not packaged in Gentoo
-	ECONF_SOURCE=${S} \
-	gnome2_src_configure \
-		$(use_enable aqua quartz-backend) \
-		$(use_enable broadway broadway-backend) \
-		$(use_enable cloudprint) \
-		$(use_enable colord) \
-		$(use_enable cups cups auto) \
-		$(multilib_native_use_enable gtk-doc) \
-		$(multilib_native_use_enable introspection) \
-		$(use_enable wayland wayland-backend) \
-		$(use_enable X x11-backend) \
-		$(use_enable X xcomposite) \
-		$(use_enable X xdamage) \
-		$(use_enable X xfixes) \
-		$(use_enable X xkb) \
-		$(use_enable X xrandr) \
-		$(use_enable xinerama) \
-		--disable-cloudproviders \
-		--disable-mir-backend \
-		--disable-papi \
-		--enable-man \
-		--with-xml-catalog="${EPREFIX}"/etc/xml/catalog \
-		--libdir="${EPREFIX}"/usr/$(get_libdir) \
+	local myconf=(
+		$(use_enable aqua quartz-backend)
+		$(use_enable broadway broadway-backend)
+		$(use_enable cloudprint)
+		$(use_enable colord)
+		$(use_enable cups cups auto)
+		$(multilib_native_use_enable gtk-doc)
+		$(multilib_native_use_enable introspection)
+		$(use_enable wayland wayland-backend)
+		$(use_enable X x11-backend)
+		$(use_enable X xcomposite)
+		$(use_enable X xdamage)
+		$(use_enable X xfixes)
+		$(use_enable X xkb)
+		$(use_enable X xrandr)
+		$(use_enable xinerama)
+		# cloudprovider is not packaged in Gentoo yet
+		--disable-cloudproviders
+		--disable-mir-backend
+		--disable-papi
+		# sysprof integration needs >=sysprof-3.33.2 and passing --disable-profiler
+		# would force enable it - https://gitlab.gnome.org/GNOME/gtk/issues/1965
+		# --disable-profiler
+		--enable-man
+		--with-xml-catalog="${EPREFIX}"/etc/xml/catalog
+		# need libdir here to avoid a double slash in a path that libtool doesn't
+		# grok so well during install (// between $EPREFIX and usr ...)
+		# TODO: Is this still the case?
+		--libdir="${EPREFIX}"/usr/$(get_libdir)
 		CUPS_CONFIG="${EPREFIX}/usr/bin/${CHOST}-cups-config"
+	)
+
+	if use wayland; then
+		myconf+=(
+			# Include wayland immodule into gtk itself, to avoid problems like
+			# https://gitlab.gnome.org/GNOME/gnome-shell/issues/109 from a
+			# user overridden GTK_IM_MODULE envvar
+			--with-included-immodules=wayland
+		)
+	fi;
+
+	ECONF_SOURCE=${S} gnome2_src_configure "${myconf[@]}"
 
 	# work-around gtk-doc out-of-source brokedness
 	if multilib_is_native_abi; then
