@@ -1,9 +1,9 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-inherit eutils bash-completion-r1 rust-toolchain toolchain-funcs
+inherit bash-completion-r1 rust-toolchain toolchain-funcs
 
 MY_P="rust-${PV}"
 
@@ -86,20 +86,10 @@ src_install() {
 	dosym "../../opt/${P}/bin/${rustlldb}" "/usr/bin/${rustlldb}"
 
 	local cargo=cargo-bin-${PV}
-	# ugly hack for https://bugs.gentoo.org/679806
-	if use ppc64; then
-		mv "${D}/opt/${P}/bin/cargo" "${D}/opt/${P}/bin/${cargo}".bin || die
-		sed -i 's/getentropy/gEtEnTrOpY/g' "${D}/opt/${P}/bin/${cargo}".bin || die
-		cat <<- 'EOF' > "${D}/opt/${P}/bin/${cargo}"
-			#!/bin/sh
-			OPENSSL_ppccap=0 $(realpath $0).bin "${@}"
-		EOF
-		fperms +x "/opt/${P}/bin/${cargo}"
-	else
-		mv "${D}/opt/${P}/bin/cargo" "${D}/opt/${P}/bin/${cargo}" || die
-	fi
+	mv "${D}/opt/${P}/bin/cargo" "${D}/opt/${P}/bin/${cargo}" || die
 	dosym "${cargo}" "/opt/${P}/bin/cargo"
 	dosym "../../opt/${P}/bin/${cargo}" "/usr/bin/${cargo}"
+
 	if use clippy; then
 		local clippy_driver=clippy-driver-bin-${PV}
 		local cargo_clippy=cargo-clippy-bin-${PV}
