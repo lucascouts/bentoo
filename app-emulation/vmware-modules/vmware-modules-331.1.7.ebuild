@@ -112,4 +112,5 @@ src_install() {
 
 pkg_postinst() {
 	linux-mod_pkg_postinst
+	ewarn "Don't forget to run '/etc/init.d/vmware restart' to use the new kernel modules."
 }

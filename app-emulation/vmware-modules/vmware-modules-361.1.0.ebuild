@@ -69,9 +69,7 @@ src_prepare() {
 	epatch "${FILESDIR}/02-vmmon-fix-indirect-call-with-retpoline-build.patch"
 	epatch "${FILESDIR}/03-vmmon-check-presence-of-file_operations-poll.patch"
 	epatch "${FILESDIR}/04-modules-replace-SUBDIRS-with-M.patch"
-	epatch "${FILESDIR}/05-vmmon-totalram_pages-is-a-function-since-5.0.patch"
 	epatch "${FILESDIR}/06-vmmon-bring-back-the-do_gettimeofday-helper.patch"
-	epatch "${FILESDIR}/07-modules-handle-access_ok-with-two-arguments.patch"
 	epatch "${FILESDIR}/08-vmmon-use-KERNEL_DS-rather-than-get_ds.patch"
 	epatch "${FILESDIR}/09-vmmon-fix-return-type-of-vm_operations_struct-fault-.patch"
 
@@ -112,4 +110,5 @@ src_install() {
 
 pkg_postinst() {
 	linux-mod_pkg_postinst
+	ewarn "Don't forget to run '/etc/init.d/vmware restart' to use the new kernel modules."
 }
