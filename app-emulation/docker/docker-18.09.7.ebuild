@@ -11,8 +11,9 @@ if [[ ${PV} = *9999* ]]; then
 	EGIT_CHECKOUT_DIR="${WORKDIR}/${P}/src/${EGO_PN}"
 	inherit git-r3
 else
-	DOCKER_GITCOMMIT="481bc77"
-	SRC_URI="https://${EGO_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	DOCKER_GITCOMMIT="2d0083d"
+	MY_PV=${PV/_/-}
+	SRC_URI="https://${EGO_PN}/archive/v${MY_PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64"
 	[ "$DOCKER_GITCOMMIT" ] || die "DOCKER_GITCOMMIT must be added manually for each bump!"
 	inherit golang-vcs-snapshot
@@ -23,7 +24,7 @@ DESCRIPTION="The core functions you need to create Docker images and run Docker 
 HOMEPAGE="https://dockerproject.org"
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="apparmor aufs btrfs +container-init device-mapper hardened +overlay pkcs11 seccomp"
+IUSE="apparmor aufs btrfs +container-init device-mapper hardened +overlay seccomp"
 
 # https://github.com/docker/docker/blob/master/project/PACKAGERS.md#build-dependencies
 CDEPEND="
@@ -54,9 +55,9 @@ RDEPEND="
 	>=dev-vcs/git-1.7
 	>=app-arch/xz-utils-4.9
 	dev-libs/libltdl
-	~app-emulation/containerd-1.2.5
-	~app-emulation/runc-1.0.0_rc6_p20190216[apparmor?,seccomp?]
-	~app-emulation/docker-proxy-0.8.0_p20190417
+	~app-emulation/containerd-1.2.6
+	~app-emulation/runc-1.0.0_rc8[apparmor?,seccomp?]
+	~app-emulation/docker-proxy-0.8.0_p20190513
 	container-init? ( >=sys-process/tini-0.18.0[static] )
 "
 
@@ -196,7 +197,7 @@ src_compile() {
 		fi
 	done
 
-	for tag in apparmor pkcs11 seccomp; do
+	for tag in apparmor seccomp; do
 		if use $tag; then
 			DOCKER_BUILDTAGS+=" $tag"
 		fi
