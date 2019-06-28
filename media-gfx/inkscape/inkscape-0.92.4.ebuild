@@ -15,7 +15,7 @@ SRC_URI="https://inkscape.global.ssl.fastly.net/media/resources/file/${P}.tar.bz
 
 LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~hppa ~ppc ~ppc64 ~x86"
+KEYWORDS="amd64 ~arm ~hppa ppc ppc64 ~x86"
 IUSE="cdr dia dbus exif gnome imagemagick openmp postscript inkjar jpeg latex"
 IUSE+=" lcms nls spell static-libs visio wpg"
 
@@ -97,6 +97,7 @@ PATCHES=(
 	"${FILESDIR}/${PN}-0.91_pre3-exif.patch"
 	"${FILESDIR}/${PN}-0.91_pre3-sk-man.patch"
 	"${FILESDIR}/${PN}-0.48.4-epython.patch"
+	"${FILESDIR}/${PN}-0.92.4-poppler-0.76.0.patch" #684246
 )
 
 S="${WORKDIR}/${MY_P}"
@@ -104,7 +105,7 @@ S="${WORKDIR}/${MY_P}"
 RESTRICT="test"
 
 pkg_pretend() {
-	if use openmp; then
+	if [[ ${MERGE_TYPE} != binary ]] && use openmp; then
 		tc-has-openmp || die "Please switch to an openmp compatible compiler"
 	fi
 }
@@ -155,16 +156,4 @@ src_install() {
 
 	find "${ED}" -name "*.la" -delete || die
 	python_optimize "${ED%/}"/usr/share/${PN}/extensions
-}
-
-pkg_postinst() {
-	gnome2_icon_cache_update
-	xdg_mimeinfo_database_update
-	xdg_desktop_database_update
-}
-
-pkg_postrm() {
-	gnome2_icon_cache_update
-	xdg_mimeinfo_database_update
-	xdg_desktop_database_update
 }
