@@ -24,7 +24,8 @@ BDEPEND="dev-util/patchelf"
 COMMON="app-eselect/eselect-opencl
 	dev-libs/ocl-icd"
 DEPEND="${COMMON}"
-RDEPEND="${COMMON}"
+RDEPEND="${COMMON}
+	!media-libs/mesa[opencl]" # Bug #686790
 
 QA_PREBUILT="/opt/amdgpu/lib*/*"
 
