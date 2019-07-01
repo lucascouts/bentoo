@@ -3,13 +3,12 @@
 
 EAPI=7
 
-# TODO python3_{6,7} contrary to 6.14 changelog, still does not build.
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_{6,7} )
 # this ebuild currently only supports installing ruby bindings for a single ruby version
 # so USE_RUBY must contain only a single value (the latest stable) as the ebuild calls
 # /usr/bin/${USE_RUBY} directly
 USE_RUBY="ruby25"
-inherit python-single-r1 ruby-single toolchain-funcs
+inherit python-single-r1 qmake-utils ruby-single toolchain-funcs
 
 DESCRIPTION="Open source multimedia framework for television broadcasting"
 HOMEPAGE="https://www.mltframework.org/"
@@ -17,10 +16,10 @@ SRC_URI="https://github.com/mltframework/${PN}/releases/download/v${PV}/${P}.tar
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86 ~x86-fbsd ~amd64-linux ~x86-linux"
-IUSE="compressed-lumas cpu_flags_x86_mmx cpu_flags_x86_sse cpu_flags_x86_sse2 debug ffmpeg fftw frei0r
-gtk jack kdenlive kernel_linux libav libsamplerate lua melt opencv opengl python qt5 rtaudio ruby sdl
-vdpau vidstab xine xml"
+KEYWORDS="~amd64 ~arm64 ~x86 ~amd64-linux ~x86-linux"
+IUSE="compressed-lumas cpu_flags_x86_mmx cpu_flags_x86_sse cpu_flags_x86_sse2 debug ffmpeg
+fftw frei0r gtk jack kdenlive kernel_linux libav libsamplerate lua melt opencv opengl python
+qt5 rtaudio ruby sdl vdpau vidstab xine xml"
 # java perl php tcl
 
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
@@ -38,10 +37,10 @@ BDEPEND="
 	ruby? ( ${SWIG_DEPEND} )"
 #rtaudio will use OSS on non linux OSes
 DEPEND="
-	>=media-libs/libebur128-1.2.2
+	>=media-libs/libebur128-1.2.2:=
 	ffmpeg? (
 		libav? ( >=media-video/libav-12:0=[vdpau?] )
-		!libav? ( media-video/ffmpeg:0=[vdpau?] )
+		!libav? ( media-video/ffmpeg:0=[vdpau?,-flite] )
 	)
 	fftw? ( sci-libs/fftw:3.0= )
 	frei0r? ( media-plugins/frei0r-plugins )
@@ -90,7 +89,14 @@ RDEPEND="${DEPEND}"
 
 DOCS=( AUTHORS ChangeLog NEWS README docs/{framework,melt,mlt{++,-xml}}.txt )
 
-PATCHES=( "${FILESDIR}"/${PN}-6.10.0-swig-underlinking.patch )
+PATCHES=(
+	"${FILESDIR}"/${PN}-6.10.0-swig-underlinking.patch
+	"${FILESDIR}"/${P}-mlt_consumer-race-condition.patch
+	"${FILESDIR}"/${P}-rotoscoping-interpolation.patch
+	"${FILESDIR}"/${P}-crop-filter.patch
+	"${FILESDIR}"/${P}-consumer_multi-does-not-correctly-handle-in-point.patch
+	"${FILESDIR}"/${P}-bad-aspect-ratio-resulting-in-black.patch
+)
 
 pkg_setup() {
 	use python && python-single-r1_pkg_setup
@@ -103,9 +109,11 @@ src_prepare() {
 	for x in python lua; do
 		sed -i "/mlt.so/s: -lmlt++ :& ${CFLAGS} ${LDFLAGS} :" src/swig/$x/build || die
 	done
-	sed -i "/^LDFLAGS/s: += :& ${LDFLAGS} :" src/swig/ruby/build || die
 
 	sed -i -e "s/env ruby/${USE_RUBY}/" src/swig/ruby/* || die
+
+	# fix python3 include dir
+	sed -i -e 's/python{}.{}/python{}.{}m/' src/swig/python/build || die
 }
 
 src_configure() {
@@ -120,68 +128,66 @@ src_configure() {
 		--disable-sdl
 		--disable-swfdec
 		$(use_enable debug)
-		$(use compressed-lumas && echo ' --luma-compress')
 		$(use_enable cpu_flags_x86_sse sse)
 		$(use_enable cpu_flags_x86_sse2 sse2)
-		$(use_enable gtk gtk2)
-		$(use_enable jack jackrack)
 		$(use_enable ffmpeg avformat)
-		$(use ffmpeg && echo ' --avformat-swscale')
 		$(use_enable fftw plus)
 		$(use_enable frei0r)
+		$(use_enable gtk gtk2)
+		$(use_enable jack jackrack)
+		$(use_enable kdenlive)
+		$(use_enable libsamplerate resample)
 		$(use_enable melt)
 		$(use_enable opencv)
 		$(use_enable opengl)
-		$(use_enable libsamplerate resample)
+		$(use_enable qt5 qt)
 		$(use_enable rtaudio)
-		$(use vdpau && echo ' --avformat-vdpau')
 		$(use_enable sdl sdl2)
 		$(use_enable vidstab vid.stab )
-		$(use_enable xml)
 		$(use_enable xine)
-		$(use_enable kdenlive)
+		$(use_enable xml)
 		--disable-sox
 	)
 		#$(use_enable sox) FIXME
 
+	use compressed-lumas && myconf+=( --luma-compress )
+	use ffmpeg && myconf+=( --avformat-swscale )
+	use vdpau && myconf+=( --avformat-vdpau )
+
 	if use qt5 ; then
 		myconf+=(
-			--enable-qt
-			--qt-includedir=$(pkg-config Qt5Core --variable=includedir)
-			--qt-libdir=$(pkg-config Qt5Core --variable=libdir)
+			--qt-includedir=$(qt5_get_headerdir)
+			--qt-libdir=$(qt5_get_libdir)
 		)
-	else
-		myconf+=( --disable-qt )
 	fi
 
-	if use x86 || use amd64 ; then
+	if use amd64 || use x86 ; then
 		myconf+=( $(use_enable cpu_flags_x86_mmx mmx) )
 	else
 		myconf+=( --disable-mmx )
 	fi
 
-	if ! use melt; then
+	if ! use melt ; then
 		sed -i -e "s;src/melt;;" Makefile || die
 	fi
 
 	# TODO: add swig language bindings
 	# see also https://www.mltframework.org/twiki/bin/view/MLT/ExtremeMakeover
 
-	local swig_lang
+	local swig_lang=()
 	# TODO: java perl php tcl
 	for i in lua python ruby ; do
-		use $i && swig_lang="${swig_lang} $i"
+		use $i && swig_lang+=( $i )
 	done
-	[[ -z "${swig_lang}" ]] && swig_lang="none"
+	[[ -z "${swig_lang}" ]] && swig_lang=( none )
 
-	econf ${myconf[@]} --swig-languages="${swig_lang}"
+	econf "${myconf[@]}" --swig-languages="${swig_lang[*]}"
 
-	sed -i -e s/^OPT/#OPT/ "${S}/config.mak" || die
+	sed -i -e s/^OPT/#OPT/ config.mak || die
 }
 
 src_install() {
-	emake DESTDIR="${D}" install
-	einstalldocs
+	default
 
 	dodir /usr/share/${PN}
 	insinto /usr/share/${PN}
