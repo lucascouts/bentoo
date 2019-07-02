@@ -91,7 +91,6 @@ EGO_PN="github.com/lxc/lxd"
 src_prepare() {
 	eapply_user
 	eapply "${FILESDIR}/de-translation-newline-1.patch"
-	eapply "${FILESDIR}/ptbr-translation-newline.patch"
 
 	cd "${S}/dist/dqlite" || die "Can't cd to dqlite dir"
 	eautoreconf

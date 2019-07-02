@@ -11,16 +11,11 @@ if [[ ${PV} = *9999* ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://libvirt.org/git/libvirt.git"
 	SRC_URI=""
-	KEYWORDS="amd64"
+	KEYWORDS=""
 	SLOT="0"
 else
-	# Versions with 4 numbers are stable updates:
-	if [[ ${PV} =~ ^[0-9]+(\.[0-9]+){3} ]]; then
-		SRC_URI="https://libvirt.org/sources/stable_updates/${P}.tar.xz"
-	else
-		SRC_URI="https://libvirt.org/sources/${P}.tar.xz"
-	fi
-	KEYWORDS="amd64 ~arm64 ~x86"
+	SRC_URI="https://libvirt.org/sources/${P}.tar.xz"
+	KEYWORDS="~amd64 ~arm64 ~x86"
 	SLOT="0/${PV}"
 fi
 
@@ -28,10 +23,10 @@ DESCRIPTION="C toolkit to manipulate virtual machines"
 HOMEPAGE="http://www.libvirt.org/"
 LICENSE="LGPL-2.1"
 IUSE="
-	apparmor audit +caps +dbus firewalld fuse glusterfs iscsi iscsi-direct
-	+libvirtd lvm libssh lxc +macvtap nfs nls numa openvz parted pcap phyp
-	policykit +qemu rbd sasl selinux +udev +vepa virtualbox virt-network
-	wireshark-plugins xen zeroconf zfs
+	apparmor audit +caps +dbus dtrace firewalld fuse glusterfs iscsi
+	iscsi-direct +libvirtd lvm libssh lxc +macvtap nfs nls numa openvz
+	parted pcap phyp policykit +qemu rbd sasl selinux +udev +vepa
+	virtualbox virt-network wireshark-plugins xen zeroconf zfs
 "
 
 REQUIRED_USE="
@@ -71,6 +66,7 @@ RDEPEND="
 	audit? ( sys-process/audit )
 	caps? ( sys-libs/libcap-ng )
 	dbus? ( sys-apps/dbus )
+	dtrace? ( dev-util/systemtap )
 	firewalld? ( >=net-firewall/firewalld-0.6.3 )
 	fuse? ( >=sys-fs/fuse-2.8.6:= )
 	glusterfs? ( >=sys-cluster/glusterfs-3.4.1 )
@@ -127,7 +123,7 @@ DEPEND="${RDEPEND}
 PATCHES=(
 	"${FILESDIR}"/${PN}-5.2.0-do-not-use-sysconf.patch
 	"${FILESDIR}"/${PN}-1.2.16-fix_paths_in_libvirt-guests_sh.patch
-	"${FILESDIR}"/${PN}-5.0.0-fix-paths-for-apparmor.patch
+	"${FILESDIR}"/${PN}-5.2.0-fix-paths-for-apparmor.patch
 	"${FILESDIR}"/${PN}-5.2.0-md-clear.patch
 )
 
@@ -258,6 +254,7 @@ src_configure() {
 		$(use_with audit)
 		$(use_with caps capng)
 		$(use_with dbus)
+		$(use_with dtrace)
 		$(use_with firewalld)
 		$(use_with fuse)
 		$(use_with glusterfs)
@@ -306,7 +303,6 @@ src_configure() {
 		--disable-static
 		--disable-werror
 
-		--with-html-subdir=${PF}/html
 		--localstatedir=/var
 	)
 
@@ -359,7 +355,7 @@ src_install() {
 	systemd_newtmpfilesd "${FILESDIR}"/libvirtd.tmpfiles.conf libvirtd.conf
 
 	newinitd "${S}/libvirtd.init" libvirtd || die
-	newinitd "${FILESDIR}/libvirt-guests.init-r3" libvirt-guests || die
+	newinitd "${FILESDIR}/libvirt-guests.init-r4" libvirt-guests || die
 	newinitd "${FILESDIR}/virtlockd.init-r1" virtlockd || die
 	newinitd "${FILESDIR}/virtlogd.init-r1" virtlogd || die
 
