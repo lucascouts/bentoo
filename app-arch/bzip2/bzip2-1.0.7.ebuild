@@ -4,31 +4,28 @@
 # XXX: atm, libbz2.a is always PIC :(, so it is always built quickly
 #      (since we're building shared libs) ...
 
-EAPI=6
+EAPI=7
 
 inherit toolchain-funcs multilib-minimal
 
 DESCRIPTION="A high-quality data compressor used extensively by Gentoo Linux"
 HOMEPAGE="https://sourceware.org/bzip2/"
-SRC_URI="mirror://gentoo/${P}.tar.gz"
+SRC_URI="https://sourceware.org/pub/${PN}/${P}.tar.gz"
 
 LICENSE="BZIP2"
 SLOT="0/1" # subslot = SONAME
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd"
 IUSE="static static-libs"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.0.4-makefile-CFLAGS.patch
-	"${FILESDIR}"/${PN}-1.0.6-saneso.patch
+	"${FILESDIR}"/${PN}-1.0.7-saneso.patch
 	"${FILESDIR}"/${PN}-1.0.4-man-links.patch #172986
 	"${FILESDIR}"/${PN}-1.0.6-progress.patch
 	"${FILESDIR}"/${PN}-1.0.3-no-test.patch
 	"${FILESDIR}"/${PN}-1.0.4-POSIX-shell.patch #193365
 	"${FILESDIR}"/${PN}-1.0.6-mingw.patch #393573
-	"${FILESDIR}"/${PN}-1.0.6-out-of-tree-build.patch
-	"${FILESDIR}"/${PN}-1.0.6-CVE-2016-3189.patch #620466
-	"${FILESDIR}"/${PN}-1.0.6-ubsan-error.patch
-	"${FILESDIR}"/${PN}-1.0.6-nselectors-upper-bound-check.patch
+	"${FILESDIR}"/${PN}-1.0.7-out-of-tree-build.patch
 )
 
 DOCS=( CHANGES README{,.COMPILATION.PROBLEMS,.XML.STUFF} manual.pdf )
