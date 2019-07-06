@@ -36,7 +36,6 @@ IUSE="doc systemd test +webengine ${QTC_PLUGINS[@]%:*}"
 QT_PV="5.9.0:5"
 
 CDEPEND="
-	>=dev-libs/botan-2.8:2=[-bindist]
 	>=dev-qt/qtconcurrent-${QT_PV}
 	>=dev-qt/qtcore-${QT_PV}
 	>=dev-qt/qtdeclarative-${QT_PV}[widgets]
@@ -56,7 +55,7 @@ CDEPEND="
 		>=dev-qt/qthelp-${QT_PV}
 		webengine? ( >=dev-qt/qtwebengine-${QT_PV}[widgets] )
 	)
-	qbs? ( >=dev-util/qbs-1.12.2 )
+	qbs? ( >=dev-util/qbs-1.13.0 )
 	serialterminal? ( >=dev-qt/qtserialport-${QT_PV} )
 	systemd? ( sys-apps/systemd:= )
 "
@@ -140,6 +139,9 @@ src_prepare() {
 	sed -i -e '/\(dumpers\|namedemangler\)\.pro/d' tests/auto/debugger/debugger.pro || die
 	sed -i -e '/CONFIG -=/s/$/ testcase/' tests/auto/extensionsystem/pluginmanager/correctplugins1/plugin?/plugin?.pro || die
 
+	# do not install test binaries
+	sed -i -e '/CONFIG +=/s/$/ no_testcase_installs/' tests/auto/{qttest.pri,json/json.pro} || die
+
 	# fix path to some clang headers
 	sed -i -e "/^CLANG_RESOURCE_DIR\s*=/s:\$\${LLVM_LIBDIR}:${EPREFIX}/usr/lib:" src/shared/clang/clang_defines.pri || die
 
@@ -149,9 +151,6 @@ src_prepare() {
 		use l10n_${lang} && languages+=" ${lang/-/_}"
 	done
 	sed -i -e "/^LANGUAGES\s*=/s:=.*:=${languages}:" share/qtcreator/translations/translations.pro || die
-
-	# remove bundled botan
-	rm -rf src/libs/3rdparty/botan || die
 
 	# remove bundled qbs
 	rm -rf src/shared/qbs || die
@@ -164,7 +163,6 @@ src_configure() {
 		$(use qbs && echo QBS_INSTALL_DIR="${EPREFIX}/usr") \
 		CONFIG+=qbs_disable_rpath \
 		CONFIG+=qbs_enable_project_file_updates \
-		CONFIG+=use_system_botan \
 		$(use systemd && echo CONFIG+=journald) \
 		$(use test && echo BUILD_TESTS=1)
 }
