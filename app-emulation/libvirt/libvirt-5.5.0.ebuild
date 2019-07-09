@@ -26,7 +26,7 @@ IUSE="
 	apparmor audit +caps +dbus dtrace firewalld fuse glusterfs iscsi
 	iscsi-direct +libvirtd lvm libssh lxc +macvtap nfs nls numa openvz
 	parted pcap phyp policykit +qemu rbd sasl selinux +udev +vepa
-	virtualbox virt-network wireshark-plugins xen zeroconf zfs
+	virtualbox virt-network wireshark-plugins xen zfs
 "
 
 REQUIRED_USE="
@@ -109,7 +109,6 @@ RDEPEND="
 		virtual/udev
 		>=x11-libs/libpciaccess-0.10.9
 	)
-	zeroconf? ( >=net-dns/avahi-0.6[dbus] )
 	zfs? ( sys-fs/zfs )"
 
 DEPEND="${RDEPEND}
@@ -238,7 +237,6 @@ src_prepare() {
 	# Tweak the init script:
 	cp "${FILESDIR}/libvirtd.init-r17" "${S}/libvirtd.init" || die
 	sed -e "s/USE_FLAG_FIREWALLD/$(usex firewalld 'need firewalld' '')/" \
-		-e "s/USE_FLAG_AVAHI/$(usex zeroconf 'use avahi-daemon' '')/" \
 		-e "s/USE_FLAG_ISCSI/$(usex iscsi 'use iscsid' '')/" \
 		-e "s/USE_FLAG_RBD/$(usex rbd 'use ceph' '')/" \
 		-i "${S}/libvirtd.init" || die "sed failed"
@@ -284,7 +282,6 @@ src_configure() {
 		$(use_with virt-network network)
 		$(use_with wireshark-plugins wireshark-dissector)
 		$(use_with xen libxl)
-		$(use_with zeroconf avahi)
 		$(use_with zfs storage-zfs)
 
 		--without-hal
