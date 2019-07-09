@@ -18,10 +18,10 @@ else
 	SLOT="stable/${ABI_VER}"
 	MY_P="rustc-${PV}"
 	SRC="${MY_P}-src.tar.xz"
-	KEYWORDS="~amd64 arm64 ~ppc64 ~x86"
+	KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 fi
 
-RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).2"
+RUST_STAGE0_VERSION="1.$(($(ver_cut 2) - 1)).0"
 
 DESCRIPTION="Systems programming language from Mozilla"
 HOMEPAGE="https://www.rust-lang.org/"
@@ -89,8 +89,8 @@ REQUIRED_USE="|| ( ${ALL_LLVM_TARGETS[*]} )
 
 PATCHES=(
 	"${FILESDIR}"/0001-llvm-cmake-Add-additional-headers-only-if-they-exist.patch
+	"${FILESDIR}"/1.34.2-fix-custom-libdir.patch
 	"${FILESDIR}"/1.35.0-revert-commits-triggering-multiple-llvm-rebuilds.patch
-	"${FILESDIR}"/1.34.0-libressl.patch # bug 684224
 )
 
 S="${WORKDIR}/${MY_P}-src"
@@ -125,13 +125,6 @@ src_prepare() {
 	local rust_stage0="rust-${RUST_STAGE0_VERSION}-$(rust_abi)"
 
 	"${WORKDIR}/${rust_stage0}"/install.sh --disable-ldconfig --destdir="${rust_stage0_root}" --prefix=/ || die
-
-	# ugly hack for https://bugs.gentoo.org/679806
-	# we have to keep it until we switch to 1.35.x bootstrap tarball.
-	if use ppc64; then
-		sed -i 's/getentropy/gEtEnTrOpY/g' "${rust_stage0_root}"/bin/cargo || die
-		export OPENSSL_ppccap=0
-	fi
 
 	default
 }
@@ -269,24 +262,10 @@ src_install() {
 		fi
 		abi_libdir=$(get_abi_LIBDIR ${v##*.})
 		rust_target=$(rust_abi $(get_abi_CHOST ${v##*.}))
-		mkdir -p "${ED}/usr/${abi_libdir}"
+		mkdir -p "${ED}/usr/${abi_libdir}/${P}"
 		cp "${ED}/usr/$(get_libdir)/${P}/rustlib/${rust_target}/lib"/*.so \
-		   "${ED}/usr/${abi_libdir}" || die
+		   "${ED}/usr/${abi_libdir}/${P}" || die
 	done
-
-	# temp fix for https://bugs.gentoo.org/672816
-	# FIXME: this should handle libdir=lib, not exact arches
-	if { use x86 || use arm; }; then
-		local rust_target wrongdir rightdir
-		rust_target=$(rust_abi $(get_abi_CHOST ${v##*.}))
-		wrongdir="${ED}/usr/$(get_libdir)/${P}/${P}/rustlib/${rust_target}/codegen-backends"
-		rightdir="${ED}/usr/$(get_libdir)/${P}/rustlib/${rust_target}/codegen-backends"
-		if [[ -e ${wrongdir}/librustc_codegen_llvm-llvm.so ]]; then
-			einfo "fixing bug #672816"
-			mv "${wrongdir}" "${rightdir}" || die
-			rm -r "${ED}/usr/$(get_libdir)/${P}/${P}" || die
-		fi
-	fi # end temp fix
 
 	dodoc COPYRIGHT
 
@@ -339,12 +318,8 @@ pkg_postinst() {
 	if has_version app-editors/gvim || has_version app-editors/vim; then
 		elog "install app-vim/rust-vim to get vim support for rust."
 	fi
-
-	if has_version 'app-shells/zsh'; then
-		elog "install app-shells/rust-zshcomp to get zsh completion for rust."
-	fi
 }
 
 pkg_postrm() {
-	eselect rust unset --if-invalid
+	eselect rust cleanup
 }

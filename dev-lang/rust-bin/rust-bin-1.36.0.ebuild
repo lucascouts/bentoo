@@ -150,12 +150,8 @@ pkg_postinst() {
 	if has_version app-editors/gvim || has_version app-editors/vim; then
 		elog "install app-vim/rust-vim to get vim support for rust."
 	fi
-
-	if has_version 'app-shells/zsh'; then
-		elog "install app-shells/rust-zshcomp to get zsh completion for rust."
-	fi
 }
 
 pkg_postrm() {
-	eselect rust unset --if-invalid
+	eselect rust cleanup
 }
