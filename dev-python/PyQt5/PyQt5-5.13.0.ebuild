@@ -9,11 +9,12 @@ inherit multibuild python-r1 qmake-utils
 DESCRIPTION="Python bindings for the Qt framework"
 HOMEPAGE="https://www.riverbankcomputing.com/software/pyqt/intro"
 
-MY_P=${PN}_gpl-${PV/_pre/.dev}
+MY_PN=PyQt5
+MY_P=${MY_PN}_gpl-${PV/_pre/.dev}
 if [[ ${PV} == *_pre* ]]; then
 	SRC_URI="https://dev.gentoo.org/~pesa/distfiles/${MY_P}.tar.gz"
 else
-	SRC_URI="https://www.riverbankcomputing.com/static/Downloads/PyQt5/${MY_P}.tar.gz"
+	SRC_URI="https://www.riverbankcomputing.com/static/Downloads/${MY_PN}/${PV}/${MY_P}.tar.gz"
 fi
 
 LICENSE="GPL-3"
@@ -21,10 +22,9 @@ SLOT="0"
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86"
 
 # TODO: QtNfc, QtRemoteObjects (Qt >= 5.12)
-IUSE="bluetooth dbus debug declarative designer examples gles2 gui help location
-	multimedia network networkauth opengl positioning printsupport sensors
-	serialport sql svg testlib webchannel webkit websockets widgets x11extras
-	xmlpatterns"
+IUSE="bluetooth dbus debug declarative designer examples gles2 gui help location multimedia
+	network networkauth opengl positioning printsupport sensors serialport sql +ssl svg
+	testlib webchannel webkit websockets widgets x11extras xmlpatterns"
 
 # The requirements below were extracted from configure.py
 # and from the output of 'grep -r "%Import " "${S}"/sip'
@@ -72,7 +72,7 @@ RDEPEND="
 	help? ( >=dev-qt/qthelp-${QT_PV} )
 	location? ( >=dev-qt/qtlocation-${QT_PV} )
 	multimedia? ( >=dev-qt/qtmultimedia-${QT_PV}[widgets?] )
-	network? ( >=dev-qt/qtnetwork-${QT_PV} )
+	network? ( >=dev-qt/qtnetwork-${QT_PV}[ssl=] )
 	networkauth? ( >=dev-qt/qtnetworkauth-${QT_PV} )
 	opengl? ( >=dev-qt/qtopengl-${QT_PV} )
 	positioning? ( >=dev-qt/qtpositioning-${QT_PV} )
@@ -117,7 +117,6 @@ src_configure() {
 			--confirm-license
 			--qmake="$(qt5_get_bindir)"/qmake
 			--bindir="${EPREFIX}/usr/bin"
-			--sip-incdir="$(python_get_includedir)"
 			--qsci-api
 			--enable=QtCore
 			--enable=QtXml
@@ -128,6 +127,7 @@ src_configure() {
 			$(usex declarative '' --no-qml-plugin)
 			$(pyqt_use_enable designer)
 			$(usex designer '' --no-designer-plugin)
+			$(usex gles2 '--disable-feature=PyQt_Desktop_OpenGL' '')
 			$(pyqt_use_enable gui)
 			$(pyqt_use_enable gui $(use gles2 && echo _QOpenGLFunctions_ES2 || echo _QOpenGLFunctions_{2_0,2_1,4_1_Core}))
 			$(pyqt_use_enable help)
@@ -141,6 +141,7 @@ src_configure() {
 			$(pyqt_use_enable sensors)
 			$(pyqt_use_enable serialport QtSerialPort)
 			$(pyqt_use_enable sql)
+			$(usex ssl '' '--disable-feature=PyQt_SSL')
 			$(pyqt_use_enable svg)
 			$(pyqt_use_enable testlib QtTest)
 			$(pyqt_use_enable webchannel QtWebChannel)
@@ -153,7 +154,11 @@ src_configure() {
 		echo "${myconf[@]}"
 		"${myconf[@]}" || die
 
-		eqmake5 -recursive ${PN}.pro
+		# Fix parallel install failure
+		sed -i -e '/INSTALLS += distinfo/i distinfo.depends = install_subtargets' ${MY_PN}.pro || die
+
+		# Run eqmake to respect toolchain and build flags
+		eqmake5 -recursive ${MY_PN}.pro
 	}
 	python_foreach_impl run_in_build_dir configuration
 }
@@ -164,9 +169,8 @@ src_compile() {
 
 src_install() {
 	installation() {
-		local tmp_root=${D}/${PN}_tmp_root
-		# parallel install fails because mk_distinfo.py runs too early
-		emake -j1 INSTALL_ROOT="${tmp_root}" install
+		local tmp_root=${D}/${MY_PN}_tmp_root
+		emake INSTALL_ROOT="${tmp_root}" install
 
 		local bin_dir=${tmp_root}${EPREFIX}/usr/bin
 		local exe
@@ -175,7 +179,7 @@ src_install() {
 			rm "${bin_dir}/${exe}" || die
 		done
 
-		local uic_dir=${tmp_root}$(python_get_sitedir)/${PN}/uic
+		local uic_dir=${tmp_root}$(python_get_sitedir)/${MY_PN}/uic
 		if python_is_python3; then
 			rm -r "${uic_dir}"/port_v2 || die
 		else
