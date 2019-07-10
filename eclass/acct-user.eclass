@@ -109,7 +109,6 @@ readonly ACCT_USER_NAME
 
 # << Boilerplate ebuild variables >>
 : ${DESCRIPTION:="System user: ${ACCT_USER_NAME}"}
-: ${HOMEPAGE:=https://www.gentoo.org/}
 : ${SLOT:=0}
 : ${KEYWORDS:=alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris}
 S=${WORKDIR}
@@ -326,8 +325,9 @@ acct-user_pkg_preinst() {
 	debug-print-function ${FUNCNAME} "${@}"
 
 	local groups=${ACCT_USER_GROUPS[*]}
-	enewuser -F -M "${ACCT_USER_NAME}" "${ACCT_USER_ID}" \
-		"${ACCT_USER_SHELL}" "${ACCT_USER_HOME}" "${groups// /,}"
+	enewuser ${ACCT_USER_ENFORCE_ID:+-F} -M "${ACCT_USER_NAME}" \
+		"${ACCT_USER_ID}" "${ACCT_USER_SHELL}" "${ACCT_USER_HOME}" \
+		"${groups// /,}"
 
 	if [[ ${ACCT_USER_HOME} != /dev/null ]]; then
 		# default ownership to user:group

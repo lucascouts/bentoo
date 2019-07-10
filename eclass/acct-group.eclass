@@ -70,7 +70,6 @@ readonly ACCT_GROUP_NAME
 
 # << Boilerplate ebuild variables >>
 : ${DESCRIPTION:="System group: ${ACCT_GROUP_NAME}"}
-: ${HOMEPAGE:=https://www.gentoo.org/}
 : ${SLOT:=0}
 : ${KEYWORDS:=alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 ~riscv s390 sh sparc x86 ~ppc-aix ~x64-cygwin ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~m68k-mint ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris}
 S=${WORKDIR}
@@ -105,7 +104,7 @@ acct-group_pkg_pretend() {
 		elif [[ -n ${group_by_name} ]]; then
 			eerror "The requested group exists already with wrong GID."
 			eerror "  groupname: ${ACCT_GROUP_NAME}"
-			eerror "  requested UID: ${ACCT_GROUP_ID}"
+			eerror "  requested GID: ${ACCT_GROUP_ID}"
 			eerror "  current entry: ${group_by_name}"
 			die "Group ${ACCT_GROUP_NAME} exists with wrong GID"
 		fi
@@ -118,7 +117,8 @@ acct-group_pkg_pretend() {
 acct-group_pkg_preinst() {
 	debug-print-function ${FUNCNAME} "${@}"
 
-	enewgroup -F "${ACCT_GROUP_NAME}" "${ACCT_GROUP_ID}"
+	enewgroup ${ACCT_GROUP_ENFORCE_ID:+-F} "${ACCT_GROUP_NAME}" \
+		"${ACCT_GROUP_ID}"
 }
 
 fi
