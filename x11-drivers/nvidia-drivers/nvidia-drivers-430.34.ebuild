@@ -23,7 +23,7 @@ SRC_URI="
 
 LICENSE="GPL-2 NVIDIA-r2"
 SLOT="0/${PV%.*}"
-KEYWORDS="-* amd64 ~amd64-fbsd"
+KEYWORDS="-* ~amd64 ~amd64-fbsd"
 RESTRICT="bindist mirror"
 EMULTILIB_PKG="true"
 
@@ -32,6 +32,7 @@ REQUIRED_USE="
 	tools? ( X )
 	static-libs? ( tools )
 "
+RESTRICT="test"
 
 COMMON="
 	app-eselect/eselect-opencl
@@ -86,11 +87,11 @@ nvidia_drivers_versions_check() {
 		die "Unexpected \${DEFAULT_ABI} = ${DEFAULT_ABI}"
 	fi
 
-	if use kernel_linux && kernel_is ge 5 2; then
+	if use kernel_linux && kernel_is ge 5 3; then
 		ewarn "Gentoo supports kernels which are supported by NVIDIA"
 		ewarn "which are limited to the following kernels:"
-		ewarn "<sys-kernel/gentoo-sources-5.2"
-		ewarn "<sys-kernel/vanilla-sources-5.2"
+		ewarn "<sys-kernel/gentoo-sources-5.3"
+		ewarn "<sys-kernel/vanilla-sources-5.3"
 		ewarn ""
 		ewarn "You are free to utilize epatch_user to provide whatever"
 		ewarn "support you feel is appropriate, but will not receive"
@@ -169,6 +170,12 @@ pkg_setup() {
 	fi
 }
 
+src_configure() {
+	tc-export AR CC LD
+
+	default
+}
+
 src_prepare() {
 	local man_file
 	for man_file in "${NV_MAN}"/*1.gz; do
@@ -192,10 +199,6 @@ src_prepare() {
 }
 
 src_compile() {
-	# This is already the default on Linux, as there's no toplevel Makefile, but
-	# on FreeBSD there's one and triggers the kernel module build, as we install
-	# it by itself, pass this.
-
 	cd "${NV_SRC}"
 	if use kernel_FreeBSD; then
 		MAKE="$(get_bmake)" CFLAGS="-Wno-sign-compare" emake CC="$(tc-getCC)" \
@@ -207,27 +210,23 @@ src_compile() {
 	fi
 
 	if use tools; then
-		emake -C "${S}"/nvidia-settings-${PV}/src \
-			AR="$(tc-getAR)" \
-			CC="$(tc-getCC)" \
+		emake -C "${S}"/nvidia-settings-${PV}/src/libXNVCtrl \
 			DO_STRIP= \
-			LD="$(tc-getCC)" \
 			LIBDIR="$(get_libdir)" \
 			NVLD="$(tc-getLD)" \
 			NV_VERBOSE=1 \
-			RANLIB="$(tc-getRANLIB)" \
-			build-xnvctrl
+			OUTPUTDIR=. \
+			RANLIB="$(tc-getRANLIB)"
 
 		emake -C "${S}"/nvidia-settings-${PV}/src \
-			CC="$(tc-getCC)" \
 			DO_STRIP= \
 			GTK3_AVAILABLE=$(usex gtk3 1 0) \
-			LD="$(tc-getCC)" \
 			LIBDIR="$(get_libdir)" \
 			NVLD="$(tc-getLD)" \
 			NVML_ENABLED=0 \
 			NV_USE_BUNDLED_LIBJANSSON=0 \
-			NV_VERBOSE=1
+			NV_VERBOSE=1 \
+			OUTPUTDIR=.
 	fi
 }
 
@@ -378,12 +377,13 @@ src_install() {
 	if use tools; then
 		emake -C "${S}"/nvidia-settings-${PV}/src/ \
 			DESTDIR="${D}" \
+			DO_STRIP= \
 			GTK3_AVAILABLE=$(usex gtk3 1 0) \
 			LIBDIR="${D}/usr/$(get_libdir)" \
 			NV_USE_BUNDLED_LIBJANSSON=0 \
 			NV_VERBOSE=1 \
+			OUTPUTDIR=. \
 			PREFIX=/usr \
-			DO_STRIP= \
 			install
 
 		if use static-libs; then
