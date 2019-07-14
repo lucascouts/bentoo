@@ -19,13 +19,12 @@ IUSE="static static-libs"
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.0.4-makefile-CFLAGS.patch
-	"${FILESDIR}"/${PN}-1.0.7-saneso.patch
+	"${FILESDIR}"/${PN}-1.0.8-saneso.patch
 	"${FILESDIR}"/${PN}-1.0.4-man-links.patch #172986
 	"${FILESDIR}"/${PN}-1.0.6-progress.patch
 	"${FILESDIR}"/${PN}-1.0.3-no-test.patch
-	"${FILESDIR}"/${PN}-1.0.4-POSIX-shell.patch #193365
-	"${FILESDIR}"/${PN}-1.0.6-mingw.patch #393573
-	"${FILESDIR}"/${PN}-1.0.7-out-of-tree-build.patch
+	"${FILESDIR}"/${PN}-1.0.8-mingw.patch #393573
+	"${FILESDIR}"/${PN}-1.0.8-out-of-tree-build.patch
 )
 
 DOCS=( CHANGES README{,.COMPILATION.PROBLEMS,.XML.STUFF} manual.pdf )
