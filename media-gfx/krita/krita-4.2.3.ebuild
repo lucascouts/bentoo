@@ -87,10 +87,7 @@ RDEPEND="${COMMON_DEPEND}
 # bug 630508
 RESTRICT+=" test"
 
-PATCHES=(
-	"${FILESDIR}"/${P}-tests-optional.patch
-	"${FILESDIR}"/${P}-fixuifiles.patch
-)
+PATCHES=( "${FILESDIR}"/${PN}-4.2.2-tests-optional.patch )
 
 pkg_setup() {
 	python-single-r1_pkg_setup

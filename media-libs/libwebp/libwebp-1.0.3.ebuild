@@ -65,6 +65,6 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	find "${ED}" -name "*.la" -delete || die
+	find "${ED}" -type f -name "*.la" -delete || die
 	dodoc AUTHORS ChangeLog doc/*.txt NEWS README{,.mux}
 }
