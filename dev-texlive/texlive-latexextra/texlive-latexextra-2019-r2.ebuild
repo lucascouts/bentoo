@@ -37,3 +37,7 @@ TEXLIVE_MODULE_BINSCRIPTS="
 	texmf-dist/scripts/exceltex/exceltex
 	texmf-dist/scripts/makedtx/makedtx.pl
 "
+
+PATCHES=( "${FILESDIR}"/exsheets-syntax.patch
+	"${FILESDIR}"/lstlinebgrd-syntax.patch
+	"${FILESDIR}"/vpe_invocation.patch )
