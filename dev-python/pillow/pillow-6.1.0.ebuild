@@ -46,10 +46,6 @@ DEPEND="${RDEPEND}
 
 S="${WORKDIR}/${MY_P}"
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-5.4.1-{pkg-config,toolchain-paths}.patch
-)
-
 python_configure_all() {
 	# It's important that these flags are also passed during the install phase
 	# as well. Make sure of that if you change the lines below. See bug 661308.
@@ -83,10 +79,14 @@ python_compile_all() {
 	use doc && emake -C docs html
 }
 
+src_test() {
+	virtx distutils-r1_src_test
+}
+
 python_test() {
 	"${PYTHON}" selftest.py --installed || die "selftest failed with ${EPYTHON}"
 	# no:relaxed: pytest-relaxed plugin make our tests fail. deactivate if installed
-	virtx pytest -vv -p no:relaxed
+	pytest -vv -p no:relaxed || die "Tests fail with ${EPYTHON}"
 }
 
 python_install() {
