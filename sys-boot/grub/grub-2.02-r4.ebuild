@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
@@ -7,7 +7,7 @@ GRUB_AUTOGEN=1
 GRUB_AUTORECONF=1
 
 if [[ -n ${GRUB_AUTOGEN} ]]; then
-	PYTHON_COMPAT=( python{2_7,3_3,3_4,3_5,3_6} )
+	PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 	inherit python-any-r1
 fi
 
@@ -28,7 +28,7 @@ if [[ ${PV} != 9999 ]]; then
 		SRC_URI="mirror://gnu/${PN}/${P}.tar.xz"
 		S=${WORKDIR}/${P%_*}
 	fi
-	KEYWORDS="~amd64 ~arm64 ppc ppc64 ~x86"
+	KEYWORDS="amd64 ~arm ~arm64 ppc ppc64 x86"
 else
 	inherit git-r3
 	EGIT_REPO_URI="git://git.sv.gnu.org/grub.git
@@ -44,6 +44,7 @@ PATCHES=(
 	"${FILESDIR}"/2.02-xfs-sparse-inodes.patch
 	"${FILESDIR}"/2.02-X86_64_PLT32.patch
 	"${FILESDIR}"/2.02-gcc8.patch
+	"${FILESDIR}"/2.02-efi-tsc-pmtimer.patch
 )
 
 DEJAVU=dejavu-sans-ttf-2.37
@@ -57,7 +58,7 @@ HOMEPAGE="https://www.gnu.org/software/grub/"
 # Includes licenses for dejavu and unifont
 LICENSE="GPL-3 fonts? ( GPL-2-with-font-exception ) themes? ( BitstreamVera )"
 SLOT="2/${PVR}"
-IUSE="debug device-mapper doc efiemu +fonts mount multislot nls static sdl test +themes truetype libzfs"
+IUSE="device-mapper doc efiemu +fonts mount multislot nls static sdl test +themes truetype libzfs"
 
 GRUB_ALL_PLATFORMS=( coreboot efi-32 efi-64 emu ieee1275 loongson multiboot qemu qemu-mips pc uboot xen xen-32 )
 IUSE+=" ${GRUB_ALL_PLATFORMS[@]/#/grub_platforms_}"
@@ -74,9 +75,7 @@ REQUIRED_USE="
 COMMON_DEPEND="
 	app-arch/xz-utils
 	>=sys-libs/ncurses-5.2-r5:0=
-	debug? (
-		sdl? ( media-libs/libsdl )
-	)
+	sdl? ( media-libs/libsdl )
 	device-mapper? ( >=sys-fs/lvm2-2.02.45 )
 	libzfs? ( sys-fs/zfs )
 	mount? ( sys-fs/fuse:0 )
@@ -210,14 +209,13 @@ grub_configure() {
 		--program-prefix=
 		--libdir="${EPREFIX}"/usr/lib
 		--htmldir="${EPREFIX}"/usr/share/doc/${PF}/html
-		$(use_enable debug mm-debug)
 		$(use_enable device-mapper)
 		$(use_enable mount grub-mount)
 		$(use_enable nls)
 		$(use_enable themes grub-themes)
 		$(use_enable truetype grub-mkfont)
 		$(use_enable libzfs)
-		$(use sdl && use_enable debug grub-emu-sdl)
+		$(use_enable sdl grub-emu-sdl)
 		${platform:+--with-platform=}${platform}
 
 		# Let configure detect this where supported
