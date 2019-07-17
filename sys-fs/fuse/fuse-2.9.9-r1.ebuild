@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit libtool linux-info udev toolchain-funcs
+inherit flag-o-matic libtool linux-info udev toolchain-funcs
 
 DESCRIPTION="An interface for filesystems implemented in userspace"
 HOMEPAGE="https://github.com/libfuse/libfuse"
@@ -34,6 +34,11 @@ src_prepare() {
 	# don't sed configure.in without eautoreconf because of maintainer mode
 	sed -i 's:umount --fake:true --fake:' configure || die
 	elibtoolize
+
+	# lto not supported yet -- https://github.com/libfuse/libfuse/issues/198
+	# gcc-9 with -flto leads to link failures: #663518,
+	# https://gcc.gnu.org/PR91186
+	filter-flags -flto*
 
 	default
 }

@@ -54,7 +54,7 @@ RDEPEND="${DEPEND}
 	cjk? ( app-text/poppler-data )
 "
 
-DOCS=( AUTHORS NEWS README README-XPDF )
+DOCS=( AUTHORS NEWS README.md README-XPDF )
 
 PATCHES=(
 	"${FILESDIR}/${PN}-0.60.1-qt5-dependencies.patch"
@@ -62,7 +62,6 @@ PATCHES=(
 	"${FILESDIR}/${PN}-0.78.0-respect-cflags.patch"
 	"${FILESDIR}/${PN}-0.61.0-respect-cflags.patch"
 	"${FILESDIR}/${PN}-0.57.0-disable-internal-jpx.patch"
-	"${FILESDIR}/${PN}-0.78.0-fix-text-selection.patch" # bug 689660
 )
 
 src_prepare() {
