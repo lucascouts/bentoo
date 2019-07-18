@@ -150,6 +150,7 @@ multilib_src_configure() {
 	# 'grep -- --enable configure | grep Check | awk '{ print $4 }' | sort
 	# 3) --with/without options third.
 	# grep -- --with configure | grep Check | awk '{ print $4 }' | sort
+
 	ECONF_SOURCE="${S}" \
 	econf \
 		--disable-alt-svc \
@@ -174,11 +175,18 @@ multilib_src_configure() {
 		--enable-tls-srp \
 		$(use_enable adns ares) \
 		--enable-cookies \
+		--enable-dateparse \
+		--enable-dnsshuffle \
+		--enable-doh \
 		--enable-hidden-symbols \
+		--enable-http-auth \
 		$(use_enable ipv6) \
 		--enable-largefile \
 		--without-libpsl \
 		--enable-manual \
+		--enable-mime \
+		--enable-netrc \
+		--enable-progress-meter \
 		--enable-proxy \
 		--disable-sspi \
 		$(use_enable static-libs static) \
