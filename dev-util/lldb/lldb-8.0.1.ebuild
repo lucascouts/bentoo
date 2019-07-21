@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -16,13 +16,13 @@ LLVM_P=llvm-${PV/_/}.src
 
 DESCRIPTION="The LLVM debugger"
 HOMEPAGE="https://llvm.org/"
-SRC_URI="https://releases.llvm.org/${PV/_//}/${MY_P}.tar.xz
-	test? ( https://releases.llvm.org/${PV/_//}/${LLVM_P}.tar.xz )"
+SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${PV}/${MY_P}.tar.xz
+	test? ( https://github.com/llvm/llvm-project/releases/download/llvmorg-${PV}/${LLVM_P}.tar.xz )"
 
 LICENSE="UoI-NCSA"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~x86"
-IUSE="libedit ncurses python test"
+IUSE="libedit ncurses +python test"
 RESTRICT="!test? ( test )"
 
 RDEPEND="
