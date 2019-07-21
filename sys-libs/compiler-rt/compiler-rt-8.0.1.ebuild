@@ -11,9 +11,10 @@ PYTHON_COMPAT=( python2_7 )
 inherit cmake-utils flag-o-matic llvm multiprocessing \
 	python-any-r1 toolchain-funcs
 
+MY_P=${P}.src
 DESCRIPTION="Compiler runtime library for clang (built-in part)"
 HOMEPAGE="https://llvm.org/"
-SRC_URI="https://releases.llvm.org/${PV/_//}/${P/_/}.src.tar.xz"
+SRC_URI="https://github.com/llvm/llvm-project/releases/download/llvmorg-${PV}/${MY_P}.tar.xz"
 
 LICENSE="|| ( UoI-NCSA MIT )"
 SLOT="${PV%_*}"
@@ -31,7 +32,7 @@ DEPEND="
 		=sys-devel/clang-${PV%_*}*:${CLANG_SLOT} )
 	${PYTHON_DEPS}"
 
-S=${WORKDIR}/${P/_/}.src
+S=${WORKDIR}/${MY_P}
 
 # least intrusive of all
 CMAKE_BUILD_TYPE=RelWithDebInfo
