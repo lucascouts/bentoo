@@ -71,9 +71,12 @@ case ${EAPI} in
 	2|3|4|5)
 		inherits="eutils"
 		;;
+	6)
+		inherits="estack"
+		;;
 esac
 
-inherit ${inherits} java-utils-2 multilib toolchain-funcs ruby-utils
+inherit ${inherits} multilib toolchain-funcs ruby-utils
 
 EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_test src_install pkg_setup
 
@@ -402,8 +405,6 @@ ruby-ng_pkg_setup() {
 	# before doing anything; by leaving the parameters empty we know
 	# it's a special case.
 	_ruby_each_implementation
-
-	has ruby_targets_jruby ${IUSE} && use ruby_targets_jruby && java-pkg_setup-vm
 }
 
 # @FUNCTION: ruby-ng_src_unpack
@@ -531,16 +532,6 @@ _each_ruby_check_install() {
 	local sitedir=$(${RUBY} -rrbconfig -e 'puts RbConfig::CONFIG["sitedir"]')
 	local sitelibdir=$(${RUBY} -rrbconfig -e 'puts RbConfig::CONFIG["sitelibdir"]')
 
-	# Look for wrong files in sitedir
-	# if [[ -d "${D}${sitedir}" ]]; then
-	# 	local f=$(find "${D}${sitedir}" -mindepth 1 -maxdepth 1 -not -wholename "${D}${sitelibdir}")
-	# 	if [[ -n ${f} ]]; then
-	# 		eerror "Found files in sitedir, outsite sitelibdir:"
-	# 		eerror "${f}"
-	# 		die "Misplaced files in sitedir"
-	# 	fi
-	# fi
-
 	# The current implementation lacks libruby (i.e.: jruby)
 	[[ -z ${libruby_soname} ]] && return 0
 
@@ -629,9 +620,6 @@ ruby_get_implementation() {
 	local ruby=${RUBY:-$(type -p ruby 2>/dev/null)}
 
 	case $(${ruby} --version) in
-		*jruby*)
-			echo "jruby"
-			;;
 		*rubinius*)
 			echo "rbx"
 			;;
@@ -712,11 +700,6 @@ ruby-ng_cucumber() {
 			cucumber_params+=" --format progress"
 			;;
 	esac
-
-	if [[ ${RUBY} == *jruby ]]; then
-		ewarn "Skipping cucumber tests on JRuby (unsupported)."
-		return 0
-	fi
 
 	${RUBY} -S cucumber ${cucumber_params} "$@" || die "cucumber failed"
 }
