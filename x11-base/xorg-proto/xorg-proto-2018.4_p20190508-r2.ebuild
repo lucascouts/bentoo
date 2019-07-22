@@ -51,7 +51,7 @@ multilib_src_install_all() {
 	DOCS=(
 		AUTHORS
 		PM_spec
-		README
+		$(set +f; echo README*)
 		$(set +f; echo COPYING-*)
 		$(set +f; echo *.txt | grep -v meson.txt)
 	)
