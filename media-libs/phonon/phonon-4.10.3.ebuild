@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 if [[ ${PV} != *9999* ]]; then
 	SRC_URI="mirror://kde/stable/phonon/${PV}/${P}.tar.xz"
@@ -20,7 +20,12 @@ LICENSE="|| ( LGPL-2.1 LGPL-3 )"
 SLOT="0"
 IUSE="debug designer gstreamer pulseaudio +vlc"
 
-RDEPEND="
+BDEPEND="
+	dev-qt/linguist-tools:5
+	kde-frameworks/extra-cmake-modules:5
+	virtual/pkgconfig
+"
+DEPEND="
 	!!dev-qt/qtphonon:4
 	dev-qt/qtcore:5
 	dev-qt/qtdbus:5
@@ -32,11 +37,7 @@ RDEPEND="
 		>=media-sound/pulseaudio-0.9.21[glib]
 	)
 "
-DEPEND="${RDEPEND}"
-BDEPEND="
-	kde-frameworks/extra-cmake-modules:5
-	virtual/pkgconfig
-"
+RDEPEND="${DEPEND}"
 PDEPEND="
 	gstreamer? ( >=media-libs/phonon-gstreamer-4.9.0[qt5(+)] )
 	vlc? ( >=media-libs/phonon-vlc-0.9.0[qt5(+)] )

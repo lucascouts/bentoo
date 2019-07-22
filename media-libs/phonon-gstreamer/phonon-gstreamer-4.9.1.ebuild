@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -14,7 +14,7 @@ else
 	inherit git-r3
 fi
 
-inherit cmake-utils
+inherit cmake-utils xdg-utils
 
 DESCRIPTION="Phonon GStreamer backend"
 HOMEPAGE="https://phonon.kde.org/"
@@ -23,7 +23,10 @@ LICENSE="LGPL-2.1+ || ( LGPL-2.1 LGPL-3 )"
 SLOT="0"
 IUSE="alsa debug +network"
 
-RDEPEND="
+BDEPEND="
+	virtual/pkgconfig
+"
+DEPEND="
 	dev-libs/glib:2
 	dev-libs/libxml2:2
 	dev-qt/qtcore:5
@@ -38,17 +41,17 @@ RDEPEND="
 	virtual/opengl
 	network? ( media-plugins/gst-plugins-soup:1.0 )
 "
-DEPEND="${RDEPEND}"
-BDEPEND="
-	virtual/pkgconfig
-"
-
-PATCHES=(
-	"${FILESDIR}/${P}-qt-5.11.patch"
-	"${FILESDIR}/${P}-no-paused-on-zero-vol.patch"
-)
+RDEPEND="${DEPEND}"
 
 src_configure() {
 	local mycmakeargs=( -DPHONON_BUILD_PHONON4QT5=ON )
 	cmake-utils_src_configure
+}
+
+pkg_postinst() {
+	xdg_icon_cache_update
+}
+
+pkg_postrm() {
+	xdg_icon_cache_update
 }
