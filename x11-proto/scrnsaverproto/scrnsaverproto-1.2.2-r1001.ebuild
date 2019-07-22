@@ -11,6 +11,7 @@ SLOT="0"
 
 RDEPEND=" || (
 	=x11-base/xorg-proto-2018.4_p99999999-r2
+	=x11-base/xorg-proto-2018.4_p20190508-r2
 	=x11-base/xorg-proto-2018.4_p20180627-r2
 	=x11-base/xorg-proto-2018.4-r2
 )"
