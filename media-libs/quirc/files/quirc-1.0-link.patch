@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 6f5c2ec..adb4e75 100644
+--- a/Makefile
++++ b/Makefile
+@@ -57,7 +57,7 @@ libquirc.a: $(LIB_OBJ)
+ libquirc.so: libquirc.so.$(LIB_VERSION)
+ 
+ libquirc.so.$(LIB_VERSION): $(LIB_OBJ)
+-	$(CC) -shared -o $@ $(LIB_OBJ) $(LDFLAGS) -lm
++	$(CC) -shared -fPIC -Wl,-soname,libquirc.so.1 -o $@ $(LIB_OBJ) $(LDFLAGS) -lm
+ 
+ .c.o:
+ 	$(CC) $(QUIRC_CFLAGS) -o $@ -c $<
