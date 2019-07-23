@@ -7,13 +7,15 @@ GCONF_DEBUG="no"
 PYTHON_COMPAT=( python2_7 )
 PYTHON_REQ_USE="sqlite"
 
-inherit gnome2 eutils flag-o-matic python-single-r1 cmake-utils
+ANTLR_VERSION=4.7.1
+
+inherit gnome2 flag-o-matic python-single-r1 cmake-utils
 
 MY_P="${PN}-community-${PV}-src"
 
 DESCRIPTION="MySQL Workbench"
 HOMEPAGE="https://www.mysql.com/products/workbench/"
-SRC_URI="mirror://mysql/Downloads/MySQLGUITools/${MY_P}.tar.gz http://www.antlr.org/download/antlr-4.7.1-complete.jar"
+SRC_URI="mirror://mysql/Downloads/MySQLGUITools/${MY_P}.tar.gz https://www.antlr.org/download/antlr-${ANTLR_VERSION}-complete.jar"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -31,7 +33,7 @@ CDEPEND="${PYTHON_DEPS}
 		>=dev-cpp/glibmm-2.14:2
 		dev-cpp/gtkmm:3.0
 		dev-libs/atk
-		>=net-libs/libssh-0.7.3[server]
+		>=net-libs/libssh-0.8.5[server]
 		x11-libs/pango
 		x11-libs/gtk+:3
 		gnome-base/libglade:2.0
@@ -42,7 +44,7 @@ CDEPEND="${PYTHON_DEPS}
 		>=dev-libs/libxml2-2.6.2:2
 		dev-libs/libzip
 		dev-libs/libpcre[cxx]
-		>=sci-libs/gdal-1.11.1-r1[-mdb]
+		>=sci-libs/gdal-1.11.1-r1
 		virtual/opengl
 		|| ( sys-libs/e2fsprogs-libs dev-libs/ossp-uuid )
 		dev-libs/tinyxml[stl]
@@ -67,6 +69,7 @@ S="${WORKDIR}"/"${MY_P}"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-6.2.5-wbcopytables.patch"
+	"${FILESDIR}/${PN}-6.3.10-i386-json.patch"
 )
 
 src_unpack() {
@@ -74,9 +77,6 @@ src_unpack() {
 }
 
 src_prepare() {
-	sed -i -e '/target_link_libraries/ s/sqlparser.grt/sqlparser.grt sqlparser/' \
-		modules/db.mysql.sqlparser/CMakeLists.txt
-
 	## remove hardcoded CXXFLAGS
 	sed -i -e 's/-O0 -g3//' ext/scintilla/gtk/CMakeLists.txt || die
 	## And avoid -Werror
@@ -94,7 +94,7 @@ src_configure() {
 	fi
 
 	append-cxxflags -std=c++11
-	ANTLR_JAR_PATH="${DISTDIR}/antlr-4.7.1-complete.jar"
+	ANTLR_JAR_PATH="${DISTDIR}/antlr-${ANTLR_VERSION}-complete.jar"
 	local mycmakeargs=(
 		-DWITH_ANTLR_JAR=${ANTLR_JAR_PATH}
 		-DLIB_INSTALL_DIR="/usr/$(get_libdir)"
