@@ -21,7 +21,7 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="Subversion GPL-2"
 SLOT="0"
 [[ "${PV}" = *_rc* ]] || \
-KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86 ~amd64-linux ~x86-linux"
 IUSE="apache2 berkdb ctypes-python debug doc +dso extras gnome-keyring +http java kwallet nls perl python ruby sasl test vim-syntax"
 
 COMMON_DEPEND="
@@ -57,7 +57,7 @@ COMMON_DEPEND="
 	sasl? ( dev-libs/cyrus-sasl )"
 RDEPEND="${COMMON_DEPEND}
 	apache2? ( www-servers/apache[apache2_modules_dav] )
-	java? ( >=virtual/jre-1.5 )
+	java? ( >=virtual/jre-1.8 )
 	nls? ( virtual/libintl )
 	perl? ( dev-perl/URI )"
 # Note: ctypesgen doesn't need PYTHON_USEDEP, it's used once
@@ -67,7 +67,7 @@ DEPEND="${COMMON_DEPEND}
 	doc? ( app-doc/doxygen )
 	gnome-keyring? ( virtual/pkgconfig )
 	http? ( virtual/pkgconfig )
-	java? ( >=virtual/jdk-1.5 )
+	java? ( >=virtual/jdk-1.8 )
 	kwallet? (
 		kde-frameworks/kdelibs4support:5
 		virtual/pkgconfig
@@ -154,10 +154,9 @@ pkg_setup() {
 
 src_prepare() {
 	eapply "${WORKDIR}/patches"
-	eapply "${FILESDIR}"/${PN}-1.11.1-allow-apr-1.7.0+.patch
 	eapply_user
 
-	fperms +x build/transform_libtool_scripts.sh
+	chmod +x build/transform_libtool_scripts.sh || die
 
 	sed -i \
 		-e "s/\(BUILD_RULES=.*\) bdb-test\(.*\)/\1\2/g" \
@@ -186,7 +185,7 @@ src_configure() {
 	local myconf=(
 		--libdir="${EPREFIX%/}/usr/$(get_libdir)"
 		$(use_with apache2 apache-libexecdir)
-		$(use_with apache2 apxs "${APXS}")
+		$(use_with apache2 apxs "${EPREFIX}"/usr/bin/apxs)
 		$(use_with berkdb berkeley-db "db.h:${EPREFIX%/}/usr/include/db${SVN_BDB_VERSION}::db-${SVN_BDB_VERSION}")
 		$(use_with ctypes-python ctypesgen "${EPREFIX%/}/usr")
 		$(use_enable dso runtime-module-search)
