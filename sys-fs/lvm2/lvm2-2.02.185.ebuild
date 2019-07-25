@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit autotools linux-info multilib systemd toolchain-funcs udev flag-o-matic
+inherit autotools linux-info multilib systemd toolchain-funcs udev flag-o-matic usr-ldscript
 
 DESCRIPTION="User-land utilities for LVM2 (device-mapper) software"
 HOMEPAGE="https://sourceware.org/lvm2/"
@@ -188,6 +188,9 @@ src_configure() {
 		--with-systemdsystemunitdir="$(systemd_get_systemunitdir)"
 		CLDFLAGS="${LDFLAGS}"
 	)
+	# Hard-wire this to bash as some shells (dash) don't know
+	# "-o pipefail" #682404
+	CONFIG_SHELL="/bin/bash" \
 	econf "${myeconfargs[@]}"
 }
 
