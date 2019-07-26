@@ -8,18 +8,17 @@ inherit fcaps flag-o-matic multilib python-r1 qmake-utils user xdg-utils cmake-u
 DESCRIPTION="A network protocol analyzer formerly known as ethereal"
 HOMEPAGE="https://www.wireshark.org/"
 SRC_URI="${HOMEPAGE}download/src/all-versions/${P/_/}.tar.xz"
-
 LICENSE="GPL-2"
-SLOT="0/${PV}"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc64 ~x86"
-IUSE="
-	adns androiddump bcg729 +capinfos +captype ciscodump +dftest doc dpauxmon
-	+dumpcap +editcap kerberos libxml2 lua lz4 maxminddb +mergecap +netlink
-	nghttp2 +pcap +qt5 +randpkt +randpktdump +reordercap sbc selinux +sharkd
-	smi snappy spandsp sshdump ssl sdjournal +text2pcap tfshark +tshark
-	+udpdump zlib
-"
 
+SLOT="0/${PV}"
+KEYWORDS=""
+IUSE="
+	adns androiddump bcg729 brotli +capinfos +captype ciscodump +dftest doc
+	dpauxmon +dumpcap +editcap kerberos libxml2 lua lz4 maxminddb +mergecap
+	+netlink nghttp2 +plugins plugin_ifdemo +pcap +qt5 +randpkt +randpktdump
+	+reordercap sbc selinux +sharkd smi snappy spandsp sshdump ssl sdjournal
+	+text2pcap tfshark +tshark +udpdump zlib
+"
 S=${WORKDIR}/${P/_/}
 
 CDEPEND="
@@ -27,6 +26,7 @@ CDEPEND="
 	dev-libs/libgcrypt:0
 	adns? ( >=net-dns/c-ares-1.5 )
 	bcg729? ( media-libs/bcg729 )
+	brotli? ( app-arch/brotli )
 	ciscodump? ( >=net-libs/libssh-0.6 )
 	filecaps? ( sys-libs/libcap )
 	kerberos? ( virtual/krb5 )
@@ -82,6 +82,7 @@ RDEPEND="
 "
 REQUIRED_USE="
 	${PYTHON_REQUIRED_USE}
+	plugin_ifdemo? ( plugins )
 "
 PATCHES=(
 	"${FILESDIR}"/${PN}-2.4-androiddump.patch
@@ -149,6 +150,7 @@ src_configure() {
 		-DCMAKE_INSTALL_DOCDIR="/usr/share/doc/${PF}"
 		-DDISABLE_WERROR=yes
 		-DENABLE_BCG729=$(usex bcg729)
+		-DENABLE_BROTLI=$(usex brotli)
 		-DENABLE_CAP=$(usex filecaps caps)
 		-DENABLE_CARES=$(usex adns)
 		-DENABLE_GNUTLS=$(usex ssl)
@@ -159,6 +161,8 @@ src_configure() {
 		-DENABLE_NETLINK=$(usex netlink)
 		-DENABLE_NGHTTP2=$(usex nghttp2)
 		-DENABLE_PCAP=$(usex pcap)
+		-DENABLE_PLUGINS=$(usex plugins)
+		-DENABLE_PLUGIN_IFDEMO=$(usex plugin_ifdemo)
 		-DENABLE_SBC=$(usex sbc)
 		-DENABLE_SMI=$(usex smi)
 		-DENABLE_SNAPPY=$(usex snappy)
