@@ -27,10 +27,8 @@ DEPEND="
 RDEPEND="${DEPEND}"
 
 PATCHES=(
-	"${FILESDIR}"/${P}-client-no-fake-surfacecreated-destroyed-events.patch
-	"${FILESDIR}"/${P}-fix-stuttering-when-gui-thread-busy.patch
-	"${FILESDIR}"/${P}-client-reset-frame-callback-timer-when-window-hiding.patch
-	"${FILESDIR}"/${P}-client-make-handleupdate-aware-of-exposure-changes.patch
+	"${FILESDIR}"/${PN}-5.12.4-fix-stuttering-when-gui-thread-busy.patch
+	"${FILESDIR}"/${PN}-5.12.4-client-reset-frame-callback-timer-when-window-hiding.patch
 )
 
 src_prepare() {

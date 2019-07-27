@@ -125,7 +125,6 @@ QT5_GENTOO_PRIVATE_CONFIG=(
 
 PATCHES+=(
 	"${FILESDIR}/qt-5.12-gcc-avx2.patch" # bug 672946
-	"${FILESDIR}/${P}-fix-highdpi-crash.patch" # QTBUG-76440
 )
 
 src_prepare() {
