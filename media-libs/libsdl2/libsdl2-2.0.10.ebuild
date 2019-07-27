@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 inherit autotools flag-o-matic toolchain-funcs multilib-minimal
 
 MY_P="SDL2-${PV}"
@@ -11,7 +11,7 @@ SRC_URI="http://www.libsdl.org/release/${MY_P}.tar.gz"
 
 LICENSE="ZLIB"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 ~hppa ia64 ppc ppc64 ~sparc x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 
 IUSE="cpu_flags_x86_3dnow alsa altivec aqua custom-cflags dbus gles haptic libsamplerate +joystick kms cpu_flags_x86_mmx nas opengl oss pulseaudio +sound cpu_flags_x86_sse cpu_flags_x86_sse2 static-libs +threads tslib udev +video video_cards_vc4 vulkan wayland X xinerama xscreensaver"
 REQUIRED_USE="
@@ -65,7 +65,10 @@ RDEPEND="${CDEPEND}
 DEPEND="${CDEPEND}
 	vulkan? ( dev-util/vulkan-headers )
 	X? ( x11-base/xorg-proto )
-	virtual/pkgconfig"
+"
+BDEPEND="
+	virtual/pkgconfig
+"
 
 MULTILIB_WRAPPED_HEADERS=(
 	/usr/include/SDL2/SDL_config.h
@@ -76,7 +79,7 @@ MULTILIB_WRAPPED_HEADERS=(
 
 PATCHES=(
 	# https://bugzilla.libsdl.org/show_bug.cgi?id=1431
-	"${FILESDIR}"/${PN}-2.0.6-static-libs.patch
+	"${FILESDIR}"/${PN}-2.0.10-static-libs.patch
 )
 
 S="${WORKDIR}/${MY_P}"
@@ -88,8 +91,6 @@ src_prepare() {
 	rm -rv src/video/khronos || die
 	ln -s "${SYSROOT}${EPREFIX}"/usr/include src/video/khronos || die
 
-	sed -i -e 's/configure.in/configure.ac/' Makefile.in || die
-	mv configure.{in,ac} || die
 	AT_M4DIR="/usr/share/aclocal acinclude" eautoreconf
 }
 
@@ -136,7 +137,6 @@ multilib_src_configure() {
 		$(use_enable sound dummyaudio)
 		$(use_enable wayland video-wayland)
 		--disable-wayland-shared
-		--disable-video-mir
 		$(use_enable video_cards_vc4 video-rpi)
 		$(use_enable X video-x11)
 		--disable-x11-shared
@@ -181,9 +181,9 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
-	find "${ED}" -name "*.la" -delete || die
+	find "${ED}" -type f -name "*.la" -delete || die
 	if ! use static-libs ; then
-		find "${ED}" -name "*.a" -delete || die
+		find "${ED}" -type f -name "*.a" -delete || die
 	fi
 	dodoc {BUGS,CREDITS,README,README-SDL,TODO,WhatsNew}.txt docs/README*.md
 }
