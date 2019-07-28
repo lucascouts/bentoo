@@ -79,10 +79,8 @@ DEPEND="${RDEPEND}
 "
 
 PATCHES+=(
-	"${FILESDIR}/${PN}-5.12.0-nouveau-disable-gpu.patch" # bug 609752
-	"${FILESDIR}/${P}-fix-should_override_user_agent_in_new_tabs.patch"
-	"${FILESDIR}/${P}-bump-V8-patchlevel.patch" # QTBUG-72532
-	"${FILESDIR}/${P}-fix-arm-32bit-segfaults.patch" # QTBUG-75097
+	"${FILESDIR}/${PN}-5.12.4-fix-should_override_user_agent_in_new_tabs.patch"
+	"${FILESDIR}/${PN}-5.12.4-fix-arm-32bit-segfaults.patch" # QTBUG-75097
 )
 
 src_prepare() {
