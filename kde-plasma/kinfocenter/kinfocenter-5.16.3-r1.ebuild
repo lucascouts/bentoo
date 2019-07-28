@@ -9,7 +9,7 @@ inherit kde5
 
 DESCRIPTION="Utility providing information about the computer hardware"
 HOMEPAGE="https://kde.org/applications/system/kinfocenter/"
-SRC_URI+=" http://www.bentoo.info/assets/img/bentoo-logo-small.png -> logo-small.png"
+SRC_URI+=" http://www.bentoo.info/assets/img/bentoo-icon.png -> logo.png"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 IUSE="gles2 ieee1394 +opengl +pci wayland"
 
@@ -83,7 +83,7 @@ src_install() {
 	doins "${FILESDIR}"/kcm-about-distrorc
 
 	insinto /usr/share/${PN}
-	doins "${DISTDIR}"/logo-small.png
+	doins "${DISTDIR}"/logo.png
 }
 
 pkg_postinst() {
