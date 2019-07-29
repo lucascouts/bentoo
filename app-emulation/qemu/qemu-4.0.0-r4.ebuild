@@ -19,7 +19,7 @@ if [[ ${PV} = *9999* ]]; then
 	SRC_URI=""
 else
 	SRC_URI="http://wiki.qemu-project.org/download/${P}.tar.xz"
-	KEYWORDS="amd64 ~arm64 ~ppc ~ppc64 ~x86 ~x86-fbsd"
+	KEYWORDS="~amd64 ~arm64 ~ppc ~ppc64 ~x86 ~x86-fbsd"
 fi
 
 DESCRIPTION="QEMU + Kernel-based Virtual Machine userland tools"
@@ -27,7 +27,7 @@ HOMEPAGE="http://www.qemu.org http://www.linux-kvm.org"
 
 LICENSE="GPL-2 LGPL-2 BSD-2"
 SLOT="0"
-IUSE="accessibility +aio alsa bzip2 capstone +caps +curl debug +doc
+IUSE="accessibility +aio alsa bzip2 capstone +caps +curl debug doc
 	+fdt glusterfs gnutls gtk infiniband iscsi +jpeg kernel_linux
 	kernel_FreeBSD lzo ncurses nfs nls numa opengl +pin-upstream-blobs +png
 	pulseaudio python rbd sasl +seccomp sdl selinux smartcard snappy
@@ -169,7 +169,7 @@ PPC64_FIRMWARE_DEPEND="
 "
 
 BDEPEND="
-	${PYTHON_DEPS}
+	$(python_gen_impl_dep)
 	dev-lang/perl
 	sys-apps/texinfo
 	virtual/pkgconfig
@@ -190,7 +190,6 @@ CDEPEND="
 	qemu_softmmu_targets_ppc64? ( ${PPC64_FIRMWARE_DEPEND} )
 "
 DEPEND="${CDEPEND}
-	${PYTHON_DEPS}
 	kernel_linux? ( >=sys-kernel/linux-headers-2.6.35 )
 	static? (
 		${ALL_DEPEND}
@@ -207,6 +206,9 @@ PATCHES=(
 	"${FILESDIR}"/${P}-sanitize-interp_info.patch
 	"${FILESDIR}"/${PN}-3.1.0-md-clear-md-no.patch
 	"${FILESDIR}"/${PN}-4.0.0-mkdir_systemtap.patch #684902
+	"${FILESDIR}"/${PN}-4.0.0-fix_infiniband_include.patch #686412
+	"${FILESDIR}"/${PN}-4.0.0-linux-headers-5.2.patch
+	"${FILESDIR}"/${PN}-4.0.0-pc-q35-4.0.patch
 )
 
 QA_PREBUILT="
