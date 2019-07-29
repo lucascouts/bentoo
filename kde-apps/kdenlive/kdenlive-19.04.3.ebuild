@@ -12,7 +12,7 @@ DESCRIPTION="Non-linear video editing suite by KDE"
 HOMEPAGE="https://www.kdenlive.org/"
 
 LICENSE="GPL-2"
-KEYWORDS="~amd64 ~arm64 ~x86"
+KEYWORDS="amd64 ~arm64 x86"
 IUSE="freesound gles2 semantic-desktop share v4l"
 
 BDEPEND="
@@ -62,6 +62,8 @@ RDEPEND="${DEPEND}
 	$(add_qt_dep qtquickcontrols)
 	virtual/ffmpeg[encode,sdl,X]
 "
+
+RESTRICT+=" test" # segfaults, bug 684132
 
 src_configure() {
 	local mycmakeargs=(

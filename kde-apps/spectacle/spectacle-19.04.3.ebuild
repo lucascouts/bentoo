@@ -8,7 +8,7 @@ inherit kde5
 
 DESCRIPTION="Screenshot capture utility"
 LICENSE="LGPL-2+ handbook? ( FDL-1.3 ) kipi? ( GPL-2+ )"
-KEYWORDS="~amd64 ~arm64 ~x86"
+KEYWORDS="amd64 ~arm64 x86"
 IUSE="kipi share"
 
 DEPEND="
@@ -40,7 +40,7 @@ DEPEND="
 	share? ( $(add_frameworks_dep purpose) )
 "
 RDEPEND="${DEPEND}
-	kipi? ( media-plugins/kipi-plugins:5 )
+	kipi? ( kde-apps/kipi-plugins:5 )
 "
 
 src_configure() {
