@@ -9,7 +9,7 @@ inherit kde5
 
 DESCRIPTION="Utility providing information about the computer hardware"
 HOMEPAGE="https://kde.org/applications/system/kinfocenter/"
-SRC_URI+=" http://www.bentoo.info/assets/img/bentoo-icon.png -> logo.png"
+SRC_URI+=" https://www.gentoo.org/assets/img/logo/gentoo-3d-small.png -> glogo-small.png"
 KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 IUSE="gles2 ieee1394 +opengl +pci wayland"
 
@@ -55,7 +55,6 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	$(add_plasma_dep kde-cli-tools)
 	$(add_qt_dep qtquickcontrols2)
-	!kde-apps/kcontrol:4
 "
 
 src_configure() {
@@ -83,7 +82,7 @@ src_install() {
 	doins "${FILESDIR}"/kcm-about-distrorc
 
 	insinto /usr/share/${PN}
-	doins "${DISTDIR}"/logo.png
+	doins "${DISTDIR}"/glogo-small.png
 }
 
 pkg_postinst() {
