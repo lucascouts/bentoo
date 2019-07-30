@@ -16,7 +16,7 @@ else
 fi
 
 LICENSE="GPL-3"
-IUSE="+networkmanager pythonqt +upower"
+IUSE="+bootloader +displaymanager +finished +fstab +grubcfg +keyboard +locale +machineid +mount +networkmanager +packages +partition pythonqt +removeuser +services-openrc +shellprocess +umount +unpackfs +upower +users webview +welcome"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
@@ -33,7 +33,7 @@ DEPEND="${PYTHON_DEPS}
 	$(add_qt_dep qtgui)
 	$(add_qt_dep qtnetwork)
 	$(add_qt_dep qtsvg)
-	$(add_qt_dep qtwebengine 'widgets')
+	webview? ( $(add_qt_dep qtwebengine 'widgets') )
 	$(add_qt_dep qtwidgets)
 	$(add_qt_dep qtxml)
 	dev-cpp/yaml-cpp:=
@@ -74,7 +74,7 @@ src_configure() {
 	local mycmakeargs=(
 		-DWEBVIEW_FORCE_WEBKIT=OFF
 		-DWITH_PYTHONQT=$(usex pythonqt)
-		-DSKIP_MODULES="services-systemd dracut dracutlukscfg"
+		-DSKIP_MODULES="services-systemd dracut dracutlukscfg webview"
 	)
 
 	kde5_src_configure
