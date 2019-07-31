@@ -11,7 +11,7 @@ inherit kde5
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
 	SRC_URI="mirror://kde/stable/${PN}/${PV}/${KMNAME}-${PV}.tar.xz"
-	KEYWORDS="amd64 x86"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 DESCRIPTION="Adds communication between KDE Plasma and your smartphone"
@@ -56,14 +56,6 @@ RDEPEND="${DEPEND}
 RESTRICT+=" test"
 
 PATCHES=( "${FILESDIR}/${PN}-1.3.0-no-wayland.patch" )
-
-src_prepare() {
-	kde5_src_prepare
-
-	sed \
-		-e 's#${LIBEXEC_INSTALL_DIR}#@KDE_INSTALL_FULL_LIBEXECDIR@#' \
-		-i daemon/kdeconnectd.desktop.cmake || die
-}
 
 src_configure() {
 	local mycmakeargs=(
