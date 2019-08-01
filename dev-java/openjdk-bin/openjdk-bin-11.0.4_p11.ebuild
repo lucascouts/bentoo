@@ -15,15 +15,16 @@ MY_PV=${PV/_p/+}
 SLOT=${MY_PV%%[.+]*}
 
 SRC_URI="
-	$(abi_uri x64 amd64)
+	$(abi_uri arm)
 	$(abi_uri aarch64 arm64)
 	$(abi_uri ppc64le ppc64)
+	$(abi_uri x64 amd64)
 "
 
 DESCRIPTION="Prebuilt Java JDK binaries provided by AdoptOpenJDK"
 HOMEPAGE="https://adoptopenjdk.net"
 LICENSE="GPL-2-with-classpath-exception"
-KEYWORDS="~amd64 ~arm64 ~ppc64"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc64"
 IUSE="alsa cups doc examples +gentoo-vm headless-awt nsplugin selinux source +webstart"
 
 RDEPEND="
@@ -52,6 +53,12 @@ QA_PREBUILT="*"
 
 S="${WORKDIR}/jdk-${MY_PV}"
 
+pkg_pretend() {
+	if [[ "$(tc-is-softfloat)" != "no" ]]; then
+		die "These binaries require a hardfloat system."
+	fi
+}
+
 src_install() {
 	local dest="/opt/${P}"
 	local ddest="${ED%/}/${dest#/}"
@@ -79,7 +86,7 @@ src_install() {
 		rm -v lib/src.zip || die
 	fi
 
-	mv lib/security/cacerts lib/security/cacerts.orig || die
+	rm -v lib/security/cacerts || die
 
 	dodir "${dest}"
 	cp -pPR * "${ddest}" || die
@@ -97,7 +104,8 @@ pkg_postinst() {
 
 	if use gentoo-vm ; then
 		ewarn "WARNING! You have enabled the gentoo-vm USE flag, making this JDK"
-		ewarn "recognised by the system. This will almost certainly break things."
+		ewarn "recognised by the system. This will almost certainly break"
+		ewarn "many java ebuilds as they are not ready for openjdk-11"
 	else
 		ewarn "The experimental gentoo-vm USE flag has not been enabled so this JDK"
 		ewarn "will not be recognised by the system. For example, simply calling"

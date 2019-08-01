@@ -13,7 +13,7 @@ HOMEPAGE="https://openjdk.java.net"
 SRC_URI="https://hg.${PN}.java.net/jdk-updates/jdk${SLOT}u/archive/jdk-${MY_PV}.tar.bz2"
 
 LICENSE="GPL-2"
-KEYWORDS="~amd64 ~arm64 ~ppc64"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc64"
 
 IUSE="alsa cups debug doc examples gentoo-vm headless-awt javafx +jbootstrap nsplugin +pch selinux source systemtap +webstart"
 
@@ -36,6 +36,7 @@ RDEPEND="
 		x11-libs/libX11
 		x11-libs/libXext
 		x11-libs/libXi
+		x11-libs/libXrandr
 		x11-libs/libXrender
 		x11-libs/libXt
 		x11-libs/libXtst
@@ -54,6 +55,7 @@ DEPEND="
 	x11-libs/libX11
 	x11-libs/libXext
 	x11-libs/libXi
+	x11-libs/libXrandr
 	x11-libs/libXrender
 	x11-libs/libXt
 	x11-libs/libXtst
@@ -158,7 +160,7 @@ src_configure() {
 		--with-vendor-bug-url="https://bugs.gentoo.org"
 		--with-vendor-vm-bug-url="https://bugs.openjdk.java.net"
 		--with-vendor-version-string="${PV}"
-		--with-version-pre=gentoo
+		--with-version-pre=""
 		--with-version-string=${MY_PV%+*}
 		--with-version-build=${MY_PV#*+}
 		--with-zlib=system
@@ -191,10 +193,14 @@ src_configure() {
 }
 
 src_compile() {
-	emake -j1 \
-		$(usex doc docs '') \
-		$(usex jbootstrap bootcycle-images product-images) \
-		JOBS=$(makeopts_jobs) LOG=debug CFLAGS_WARNINGS_ARE_ERRORS= # No -Werror
+	local myemakeargs=(
+		JOBS=$(makeopts_jobs)
+		LOG=debug
+		CFLAGS_WARNINGS_ARE_ERRORS= # No -Werror
+		$(usex doc docs '')
+		$(usex jbootstrap bootcycle-images product-images)
+	)
+	emake "${myemakeargs[@]}" -j1 #nowarn
 }
 
 src_install() {
@@ -222,7 +228,7 @@ src_install() {
 		rm -v lib/src.zip || die
 	fi
 
-	mv lib/security/cacerts lib/security/cacerts.orig || die
+	rm -v lib/security/cacerts || die
 
 	dodir "${dest}"
 	cp -pPR * "${ddest}" || die
@@ -251,7 +257,8 @@ pkg_postinst() {
 
 	if use gentoo-vm ; then
 		ewarn "WARNING! You have enabled the gentoo-vm USE flag, making this JDK"
-		ewarn "recognised by the system. This will almost certainly break things."
+		ewarn "recognised by the system. This will almost certainly break"
+		ewarn "many java ebuilds as they are not ready for openjdk-11"
 	else
 		ewarn "The experimental gentoo-vm USE flag has not been enabled so this JDK"
 		ewarn "will not be recognised by the system. For example, simply calling"
