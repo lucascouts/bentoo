@@ -17,16 +17,16 @@ ICEDTEA_BRANCH=$(get_version_component_range 1-2)
 ICEDTEA_PKG=icedtea-${ICEDTEA_VER}
 ICEDTEA_PRE=$(get_version_component_range _)
 
-CORBA_TARBALL="fa1553d2f23e.tar.xz"
-JAXP_TARBALL="7a977b82f34c.tar.xz"
-JAXWS_TARBALL="752d9e54c69a.tar.xz"
-JDK_TARBALL="bfaa5c6df4a8.tar.xz"
-LANGTOOLS_TARBALL="fb494039358f.tar.xz"
-OPENJDK_TARBALL="f0482b9b7f7b.tar.xz"
-NASHORN_TARBALL="93462e8b4f4f.tar.xz"
-HOTSPOT_TARBALL="3f9a60eb8ef0.tar.xz"
-SHENANDOAH_TARBALL="adb62c0031b8.tar.xz"
-AARCH32_TARBALL="57f4048a925b.tar.xz"
+CORBA_TARBALL="24a4cc7d7de6.tar.xz"
+JAXP_TARBALL="7f4569c121d6.tar.xz"
+JAXWS_TARBALL="1c6f4ebde697.tar.xz"
+JDK_TARBALL="51afcf17e031.tar.xz"
+LANGTOOLS_TARBALL="2008b12a91d1.tar.xz"
+OPENJDK_TARBALL="c8f86954855a.tar.xz"
+NASHORN_TARBALL="69b1da223d93.tar.xz"
+HOTSPOT_TARBALL="ab8fadcbbde6.tar.xz"
+SHENANDOAH_TARBALL="ff69edbcd7ae.tar.xz"
+AARCH32_TARBALL="26d64a5c4b9a.tar.xz"
 
 CACAO_TARBALL="cacao-c182f119eaad.tar.xz"
 JAMVM_TARBALL="jamvm-ec18fb9e49e62dce16c5094ef1527eed619463aa.tar.gz"
@@ -136,9 +136,7 @@ RDEPEND="${COMMON_DEP}
 DEPEND="${COMMON_DEP} ${ALSA_COMMON_DEP} ${CUPS_COMMON_DEP} ${X_COMMON_DEP} ${X_DEPEND}
 	|| (
 		dev-java/icedtea-bin:8
-		dev-java/icedtea-bin:7
 		dev-java/icedtea:8
-		dev-java/icedtea:7
 		dev-java/openjdk:8
 		dev-java/openjdk-bin:8
 	)
@@ -182,7 +180,6 @@ pkg_setup() {
 
 	JAVA_PKG_WANT_BUILD_VM="
 		icedtea-8 icedtea-bin-8
-		icedtea-7 icedtea-bin-7
 		openjdk-8 openjdk-bin-8"
 	JAVA_PKG_WANT_SOURCE="1.5"
 	JAVA_PKG_WANT_TARGET="1.5"
@@ -359,16 +356,7 @@ src_install() {
 	# Fix the permissions.
 	find "${ddest}" \! -type l \( -perm /111 -exec chmod 755 {} \; -o -exec chmod 644 {} \; \) || die
 
-	# We need to generate keystore - bug #273306
-	einfo "Generating cacerts file from certificates in ${EPREFIX}/usr/share/ca-certificates/"
-	mkdir "${T}/certgen" && cd "${T}/certgen" || die
-	cp "${FILESDIR}/generate-cacerts.pl" . && chmod +x generate-cacerts.pl || die
-	for c in "${EPREFIX}"/usr/share/ca-certificates/*/*.crt; do
-		openssl x509 -text -in "${c}" >> all.crt || die
-	done
-	./generate-cacerts.pl "${ddest}/bin/keytool" all.crt || die
-	cp -vRP cacerts "${ddest}/jre/lib/security/" || die
-	chmod 644 "${ddest}/jre/lib/security/cacerts" || die
+	dosym "${EPREFIX}"/etc/ssl/certs/java/cacerts "${dest}"/jre/lib/security/cacerts
 
 	java-vm_install-env "${FILESDIR}/icedtea.env.sh"
 	java-vm_sandbox-predict /proc/self/coredump_filter

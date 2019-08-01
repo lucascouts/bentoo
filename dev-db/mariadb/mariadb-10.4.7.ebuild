@@ -2,13 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
-MY_EXTRAS_VER="20190521-1824Z"
+MY_EXTRAS_VER="20190731-2258Z"
 SUBSLOT="18"
 
 JAVA_PKG_OPT_USE="jdbc"
 
 inherit eutils systemd flag-o-matic prefix toolchain-funcs \
-	java-pkg-opt-2 user cmake-utils
+	java-pkg-opt-2 cmake-utils
 
 SRC_URI="https://downloads.mariadb.org/interstitial/${P}/source/${P}.tar.gz "
 
@@ -26,7 +26,7 @@ HOMEPAGE="https://mariadb.org/"
 DESCRIPTION="An enhanced, drop-in replacement for MySQL"
 LICENSE="GPL-2 LGPL-2.1+"
 SLOT="0/${SUBSLOT:-0}"
-IUSE="+backup bindist client-libs cracklib debug extraengine galera innodb-lz4
+IUSE="+backup bindist cracklib debug extraengine galera innodb-lz4
 	innodb-lzo innodb-snappy jdbc jemalloc kerberos latin1 libressl mroonga
 	numa odbc oqgraph pam +perl profiling rocksdb selinux +server sphinx
 	sst-rsync sst-mariabackup static systemd systemtap tcmalloc
@@ -49,11 +49,11 @@ S="${WORKDIR}/mysql"
 if [[ "${MY_EXTRAS_VER}" == "live" ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://anongit.gentoo.org/git/proj/mysql-extras.git"
-	EGIT_CHECKOUT_DIR="${WORKDIR%/}/mysql-extras"
+	EGIT_CHECKOUT_DIR="${WORKDIR}/mysql-extras"
 	EGIT_CLONE_TYPE=shallow
-	MY_PATCH_DIR="${WORKDIR%/}/mysql-extras"
+	MY_PATCH_DIR="${WORKDIR}/mysql-extras"
 else
-	MY_PATCH_DIR="${WORKDIR%/}/mysql-extras-${MY_EXTRAS_VER}"
+	MY_PATCH_DIR="${WORKDIR}/mysql-extras-${MY_EXTRAS_VER}"
 fi
 
 PATCHES=(
@@ -111,25 +111,29 @@ BDEPEND="virtual/yacc
 	|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )
 "
 DEPEND="static? ( sys-libs/ncurses[static-libs] )
-	server? ( extraengine? ( jdbc? ( >=virtual/jdk-1.6 ) ) )
+	server? ( extraengine? ( jdbc? ( >=virtual/jdk-1.6 ) )
+		test? ( acct-group/mysql acct-user/mysql ) )
 	${COMMON_DEPEND}"
 RDEPEND="selinux? ( sec-policy/selinux-mysql )
 	!dev-db/mysql !dev-db/mariadb-galera !dev-db/percona-server !dev-db/mysql-cluster
-	server? ( !prefix? ( dev-db/mysql-init-scripts ) )
 	!<virtual/mysql-5.6-r11
+	!<virtual/libmysqlclient-18-r1
 	${COMMON_DEPEND}
-	server? ( galera? (
-		sys-apps/iproute2
-		=sys-cluster/galera-26*
-		sst-rsync? ( sys-process/lsof )
-		sst-mariabackup? ( net-misc/socat[ssl] )
-	) )
+	server? (
+		galera? (
+			sys-apps/iproute2
+			=sys-cluster/galera-26*
+			sst-rsync? ( sys-process/lsof )
+			sst-mariabackup? ( net-misc/socat[ssl] )
+		)
+		!prefix? ( dev-db/mysql-init-scripts acct-group/mysql acct-user/mysql )
+		extraengine? ( jdbc? ( >=virtual/jre-1.6 ) )
+	)
 	perl? ( !dev-db/mytop
 		virtual/perl-Getopt-Long
 		dev-perl/TermReadKey
 		virtual/perl-Term-ANSIColor
 		virtual/perl-Time-HiRes )
-	server? ( extraengine? ( jdbc? ( >=virtual/jre-1.6 ) ) )
 "
 # For other stuff to bring us in
 # dev-perl/DBD-mysql is needed by some scripts installed by MySQL
@@ -161,24 +165,10 @@ pkg_setup() {
 			eerror "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
 	fi
 
-	# This should come after all of the die statements
-	enewgroup mysql 60 || die "problem adding 'mysql' group"
-	enewuser mysql 60 -1 /dev/null mysql || die "problem adding 'mysql' user"
 }
 
 pkg_preinst() {
 	java-pkg-opt-2_pkg_preinst
-
-	# Here we need to see if the implementation switched client libraries
-	# We check if this is a new instance of the package and a client library already exists
-	local SHOW_ABI_MESSAGE libpath
-	if [[ -z ${REPLACING_VERSIONS} && -e "${EROOT}usr/$(get_libdir)/libmysqlclient.so" ]] ; then
-		libpath=$(readlink "${EROOT}usr/$(get_libdir)/libmysqlclient.so")
-		elog "Due to ABI changes when switching between different client libraries,"
-		elog "revdep-rebuild must find and rebuild all packages linking to libmysqlclient."
-		elog "Please run: revdep-rebuild --library ${libpath}"
-		ewarn "Failure to run revdep-rebuild may cause issues with other programs or libraries"
-	fi
 }
 
 pkg_postinst() {
@@ -186,7 +176,7 @@ pkg_postinst() {
 	mysql_init_vars
 
 	# Create log directory securely if it does not exist
-	[[ -d "${ROOT}${MY_LOGDIR}" ]] || install -d -m0750 -o mysql -g mysql "${ROOT}${MY_LOGDIR}"
+	[[ -d "${ROOT}/${MY_LOGDIR}" ]] || install -d -m0750 -o mysql -g mysql "${ROOT}/${MY_LOGDIR}"
 
 	if use server ; then
 		if use pam; then
@@ -195,6 +185,7 @@ pkg_postinst() {
 			elog "To activate and configure the PAM plugin, please read:"
 			elog "https://mariadb.com/kb/en/mariadb/pam-authentication-plugin/"
 			einfo
+			chown mysql:mysql "${EROOT}/usr/$(get_libdir)/mariadb/plugin/auth_pam_tool_dir" || die
 		fi
 
 		if [[ -z "${REPLACING_VERSIONS}" ]] ; then
@@ -226,7 +217,7 @@ pkg_postinst() {
 				for rver in ${REPLACING_VERSIONS} ; do
 					if ver_test "${rver}" -lt "10.4.0" ; then
 						ewarn "Upgrading galera from a previous version requires admin restart of the entire cluster."
-						ewarn "Please refer to https://mariadb.com/kb/en/library/changes-improvements-in-mariadb-104/#galera"
+						ewarn "Please refer to https://mariadb.com/kb/en/library/changes-improvements-in-mariadb-104/#galera-4"
 						ewarn "for more information"
 					fi
 				done
@@ -255,10 +246,10 @@ src_unpack() {
 
 src_prepare() {
 	_disable_plugin() {
-		echo > "${S%/}/plugin/${1}/CMakeLists.txt" || die
+		echo > "${S}/plugin/${1}/CMakeLists.txt" || die
 	}
 	_disable_engine() {
-		echo > "${S%/}/storage/${1}/CMakeLists.txt" || die
+		echo > "${S}/storage/${1}/CMakeLists.txt" || die
 	}
 
 	if use jemalloc; then
@@ -274,7 +265,7 @@ src_prepare() {
 
 	local plugin
 	local server_plugins=( handler_socket auth_socket feedback metadata_lock_info
-				locale_info qc_info server_audit sql_errlog )
+				locale_info qc_info server_audit sql_errlog auth_ed25519 )
 	local test_plugins=( audit_null auth_examples daemon_example fulltext
 				debug_key_management example_key_management versioning )
 	if ! use server; then # These plugins are for the server
@@ -288,6 +279,7 @@ src_prepare() {
 			_disable_plugin "${plugin}"
 		done
 		_disable_engine test_sql_discovery
+		echo > "${S}/plugin/auth_pam/testing/CMakeLists.txt" || die
 	fi
 
 	_disable_engine example
@@ -365,6 +357,7 @@ src_configure(){
 		-DWITHOUT_CLIENTLIBS=YES
 		-DCLIENT_PLUGIN_DIALOG=OFF
 		-DCLIENT_PLUGIN_AUTH_GSSAPI_CLIENT=OFF
+		-DCLIENT_PLUGIN_CLIENT_ED25519=OFF
 		-DCLIENT_PLUGIN_MYSQL_CLEAR_PASSWORD=STATIC
 		-DCLIENT_PLUGIN_CACHING_SHA2_PASSWORD=OFF
 	)
@@ -578,6 +571,10 @@ src_install() {
 		# but are needed for galera and initial installation
 		exeinto /usr/libexec/mariadb
 		doexe "${BUILD_DIR}/extra/my_print_defaults" "${BUILD_DIR}/extra/perror"
+
+		if use pam ; then
+			keepdir /usr/$(get_libdir)/mariadb/plugin/auth_pam_tool_dir
+		fi
 	fi
 
 	# Remove mytop if perl is not selected
@@ -751,7 +748,7 @@ mysql_init_vars() {
 
 pkg_config() {
 	_getoptval() {
-		local mypd="${EROOT}"usr/libexec/mariadb/my_print_defaults
+		local mypd="${EROOT}"/usr/libexec/mariadb/my_print_defaults
 		local section="$1"
 		local flag="--${2}="
 		local extra_options="${3}"
@@ -887,7 +884,7 @@ pkg_config() {
 	# Figure out which options we need to disable to do the setup
 	local helpfile="${TMPDIR}/mysqld-help"
 	"${EROOT}/usr/sbin/mysqld" --verbose --help >"${helpfile}" 2>/dev/null
-	for opt in grant-tables host-cache name-resolve networking slave-start \
+	for opt in host-cache name-resolve networking slave-start \
 		federated ssl log-bin relay-log slow-query-log external-locking \
 		log-slave-updates \
 		; do
@@ -913,8 +910,8 @@ pkg_config() {
 	# https://dev.mysql.com/doc/mysql/en/time-zone-support.html
 	"${EROOT}/usr/bin/mysql_tzinfo_to_sql" "${EROOT}/usr/share/zoneinfo" > "${sqltmp}" 2>/dev/null
 
-	local cmd=( "${EROOT}usr/share/mariadb/scripts/mysql_install_db" )
-	[[ -f "${cmd}" ]] || cmd=( "${EROOT}usr/bin/mysql_install_db" )
+	local cmd=( "${EROOT}/usr/share/mariadb/scripts/mysql_install_db" )
+	[[ -f "${cmd}" ]] || cmd=( "${EROOT}/usr/bin/mysql_install_db" )
 	cmd+=( "--basedir=${EPREFIX}/usr" ${options} "--datadir=${ROOT}/${MY_DATADIR}" "--tmpdir=${ROOT}/${MYSQL_TMPDIR}" )
 	einfo "Command: ${cmd[*]}"
 	su -s /bin/sh -c "${cmd[*]}" mysql \
