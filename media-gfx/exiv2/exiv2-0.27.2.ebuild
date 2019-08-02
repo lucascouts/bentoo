@@ -7,7 +7,7 @@ if [[ ${PV} = *9999 ]]; then
 	EGIT_REPO_URI="https://github.com/Exiv2/exiv2.git"
 	inherit git-r3
 else
-	SRC_URI="http://exiv2.dyndns.org/builds/${P}a-Source.tar.gz"
+	SRC_URI="https://exiv2.org/builds/${P}-Source.tar.gz"
 	KEYWORDS="alpha amd64 arm arm64 ~hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
 fi
 
@@ -21,17 +21,7 @@ LICENSE="GPL-2"
 SLOT="0/27"
 IUSE="doc examples nls +png webready +xmp"
 
-RDEPEND="
-	>=virtual/libiconv-0-r1[${MULTILIB_USEDEP}]
-	nls? ( >=virtual/libintl-0-r1[${MULTILIB_USEDEP}] )
-	png? ( sys-libs/zlib[${MULTILIB_USEDEP}] )
-	webready? (
-		net-libs/libssh[${MULTILIB_USEDEP}]
-		net-misc/curl[${MULTILIB_USEDEP}]
-	)
-	xmp? ( dev-libs/expat[${MULTILIB_USEDEP}] )
-"
-DEPEND="${RDEPEND}
+BDEPEND="
 	doc? (
 		${PYTHON_DEPS}
 		app-doc/doxygen
@@ -41,16 +31,21 @@ DEPEND="${RDEPEND}
 	)
 	nls? ( sys-devel/gettext )
 "
+DEPEND="
+	>=virtual/libiconv-0-r1[${MULTILIB_USEDEP}]
+	nls? ( >=virtual/libintl-0-r1[${MULTILIB_USEDEP}] )
+	png? ( sys-libs/zlib[${MULTILIB_USEDEP}] )
+	webready? (
+		net-libs/libssh[${MULTILIB_USEDEP}]
+		net-misc/curl[${MULTILIB_USEDEP}]
+	)
+	xmp? ( dev-libs/expat[${MULTILIB_USEDEP}] )
+"
+RDEPEND="${DEPEND}"
 
 DOCS=( README.md doc/ChangeLog doc/cmd.txt )
 
 S="${S}-Source"
-
-PATCHES=(
-	"${FILESDIR}"/${P}-png-broken-icc-profile.patch # pending upstream
-	"${FILESDIR}"/${P}-fix-pkgconfig.patch # bug 675240
-	"${FILESDIR}"/${P}-doc.patch # bug 675740
-)
 
 pkg_setup() {
 	use doc && python-any-r1_pkg_setup
@@ -63,6 +58,8 @@ src_prepare() {
 	mv -f doc/cmd.txt.tmp doc/cmd.txt || die
 
 	cmake-utils_src_prepare
+
+	sed -e "/^include.*compilerFlags/s/^/#DONT /" -i CMakeLists.txt || die
 }
 
 multilib_src_configure() {
@@ -77,7 +74,7 @@ multilib_src_configure() {
 		-DEXIV2_ENABLE_XMP=$(usex xmp)
 		$(multilib_is_native_abi || echo -DEXIV2_BUILD_EXIV2_COMMAND=NO)
 		$(multilib_is_native_abi && echo -DEXIV2_BUILD_DOC=$(usex doc))
-		-DCMAKE_INSTALL_DOCDIR=${EPREFIX}/usr/share/doc/${PF}/html
+		-DCMAKE_INSTALL_DOCDIR="${EPREFIX}"/usr/share/doc/${PF}/html
 	)
 
 	cmake-utils_src_configure

@@ -5,7 +5,6 @@ EAPI="7"
 
 inherit flag-o-matic systemd autotools
 
-MY_PV=${PV/_rc/RC}
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://php.net/"
 SRC_URI="https://php.net/distributions/${P}.tar.xz"
@@ -19,9 +18,7 @@ LICENSE="PHP-3.01
 	unicode? ( BSD-2 LGPL-2.1 )"
 
 SLOT="$(ver_cut 1-2)"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
-
-S="${WORKDIR}/${PN}-${MY_PV}"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
 
 # We can build the following SAPIs in the given order
 SAPIS="embed cli cgi fpm apache2 phpdbg"
@@ -48,7 +45,7 @@ IUSE="${IUSE} acl argon2 bcmath berkdb bzip2 calendar cdb cjk
 # the ones that can be detected to avoid a repeat of bug #564824.
 COMMON_DEPEND="
 	>=app-eselect/eselect-php-0.9.1[apache2?,fpm?]
-	>=dev-libs/libpcre2-10.30[unicode]
+	>=dev-libs/libpcre-8.32[unicode]
 	fpm? ( acl? ( sys-apps/acl ) )
 	apache2? ( || ( >=www-servers/apache-2.4[apache2_modules_unixd,threads=]
 		<www-servers/apache-2.4[threads=] ) )
@@ -65,7 +62,7 @@ COMMON_DEPEND="
 	curl? ( >=net-misc/curl-7.10.5 )
 	enchant? ( <app-text/enchant-2.0:0 )
 	firebird? ( dev-db/firebird )
-	gd? ( virtual/jpeg:0 media-libs/libpng:0= >=sys-libs/zlib-1.2.0.4 )
+	gd? ( virtual/jpeg:0 media-libs/libpng:0= sys-libs/zlib )
 	gdbm? ( >=sys-libs/gdbm-1.8.0:0= )
 	gmp? ( dev-libs/gmp:0= )
 	iconv? ( virtual/libiconv )
@@ -93,7 +90,7 @@ COMMON_DEPEND="
 	spell? ( >=app-text/aspell-0.50 )
 	sqlite? ( >=dev-db/sqlite-3.7.6.3 )
 	ssl? (
-		!libressl? ( >=dev-libs/openssl-1.0.1:0= )
+		!libressl? ( dev-libs/openssl:0= )
 		libressl? ( dev-libs/libressl:0= )
 	)
 	tidy? ( || ( app-text/tidy-html5 app-text/htmltidy ) )
@@ -108,9 +105,9 @@ COMMON_DEPEND="
 	xmlwriter? ( >=dev-libs/libxml2-2.6.8 )
 	xpm? ( x11-libs/libXpm )
 	xslt? ( dev-libs/libxslt >=dev-libs/libxml2-2.6.8 )
-	zip? ( >=sys-libs/zlib-1.2.0.4:0= )
+	zip? ( sys-libs/zlib:0= )
 	zip-encryption? ( >=dev-libs/libzip-1.2.0:= )
-	zlib? ( >=sys-libs/zlib-1.2.0.4:0= )
+	zlib? ( sys-libs/zlib:0= )
 "
 
 RDEPEND="${COMMON_DEPEND}
@@ -151,11 +148,13 @@ REQUIRED_USE="
 	readline? ( !libedit )
 	recode? ( !imap !mysqli !mysql )
 	session-mm? ( session !threads )
-	mysql? ( || ( mysqli pdo ) )
+	mysql? ( hash || ( mysqli pdo ) )
+	mysqli? ( hash )
 	zip-encryption? ( zip )
 "
 PATCHES=(
 	"${FILESDIR}/php-freetype-2.9.1.patch"
+	"${FILESDIR}/php-7.2.13-intl-use-icu-namespace.patch"
 )
 
 PHP_MV="$(ver_cut 1)"
