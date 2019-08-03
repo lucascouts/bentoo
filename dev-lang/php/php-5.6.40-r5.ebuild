@@ -5,7 +5,7 @@ EAPI="7"
 
 inherit autotools flag-o-matic systemd
 
-PATCH_V="7.1.30bp"
+PATCH_V="7.1.31bp"
 
 DESCRIPTION="The PHP language runtime engine"
 HOMEPAGE="https://secure.php.net/"
@@ -21,7 +21,7 @@ LICENSE="PHP-3.01
 	unicode? ( BSD-2 LGPL-2.1 )"
 
 SLOT="$(ver_cut 1-2)"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos"
 
 # We can build the following SAPIs in the given order
 SAPIS="embed cli cgi fpm apache2"
@@ -34,7 +34,7 @@ IUSE="${IUSE}
 IUSE="${IUSE} acl bcmath berkdb bzip2 calendar cdb cjk
 	coverage crypt +ctype curl debug
 	enchant exif +fileinfo +filter firebird
-	flatfile ftp gd gdbm gmp +hash +iconv imap inifile
+	+flatfile ftp gd gdbm gmp +hash +iconv imap inifile
 	intl iodbc ipv6 +json kerberos ldap ldap-sasl libedit libressl
 	mhash mssql mysql libmysqlclient mysqli nls
 	oci8-instant-client odbc +opcache pcntl pdo +phar +posix postgres qdbm

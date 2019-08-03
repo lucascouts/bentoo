@@ -13,7 +13,7 @@ HOMEPAGE="https://dev.mysql.com/downloads/"
 LICENSE="GPL-2"
 
 SRC_URI="https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-boost-${PV}.tar.gz"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 
 SLOT="0/21"
 IUSE="ldap libressl +ssl static-libs"
@@ -32,7 +32,7 @@ DOCS=( README )
 
 S="${WORKDIR}/mysql-${PV}"
 
-PATCHES=( "${FILESDIR}/8.0.16-libressl.patch" )
+PATCHES=( "${FILESDIR}"/${PN}-8.0.17-libressl.patch )
 
 src_prepare() {
 	sed -i -e 's/CLIENT_LIBS/CONFIG_CLIENT_LIBS/' "${S}/scripts/CMakeLists.txt" || die
@@ -86,6 +86,11 @@ multilib_src_install() {
 }
 
 multilib_src_install_all() {
+	doman \
+		man/my_print_defaults.1 \
+		man/perror.1 \
+		man/zlib_decompress.1
+
 	if ! use static-libs ; then
 		find "${ED}" -name "*.a" -delete || die
 	fi
