@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python2_7 python3_{5,6} )
+PYTHON_COMPAT=( python2_7 python3_{5,6,7} )
 inherit autotools python-single-r1 systemd
 
 MY_PV_MM=$(ver_cut 1-2)
@@ -13,15 +13,15 @@ SRC_URI="https://github.com/balabit/syslog-ng/releases/download/${P}/${P}.tar.gz
 
 LICENSE="GPL-2+ LGPL-2.1+"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86"
-IUSE="amqp caps dbi geoip geoip2 http ipv6 json libressl mongodb pacct python redis smtp spoof-source systemd tcpd"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86"
+IUSE="amqp caps dbi geoip geoip2 http ipv6 json kafka libressl mongodb pacct python redis smtp snmp spoof-source systemd tcpd"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 # unit tests require https://github.com/Snaipe/Criterion with additional deps
 RESTRICT="test"
 
 RDEPEND="
 	>=dev-libs/glib-2.10.1:2
-	>=dev-libs/ivykis-0.42.3
+	>=dev-libs/ivykis-0.42.4
 	>=dev-libs/libpcre-6.1:=
 	!dev-libs/eventlog
 	amqp? ( >=net-libs/rabbitmq-c-0.8.0:=[ssl] )
@@ -31,10 +31,12 @@ RDEPEND="
 	geoip2? ( dev-libs/libmaxminddb:= )
 	http? ( net-misc/curl )
 	json? ( >=dev-libs/json-c-0.9:= )
+	kafka? ( >=dev-libs/librdkafka-1.0.0:= )
 	mongodb? ( >=dev-libs/mongo-c-driver-1.2.0 )
 	python? ( ${PYTHON_DEPS} )
 	redis? ( >=dev-libs/hiredis-0.11.0:= )
 	smtp? ( net-libs/libesmtp )
+	snmp? ( net-analyzer/net-snmp )
 	spoof-source? ( net-libs/libnet:1.1= )
 	systemd? ( sys-apps/systemd:= )
 	tcpd? ( >=sys-apps/tcp-wrappers-7.6 )
@@ -84,8 +86,7 @@ src_prepare() {
 			"${FILESDIR}/${f}" > "${T}/${f/.in/}" || die
 	done
 
-	for f in syslog-ng.conf.gentoo.fbsd.in \
-			syslog-ng.conf.gentoo.hardened.in \
+	for f in syslog-ng.conf.gentoo.hardened.in \
 			syslog-ng.conf.gentoo.in; do
 		sed -e "s/@SYSLOGNG_VERSION@/${MY_PV_MM}/g" "${FILESDIR}/${f}" > "${T}/${f/.in/}" || die
 	done
@@ -117,12 +118,14 @@ src_configure() {
 		$(use_enable http)
 		$(use_enable ipv6)
 		$(use_enable json)
+		$(use_enable kafka)
 		$(use_enable mongodb)
 		$(usex mongodb --with-mongoc=system "--without-mongoc --disable-legacy-mongodb-options")
 		$(use_enable pacct)
 		$(use_enable python)
 		$(use_enable redis)
 		$(use_enable smtp)
+		$(use_enable snmp snmp-dest)
 		$(use_enable spoof-source)
 		$(use_enable systemd)
 		$(use_enable tcpd tcp-wrapper)
@@ -139,11 +142,7 @@ src_install() {
 	doins contrib/systemd/syslog-ng@default
 
 	insinto /etc/syslog-ng
-	if use userland_BSD ; then
-		newins "${T}/syslog-ng.conf.gentoo.fbsd" syslog-ng.conf
-	else
-		newins "${T}/syslog-ng.conf.gentoo" syslog-ng.conf
-	fi
+	newins "${T}/syslog-ng.conf.gentoo" syslog-ng.conf
 
 	insinto /etc/logrotate.d
 	newins "${T}/syslog-ng.logrotate" syslog-ng
