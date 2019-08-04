@@ -9,7 +9,7 @@ PYTHON_COMPAT=( python3_{5,6,7} )
 inherit kde5 python-single-r1
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/${PN}/${PV}/${P}.tar.gz"
+	SRC_URI="mirror://kde/stable/${PN}/${PV}/${P}.tar.xz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
@@ -86,7 +86,7 @@ RDEPEND="${COMMON_DEPEND}
 # bug 630508
 RESTRICT+=" test"
 
-PATCHES=( "${FILESDIR}"/${P}-tests-optional.patch )
+PATCHES=( "${FILESDIR}"/${PN}-4.2.4-tests-optional.patch )
 
 pkg_setup() {
 	python-single-r1_pkg_setup

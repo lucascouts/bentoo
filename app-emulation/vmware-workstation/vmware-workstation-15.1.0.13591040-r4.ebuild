@@ -184,8 +184,8 @@ RDEPEND="
 	dev-libs/gmp:0
 	dev-libs/icu
 	dev-libs/json-c
-	dev-libs/nettle:0/6.2
-	<gnome-base/dconf-0.30.1
+	dev-libs/nettle
+	gnome-base/dconf
 	gnome-base/gconf
 	gnome-base/libgnome-keyring
 	media-gfx/graphite2
