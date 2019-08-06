@@ -11,7 +11,7 @@ DESCRIPTION="Administer web accounts for the sites and services across the Plasm
 HOMEPAGE="https://community.kde.org/KTp"
 LICENSE="LGPL-2.1"
 
-KEYWORDS="amd64 ~arm ~arm64 x86"
+KEYWORDS="amd64 ~arm arm64 x86"
 IUSE=""
 
 BDEPEND="
@@ -29,7 +29,7 @@ COMMON_DEPEND="
 	$(add_qt_dep qtgui)
 	$(add_qt_dep qtwidgets)
 	net-libs/accounts-qt
-	>=net-libs/libaccounts-glib-1.21
+	>=net-libs/libaccounts-glib-1.21:=
 	net-libs/signond
 "
 DEPEND="${COMMON_DEPEND}
