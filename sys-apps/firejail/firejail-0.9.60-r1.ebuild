@@ -11,7 +11,7 @@ SRC_URI="https://github.com/netblue30/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="apparmor +chroot contrib debug +file-transfer +globalcfg +network +overlayfs +private-home +seccomp +suid test +userns +whitelist x11"
+IUSE="apparmor +chroot contrib debug +file-transfer +globalcfg +network +overlayfs +private-home +seccomp +suid test +userns vim-syntax +whitelist x11"
 
 DEPEND="!sys-apps/firejail-lts
 	apparmor? ( sys-libs/libapparmor )
@@ -20,6 +20,8 @@ DEPEND="!sys-apps/firejail-lts
 RDEPEND="apparmor? ( sys-libs/libapparmor )"
 
 RESTRICT="test"
+
+PATCHES=( "${FILESDIR}/${PN}-compressed-manpages.patch" )
 
 src_prepare() {
 	default
@@ -42,10 +44,22 @@ src_configure() {
 		$(use_enable globalcfg) \
 		$(use_enable network) \
 		$(use_enable overlayfs) \
-		$(use_enable private-home)
+		$(use_enable private-home) \
 		$(use_enable seccomp) \
 		$(use_enable suid) \
 		$(use_enable userns) \
 		$(use_enable whitelist) \
 		$(use_enable x11)
+}
+
+src_install() {
+	default
+
+	if use vim-syntax; then
+		insinto /usr/share/vim/vimfiles/ftdetect
+		doins contrib/vim/ftdetect/firejail.vim
+
+		insinto /usr/share/vim/vimfiles/syntax
+		doins contrib/vim/syntax/firejail.vim
+	fi
 }
