@@ -7,7 +7,7 @@ inherit kde5
 
 DESCRIPTION="Framework to install and load packages of non binary content"
 LICENSE="LGPL-2+"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
+KEYWORDS="amd64 ~arm arm64 x86"
 IUSE="man"
 
 BDEPEND="
@@ -19,6 +19,8 @@ DEPEND="
 	$(add_frameworks_dep ki18n)
 "
 RDEPEND="${DEPEND}"
+
+PATCHES=( "${FILESDIR}/${P}-qt-5.12.4-missing-header.patch" )
 
 src_configure() {
 	local mycmakeargs=(

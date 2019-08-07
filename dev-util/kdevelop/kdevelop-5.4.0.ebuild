@@ -10,13 +10,14 @@ VIRTUALX_REQUIRED="test"
 inherit kde5
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/kdevelop/${PV}/src/${P}.tar.xz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
 DESCRIPTION="Integrated Development Environment, supporting KF5/Qt, C/C++ and much more"
 HOMEPAGE="https://www.kdevelop.org/"
+
 LICENSE="GPL-2 LGPL-2"
+SLOT="5/54" # look at KDEVELOP_SOVERSION inside CMakeLists.txt
 IUSE="+gdbui hex +plasma +qmake reviewboard subversion webkit"
 
 COMMON_DEPEND="
@@ -83,9 +84,12 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	$(add_kdeapps_dep kapptemplate)
 	$(add_kdeapps_dep kio-extras)
+	$(add_qt_dep qtquickcontrols)
+	$(add_qt_dep qtquickcontrols2)
 	dev-util/ninja
 	>=sys-devel/gdb-7.0[python]
 	reviewboard? ( $(add_kdeapps_dep ktp-accounts-kcm) )
+	!dev-util/kdevelop-clang-tidy
 	!dev-util/kdevplatform
 "
 

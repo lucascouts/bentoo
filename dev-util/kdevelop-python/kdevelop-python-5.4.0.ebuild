@@ -9,7 +9,6 @@ PYTHON_COMPAT=( python3_{5,6,7} )
 inherit kde5 python-single-r1
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/kdevelop/${PV}/src/${KMNAME}-${PV}.tar.xz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
@@ -34,7 +33,7 @@ DEPEND="${PYTHON_DEPS}
 	$(add_frameworks_dep threadweaver)
 	$(add_qt_dep qtgui)
 	$(add_qt_dep qtwidgets)
-	dev-util/kdevelop:5
+	dev-util/kdevelop:5=
 "
 RDEPEND="${DEPEND}
 	dev-python/pycodestyle[${PYTHON_USEDEP}]

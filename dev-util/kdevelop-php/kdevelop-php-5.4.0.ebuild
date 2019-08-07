@@ -11,7 +11,6 @@ VIRTUALX_REQUIRED="test"
 inherit kde5
 
 if [[ ${KDE_BUILD_TYPE} = release ]]; then
-	SRC_URI="mirror://kde/stable/kdevelop/${PV}/src/${KMNAME}-${PV}.tar.xz"
 	KEYWORDS="~amd64 ~x86"
 fi
 
@@ -37,7 +36,7 @@ DEPEND="
 	$(add_qt_dep qtgui)
 	$(add_qt_dep qtwidgets)
 	dev-util/kdevelop-pg-qt:5
-	dev-util/kdevelop:5
+	dev-util/kdevelop:5=
 "
 RDEPEND="${DEPEND}"
 

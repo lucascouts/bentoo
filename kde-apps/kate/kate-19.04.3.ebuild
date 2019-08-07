@@ -10,7 +10,7 @@ inherit kde5
 
 DESCRIPTION="Kate is an advanced text editor"
 HOMEPAGE="https://kde.org/applications/utilities/kate https://kate-editor.org/"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE="+addons"
 
 DEPEND="
@@ -52,6 +52,8 @@ DEPEND="
 RDEPEND="${DEPEND}
 	!kde-misc/ktexteditorpreviewplugin
 "
+
+PATCHES=( "${FILESDIR}/${P}-qt-5.12.4-missing-header.patch" )
 
 src_prepare() {
 	kde5_src_prepare
