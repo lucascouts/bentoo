@@ -21,6 +21,8 @@ DEPEND="!sys-apps/firejail
 
 RDEPEND="apparmor? ( sys-libs/libapparmor )"
 
+PATCHES=( "${FILESDIR}/${PN}-fix-compressed-manpages.patch" )
+
 S="${WORKDIR}/${MY_PN}-${PV}-LTS"
 
 src_prepare() {
