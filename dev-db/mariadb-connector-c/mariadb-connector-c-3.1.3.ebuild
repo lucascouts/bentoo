@@ -46,7 +46,7 @@ DEPEND="sys-libs/zlib:=[${MULTILIB_USEDEP}]
 RDEPEND="${DEPEND}"
 PATCHES=(
 	"${FILESDIR}"/gentoo-layout-3.0.patch
-	"${FILESDIR}"/${PN}-3.0.8-fix-pkconfig-file.patch
+	"${FILESDIR}"/${PN}-3.1.3-fix-pkconfig-file.patch
 )
 
 src_configure() {
