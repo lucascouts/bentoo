@@ -47,7 +47,7 @@ inherit check-reqs eapi7-ver flag-o-matic toolchain-funcs eutils \
 DESCRIPTION="Firefox Web Browser"
 HOMEPAGE="https://www.mozilla.com/firefox"
 
-KEYWORDS="~amd64 ~ppc64 ~x86"
+KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 
 SLOT="0"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
@@ -164,10 +164,12 @@ DEPEND="${CDEPEND}
 	x86? ( >=dev-lang/yasm-1.1 virtual/opengl )
 	!system-av1? ( >=dev-lang/nasm-2.13 )"
 
-# Due to a bug in GCC, profile guided optimization will produce
-# AVX2 instructions, bug #677052
+# We use virtx eclass which cannot handle wayland
 REQUIRED_USE="wifi? ( dbus )
-	pgo? ( lto )"
+	pgo? (
+		lto
+		!wayland
+	)"
 
 S="${WORKDIR}/firefox-${PV%_*}"
 
