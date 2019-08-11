@@ -1,19 +1,20 @@
-# Copyright 1999-2018 Gentoo Foundation
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 KDE_HANDBOOK="forceoptional"
 inherit kde5
 
-DESCRIPTION="A user friendly IRC Client"
-HOMEPAGE="https://www.kde.org/applications/internet/konversation/ https://konversation.kde.org"
+DESCRIPTION="User friendly IRC Client"
+HOMEPAGE="https://kde.org/applications/internet/konversation/ https://konversation.kde.org"
 SRC_URI="mirror://kde/stable/${PN}/${PV/_/-}/src/${P/_/-}.tar.xz"
 
 LICENSE="GPL-2"
-KEYWORDS="amd64 x86"
+KEYWORDS="~amd64 ~x86"
 IUSE="+crypt"
 
+BDEPEND="sys-devel/gettext"
 DEPEND="
 	$(add_frameworks_dep karchive)
 	$(add_frameworks_dep kbookmarks)
@@ -46,13 +47,16 @@ DEPEND="
 	$(add_qt_dep qtwidgets)
 	$(add_qt_dep qtxml)
 	media-libs/phonon[qt5(+)]
-	sys-devel/gettext
 	crypt? ( app-crypt/qca:2[qt5(+)] )
 "
 RDEPEND="${DEPEND}
-	!net-irc/konversation:4
 	crypt? ( app-crypt/qca:2[ssl] )
 "
+
+PATCHES=(
+	"${FILESDIR}"/${P}-fix-regex-for-cap-ack.patch
+	"${FILESDIR}"/${P}-missing-header.patch
+)
 
 src_configure() {
 	local mycmakeargs=(

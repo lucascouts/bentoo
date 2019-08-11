@@ -8,13 +8,14 @@ PYTHON_REQ_USE="threads"
 inherit python-single-r1 unpacker
 
 DESCRIPTION="Commercial version of app-emulation/wine with paid support."
-HOMEPAGE="http://www.codeweavers.com/products/crossover/"
+HOMEPAGE="https://www.codeweavers.com/products/"
 SRC_URI="https://media.codeweavers.com/pub/crossover/cxlinux/demo/install-crossover-${PV}.bin"
 
 LICENSE="CROSSOVER-3"
 SLOT="0"
 KEYWORDS="-* ~amd64 ~x86"
 IUSE="+capi +cups doc +gphoto2 +gsm +jpeg +lcms +ldap +mp3 +nls +openal +opencl +opengl +png +scanner +ssl +v4l"
+REQUIRED_USE=${PYTHON_REQUIRED_USE}
 RESTRICT="bindist test"
 
 QA_FLAGS_IGNORED="opt/cxoffice/.*"
@@ -45,6 +46,7 @@ BDEPEND="${PYTHON_DEPS}
 "
 
 RDEPEND="${DEPEND}
+	${PYTHON_DEPS}
 	!prefix? ( sys-libs/glibc )
 	>=dev-python/pygtk-2.10:2[${PYTHON_USEDEP}]
 	dev-python/dbus-python[${PYTHON_USEDEP}]
@@ -124,7 +126,7 @@ src_install() {
 
 	# Install files
 	dodir /opt/cxoffice
-	#cp -r ./* "${ED}opt/cxoffice" \
+	#cp -r ./* "${ED}/opt/cxoffice" \
 	find . | cpio -dumpl "${ED}/opt/cxoffice" 2>/dev/null \
 		|| die "Could not install into ${ED}/opt/cxoffice"
 
