@@ -24,7 +24,5 @@ RDEPEND="${DEPEND}
 	$(add_qt_dep qtwayland 'egl(+)')
 "
 
-PATCHES=( "${FILESDIR}/${P}-system-wl-protocols.patch" )
-
 # All failing, I guess we need a virtual wayland server
 RESTRICT+=" test"
