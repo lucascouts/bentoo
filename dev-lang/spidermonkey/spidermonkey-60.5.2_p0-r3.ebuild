@@ -3,7 +3,7 @@
 
 EAPI=6
 WANT_AUTOCONF="2.1"
-inherit autotools toolchain-funcs pax-utils mozcoreconf-v5
+inherit autotools check-reqs toolchain-funcs pax-utils mozcoreconf-v5
 
 MY_PN="mozjs"
 MY_P="${MY_PN}-${PV/_rc/.rc}"
@@ -13,7 +13,7 @@ DESCRIPTION="Stand-alone JavaScript C++ library"
 HOMEPAGE="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey"
 #SRC_URI="https://archive.mozilla.org/pub/spidermonkey/prereleases/60/pre3/${MY_P}.tar.bz2
 SRC_URI="https://dev.gentoo.org/~axs/distfiles/${MY_P}.tar.bz2
-	https://dev.gentoo.org/~axs/distfiles/${PN}-60.0-patches-03.tar.xz"
+	https://dev.gentoo.org/~anarchy/mozilla/patchsets/${PN}-60.0-patches-04.tar.xz"
 
 LICENSE="NPL-1.1"
 SLOT="60"
@@ -33,13 +33,20 @@ RDEPEND=">=dev-libs/nspr-4.13.1
 	system-icu? ( >=dev-libs/icu-59.1:= )"
 DEPEND="${RDEPEND}"
 
+pkg_pretend() {
+	CHECKREQS_DISK_BUILD="2G"
+
+	check-reqs_pkg_setup
+}
 pkg_setup(){
 	[[ ${MERGE_TYPE} == "binary" ]] || \
 		moz_pkgsetup
+	export SHELL="${EPREFIX}/bin/bash"
 }
 
 src_prepare() {
 	eapply "${WORKDIR}/${PN}"
+	eapply "${FILESDIR}/${PN}-60.5.2-ia64-support.patch"
 
 	eapply_user
 
@@ -51,6 +58,9 @@ src_prepare() {
 	cd "${S}/js/src" || die
 	eautoconf old-configure.in
 	eautoconf
+
+	# remove options that are not correct from js-config
+	sed '/lib-filenames/d' -i "${S}"/js/src/build/js-config.in || die "failed to remove invalid option from js-config"
 
 	# there is a default config.cache that messes everything up
 	rm -f "${S}/js/src"/config.cache || die
@@ -74,7 +84,7 @@ src_configure() {
 		$(use_enable jit ion) \
 		$(use_enable test tests) \
 		XARGS="/usr/bin/xargs" \
-		SHELL="${SHELL:-${EPREFIX}/bin/bash}" \
+		CONFIG_SHELL="${EPREFIX}/bin/bash" \
 		CC="${CC}" CXX="${CXX}" LD="${LD}" AR="${AR}" RANLIB="${RANLIB}"
 }
 
