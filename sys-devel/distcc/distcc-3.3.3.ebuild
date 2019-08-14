@@ -14,7 +14,7 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~alpha amd64 arm ~arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 IUSE="gnome gssapi gtk hardened ipv6 selinux xinetd zeroconf"
 
 RESTRICT="test"
@@ -44,8 +44,6 @@ RDEPEND="${CDEPEND}
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
-S="${WORKDIR}/distcc"
-
 pkg_setup() {
 	enewuser distcc 240 -1 -1 daemon
 	python-single-r1_pkg_setup
@@ -57,8 +55,6 @@ src_prepare() {
 	eapply "${FILESDIR}/${PN}-3.3.2-freedesktop.patch"
 	# SOCKSv5 support needed for Portage, bug #537616
 	eapply "${FILESDIR}/${PN}-3.2_rc1-socks5.patch"
-	# crash on missing directory
-	eapply "${FILESDIR}"/distcc-3.3.2-noexist-crash.patch
 	eapply_user
 
 	# Bugs #120001, #167844 and probably more. See patch for description.
