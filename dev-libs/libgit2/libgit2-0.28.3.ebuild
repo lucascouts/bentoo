@@ -1,9 +1,9 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-PYTHON_COMPAT=( python{2_7,3_{4,5,6,7}} )
+PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 inherit cmake-utils python-any-r1
 
 if [[ ${PV} == "9999" ]] ; then
@@ -18,18 +18,15 @@ DESCRIPTION="A linkable library for Git"
 HOMEPAGE="https://libgit2.github.com/"
 
 LICENSE="GPL-2-with-linking-exception"
-SLOT="0/27"
-IUSE="+curl examples gssapi libressl +ssh test +threads trace"
+SLOT="0/28"
+IUSE="examples gssapi libressl +ssh test +threads trace"
+RESTRICT="!test? ( test )"
 
 RDEPEND="
 	!libressl? ( dev-libs/openssl:0= )
 	libressl? ( dev-libs/libressl:0= )
 	sys-libs/zlib
 	net-libs/http-parser:=
-	curl? (
-		!libressl? ( net-misc/curl:=[curl_ssl_openssl(-)] )
-		libressl? ( net-misc/curl:=[curl_ssl_libressl(-)] )
-	)
 	gssapi? ( virtual/krb5 )
 	ssh? ( net-libs/libssh2 )
 "
@@ -38,14 +35,7 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
 
-DOCS=( AUTHORS CONTRIBUTING.md CONVENTIONS.md README.md )
-
-PATCHES=(
-	# skip OOM tests on 32-bit systems
-	# https://bugs.gentoo.org/669892
-	# https://github.com/libgit2/libgit2/commit/415a8ae9c9b6ac18f0524b6af8e58408b426457d
-	"${FILESDIR}"/libgit2-0.26.8-disable-oom-tests-on-32bit.patch
-)
+S=${WORKDIR}/${P/_/-}
 
 src_configure() {
 	local mycmakeargs=(
@@ -55,7 +45,6 @@ src_configure() {
 		-DUSE_GSSAPI=$(usex gssapi)
 		-DUSE_SSH=$(usex ssh)
 		-DTHREADSAFE=$(usex threads)
-		-DCURL=$(usex curl)
 	)
 	cmake-utils_src_configure
 }
@@ -73,6 +62,7 @@ src_test() {
 
 src_install() {
 	cmake-utils_src_install
+	dodoc docs/*.{md,txt}
 
 	if use examples ; then
 		find examples -name '.gitignore' -delete || die
