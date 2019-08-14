@@ -11,7 +11,7 @@ inherit kde5
 DESCRIPTION="KDE Archiving tool"
 HOMEPAGE="https://kde.org/applications/utilities/ark
 https://utils.kde.org/projects/ark/"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE="bzip2 lzma zip"
 
 BDEPEND="
@@ -45,6 +45,8 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	$(add_qt_dep qtconcurrent)
 "
+
+PATCHES=( "${FILESDIR}/${P}-missing-header.patch" )
 
 # bug #560548, last checked with 16.04.1
 RESTRICT+=" test"

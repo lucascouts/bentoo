@@ -10,7 +10,7 @@ inherit kde5
 
 DESCRIPTION="Runtime plugin collection to extend the functionality of KDE PIM"
 LICENSE="GPL-2+ LGPL-2.1+"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 # TODO kolab
@@ -73,6 +73,8 @@ RDEPEND="${COMMON_DEPEND}
 	!kde-apps/kdepim-l10n
 	!kde-misc/akonadi-ews
 "
+
+PATCHES=( "${FILESDIR}/${P}-ui_lockfilepage-race-condition.patch" )
 
 RESTRICT+=" test"
 

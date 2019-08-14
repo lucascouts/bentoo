@@ -1,29 +1,28 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit autotools udev
 
 DESCRIPTION="Library for identifying Wacom tablets and their model-specific features"
 HOMEPAGE="https://github.com/linuxwacom/libwacom"
-SRC_URI="https://github.com/linuxwacom/${PN}/archive/${P}.tar.gz"
+SRC_URI="https://github.com/linuxwacom/${PN}/releases/download/${P}/${P}.tar.bz2"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ia64 ppc ppc64 sparc x86"
+KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="doc static-libs"
 
+BDEPEND="
+	virtual/pkgconfig
+	doc? ( app-doc/doxygen )
+"
 RDEPEND="
 	dev-libs/glib:2
 	virtual/libgudev:=
 "
-DEPEND="${RDEPEND}
-	virtual/pkgconfig
-	doc? ( app-doc/doxygen )
-"
-
-S="${WORKDIR}/${PN}-${P}"
+DEPEND="${RDEPEND}"
 
 src_prepare() {
 	default
@@ -47,5 +46,5 @@ src_install() {
 	./generate-udev-rules > "${ED}/${udevdir}/rules.d/65-libwacom.rules" || \
 		die "generating udev rules failed"
 	popd > /dev/null || die
-	find "${D}" -name '*.la' -exec rm -f {} + || die
+	find "${D}" -name '*.la' -type f -delete || die
 }

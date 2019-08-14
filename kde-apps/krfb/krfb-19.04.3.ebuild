@@ -8,7 +8,7 @@ inherit kde5
 
 DESCRIPTION="VNC-compatible server to share Plasma desktops"
 HOMEPAGE="https://kde.org/applications/system/krfb/"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 DEPEND="
@@ -36,3 +36,5 @@ DEPEND="
 	x11-libs/xcb-util-image
 "
 RDEPEND="${DEPEND}"
+
+PATCHES=( "${FILESDIR}/${P}-missing-header.patch" )

@@ -11,7 +11,7 @@ inherit kde5
 DESCRIPTION="Email client, supporting POP3 and IMAP mailboxes."
 HOMEPAGE="https://kde.org/applications/internet/kmail/"
 LICENSE="GPL-2+ handbook? ( FDL-1.2+ )"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 BDEPEND="
@@ -82,6 +82,8 @@ RDEPEND="${COMMON_DEPEND}
 	$(add_kdeapps_dep kdepim-runtime)
 	$(add_kdeapps_dep kmail-account-wizard)
 "
+
+PATCHES=( "${FILESDIR}/${P}-missing-header.patch" )
 
 RESTRICT+=" test" # bug 616878
 

@@ -8,7 +8,7 @@ inherit kde5
 
 DESCRIPTION="Jigsaw puzzle game by KDE"
 HOMEPAGE="https://kde.org/applications/games/palapeli/"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 RDEPEND="
@@ -33,3 +33,5 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	$(add_qt_dep qtconcurrent)
 "
+
+PATCHES=( "${FILESDIR}/${P}-missing-header.patch" )

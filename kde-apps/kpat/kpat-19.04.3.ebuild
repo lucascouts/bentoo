@@ -9,7 +9,7 @@ inherit kde5
 
 DESCRIPTION="KDE patience game"
 HOMEPAGE="https://games.kde.org/game.php?game=kpat"
-KEYWORDS="amd64 ~arm64 x86"
+KEYWORDS="amd64 arm64 x86"
 IUSE=""
 
 DEPEND="
@@ -32,3 +32,5 @@ DEPEND="
 	dev-games/freecell-solver
 "
 RDEPEND="${DEPEND}"
+
+PATCHES=( "${FILESDIR}"/${P}-missing-header.patch )

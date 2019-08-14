@@ -6,7 +6,7 @@ EAPI=7
 DISTUTILS_OPTIONAL=1
 PYTHON_COMPAT=( python{2_7,3_{5,6,7}} )
 
-inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 systemd toolchain-funcs udev
+inherit bash-completion-r1 flag-o-matic linux-info linux-mod distutils-r1 systemd toolchain-funcs udev usr-ldscript
 
 DESCRIPTION="Userland utilities for ZFS Linux kernel module"
 HOMEPAGE="https://zfsonlinux.org/"
@@ -16,7 +16,7 @@ if [[ ${PV} == "9999" ]] ; then
 	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
 else
 	SRC_URI="https://github.com/zfsonlinux/${PN}/releases/download/${P}/${P}.tar.gz"
-	KEYWORDS="~amd64"
+	KEYWORDS="~amd64 ~ppc64"
 fi
 
 LICENSE="BSD-2 CDDL MIT"
