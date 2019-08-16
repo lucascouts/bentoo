@@ -5,7 +5,7 @@ EAPI=6
 
 # Don't block arm. See bug #600134.
 #MULTILIB_COMPAT=( abi_ppc_64 abi_x86_{32,64} )
-KEYWORDS="-* amd64 ~arm arm64 ppc64 x86"
+KEYWORDS="-* ~amd64 ~arm ~arm64 ~ppc64 ~x86"
 
 inherit java-vm-2 multilib-build toolchain-funcs
 
@@ -32,7 +32,7 @@ HOMEPAGE="http://icedtea.classpath.org"
 LICENSE="GPL-2-with-classpath-exception"
 SLOT="8"
 
-IUSE="+alsa big-endian +cups doc examples +gtk headless-awt multilib nsplugin pulseaudio selinux source +webstart"
+IUSE="+alsa big-endian cups doc examples +gtk headless-awt multilib nsplugin pulseaudio selinux source webstart"
 REQUIRED_USE="gtk? ( !headless-awt ) nsplugin? ( !headless-awt )"
 
 RESTRICT="preserve-libs strip"
@@ -64,8 +64,8 @@ RDEPEND=">=dev-libs/glib-2.58:2%
 		>=x11-libs/libXtst-1.2%
 	)"
 
-RDEPEND=">=sys-devel/gcc-8.2.0[multilib?]
-	>=sys-libs/glibc-2.28[multilib?]
+RDEPEND=">=sys-devel/gcc-8.3.0[multilib?]
+	>=sys-libs/glibc-2.29[multilib?]
 	virtual/ttf-fonts
 	selinux? ( sec-policy/selinux-java )
 	multilib? ( ${RDEPEND//%/[${MULTILIB_USEDEP}]} )
@@ -121,8 +121,7 @@ multilib_src_install() {
 		fi
 
 		# use system-wide cacert store
-		mv "${ddest}"/jre/lib/security/cacerts \
-			"${ddest}"/jre/lib/security/cacerts.orig || die
+		rm "${ddest}"/jre/lib/security/cacerts || die
 		dosym "${EPREFIX}"/etc/ssl/certs/java/cacerts "${dest}"/jre/lib/security/cacerts
 
 		# Use default VMHANDLE.

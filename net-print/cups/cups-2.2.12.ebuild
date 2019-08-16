@@ -21,7 +21,7 @@ if [[ ${PV} == *9999 ]]; then
 else
 	#SRC_URI="https://github.com/apple/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	SRC_URI="https://github.com/apple/cups/releases/download/v${PV}/${P}-source.tar.gz"
-	KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~m68k-mint"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~m68k-mint"
 fi
 
 DESCRIPTION="The Common Unix Printing System"
@@ -56,10 +56,12 @@ CDEPEND="
 
 DEPEND="${CDEPEND}"
 BDEPEND="
+	acct-group/lp
 	>=virtual/pkgconfig-0-r1[${MULTILIB_USEDEP}]
 "
 
 RDEPEND="${CDEPEND}
+	acct-group/lp
 	selinux? ( sec-policy/selinux-cups )
 "
 
@@ -87,7 +89,7 @@ MULTILIB_CHOST_TOOLS=(
 )
 
 pkg_setup() {
-	enewgroup lp
+	#enewgroup lp -> acct-group/lp
 	enewuser lp -1 -1 -1 lp
 	enewgroup lpadmin 106
 
@@ -240,10 +242,11 @@ multilib_src_install_all() {
 	rm -rf "${ED}"/etc/{init.d/cups,rc*,pam.d/cups}
 
 	# install our init script
-	local neededservices
-	use zeroconf && neededservices+=" avahi-daemon"
-	use dbus && neededservices+=" dbus"
-	[[ -n ${neededservices} ]] && neededservices="need${neededservices}"
+	local neededservices=(
+		$(usex zeroconf avahi-daemon '')
+		$(usex dbus dbus '')
+	)
+	[[ -n ${neededservices[@]} ]] && neededservices="need ${neededservices[@]}"
 	cp "${FILESDIR}"/cupsd.init.d-r3 "${T}"/cupsd || die
 	sed -i \
 		-e "s/@neededservices@/${neededservices}/" \

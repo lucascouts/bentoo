@@ -20,6 +20,14 @@ fi
 SLOT="0"
 IUSE="ap bindist dbus eap-sim eapol_test fasteap +fils +hs2-0 libressl macsec p2p privsep ps3 qt5 readline selinux smartcard tdls uncommon-eap-types wimax wps kernel_linux kernel_FreeBSD"
 
+# CONFIG_PRIVSEP=y does not have sufficient support for the new driver
+# interface functions used for MACsec, so this combination cannot be used
+# at least for now.
+REQUIRED_USE="
+	macsec? ( !privsep )
+	privsep? ( !macsec )
+"
+
 CDEPEND="dbus? ( sys-apps/dbus )
 	kernel_linux? (
 		dev-libs/libnl:3
@@ -149,14 +157,13 @@ src_configure() {
 	Kconfig_style_config EAP_OTP
 	Kconfig_style_config EAP_PAX
 	Kconfig_style_config EAP_PSK
-	Kconfig_style_config EAP_TLV
-	Kconfig_style_config EAP_EXE
 	Kconfig_style_config IEEE8021X_EAPOL
 	Kconfig_style_config PKCS12
 	Kconfig_style_config PEERKEY
 	Kconfig_style_config EAP_LEAP
 	Kconfig_style_config EAP_MSCHAPV2
 	Kconfig_style_config EAP_PEAP
+	Kconfig_style_config EAP_TEAP
 	Kconfig_style_config EAP_TLS
 	Kconfig_style_config EAP_TTLS
 
@@ -168,6 +175,10 @@ src_configure() {
 		Kconfig_style_config CTRL_IFACE_DBUS
 		Kconfig_style_config CTRL_IFACE_DBUS_NEW
 		Kconfig_style_config CTRL_IFACE_DBUS_INTRO
+	else
+		Kconfig_style_config CTRL_IFACE_DBUS n
+		Kconfig_style_config CTRL_IFACE_DBUS_NEW n
+		Kconfig_style_config CTRL_IFACE_DBUS_INTRO n
 	fi
 
 	if use eapol_test ; then
@@ -225,12 +236,16 @@ src_configure() {
 		Kconfig_style_config OWE
 		Kconfig_style_config SAE
 		Kconfig_style_config DPP
-		Kconfig_style_config SUITEB
 		Kconfig_style_config SUITEB192
+	fi
+	if ! use bindist && ! use libressl; then
+		Kconfig_style_config SUITEB
 	fi
 
 	if use smartcard ; then
 		Kconfig_style_config SMARTCARD
+	else
+		Kconfig_style_config SMARTCARD n
 	fi
 
 	if use tdls ; then
@@ -275,6 +290,8 @@ src_configure() {
 		Kconfig_style_config WPS_UPNP
 		# Near Field Communication
 		Kconfig_style_config WPS_NFC
+	else
+		Kconfig_style_config WPS n
 	fi
 
 	# Wi-Fi Direct (WiDi)
@@ -286,6 +303,8 @@ src_configure() {
 	# Access Point Mode
 	if use ap ; then
 		Kconfig_style_config AP
+	else
+		Kconfig_style_config AP n
 	fi
 
 	# Enable essentials for AP/P2P
@@ -373,7 +392,7 @@ src_install() {
 		into /usr
 		dobin wpa_gui-qt4/wpa_gui
 		doicon wpa_gui-qt4/icons/wpa_gui.svg
-		make_desktop_entry wpa_gui "WPA Supplicant Administration GUI" "wpa_gui" "Qt;Network;"
+		domenu wpa_gui-qt4/wpa_gui.desktop
 	else
 		rm "${ED}"/usr/share/man/man8/wpa_gui.8
 	fi
@@ -415,6 +434,11 @@ pkg_postinst() {
 			ewarn "Using bindist use flag presently breaks WPA3 (specifically SAE, OWE, DPP, and FILS)."
 			ewarn "This is incredibly undesirable"
 		fi
+	fi
+	if use libressl; then
+		ewarn "Libressl doesn't support SUITEB (part of WPA3)"
+		ewarn "but it does support SUITEB192 (the upgraded strength version of the same)"
+		ewarn "You probably don't care.  Patches welcome"
 	fi
 
 	# Mea culpa, feel free to remove that after some time --mgorny.
