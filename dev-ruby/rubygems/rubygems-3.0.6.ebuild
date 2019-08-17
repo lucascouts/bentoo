@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 USE_RUBY="ruby24 ruby25 ruby26"
 
@@ -81,7 +81,7 @@ all_ruby_install() {
 }
 
 pkg_postinst() {
-	if [[ ! -n $(readlink "${ROOT}"usr/bin/gem) ]] ; then
+	if [[ ! -n $(readlink "${ROOT}"/usr/bin/gem) ]] ; then
 		eselect ruby set $(eselect --brief --colour=no ruby show | head -n1)
 	fi
 

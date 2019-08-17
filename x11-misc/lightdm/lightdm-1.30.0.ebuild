@@ -12,7 +12,7 @@ SRC_URI="https://github.com/CanonicalLtd/lightdm/releases/download/${PV}/${P}.ta
 
 LICENSE="GPL-3 LGPL-3"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86"
 IUSE="audit +gnome +gtk +introspection non_root qt5 vala"
 
 COMMON_DEPEND="
@@ -46,6 +46,7 @@ PDEPEND="gtk? ( x11-misc/lightdm-gtk-greeter )"
 
 DOCS=( NEWS )
 RESTRICT="test"
+REQUIRED_USE="vala? ( introspection )"
 
 pkg_setup() {
 	export LIGHTDM_USER=${LIGHTDM_USER:-lightdm}
