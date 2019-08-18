@@ -1,10 +1,12 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=6
+
 PYTHON_COMPAT=( python2_7 )
 PYTHON_REQ_USE="threads"
-inherit bash-completion-r1 flag-o-matic pax-utils python-any-r1 toolchain-funcs
+
+inherit bash-completion-r1 eutils flag-o-matic pax-utils python-any-r1 toolchain-funcs
 
 DESCRIPTION="A JavaScript runtime built on Chrome's V8 JavaScript engine"
 HOMEPAGE="https://nodejs.org/"
@@ -20,12 +22,12 @@ REQUIRED_USE="
 "
 
 RDEPEND="
-	>=dev-libs/libuv-1.27.0:=
+	>=dev-libs/libuv-1.28.0:=
 	>=net-dns/c-ares-1.15.0
 	>=net-libs/http-parser-2.9.0:=
-	>=net-libs/nghttp2-1.37.0
+	>=net-libs/nghttp2-1.39.2
 	sys-libs/zlib
-	icu? ( >=dev-libs/icu-63.1:= )
+	icu? ( >=dev-libs/icu-64.2:= )
 	ssl? ( >=dev-libs/openssl-1.1.1:0= )
 "
 DEPEND="
@@ -36,7 +38,6 @@ DEPEND="
 "
 PATCHES=(
 	"${FILESDIR}"/${PN}-10.3.0-global-npm-config.patch
-	"${FILESDIR}"/${PN}-99999999-llhttp.patch
 )
 S="${WORKDIR}/node-v${PV}"
 
@@ -91,10 +92,7 @@ src_prepare() {
 }
 
 src_configure() {
-	local myconf=(
-		--shared-cares --shared-http-parser --shared-libuv --shared-nghttp2
-		--shared-zlib
-	)
+	local myconf=( --shared-cares --shared-http-parser --shared-libuv --shared-nghttp2 --shared-zlib )
 	use debug && myconf+=( --debug )
 	use icu && myconf+=( --with-intl=system-icu ) || myconf+=( --with-intl=none )
 	use inspector || myconf+=( --without-inspector )
@@ -131,8 +129,8 @@ src_compile() {
 
 src_install() {
 	local LIBDIR="${ED}/usr/$(get_libdir)"
-	default
-	pax-mark -m "${ED}"/usr/bin/node
+	emake install DESTDIR="${D}"
+	pax-mark -m "${ED}"usr/bin/node
 
 	# set up a symlink structure that node-gyp expects..
 	dodir /usr/include/node/deps/{v8,uv}
@@ -188,7 +186,7 @@ src_install() {
 			\) \) -exec rm -rf "{}" \;
 	fi
 
-	mv "${ED}"/usr/share/doc/node "${ED}"/usr/share/doc/${PF} || die
+	mv "${D}"/usr/share/doc/node "${D}"/usr/share/doc/${PF} || die
 }
 
 src_test() {
@@ -197,10 +195,10 @@ src_test() {
 }
 
 pkg_postinst() {
-	elog "The global npm config lives in /etc/npm. This deviates slightly"
-	elog "from upstream which otherwise would have it live in /usr/etc/."
-	elog ""
-	elog "Protip: When using node-gyp to install native modules, you can"
-	elog "avoid having to download extras by doing the following:"
-	elog "$ node-gyp --nodedir /usr/include/node <command>"
+	einfo "The global npm config lives in /etc/npm. This deviates slightly"
+	einfo "from upstream which otherwise would have it live in /usr/etc/."
+	einfo ""
+	einfo "Protip: When using node-gyp to install native modules, you can"
+	einfo "avoid having to download extras by doing the following:"
+	einfo "$ node-gyp --nodedir /usr/include/node <command>"
 }

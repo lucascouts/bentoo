@@ -12,7 +12,7 @@ SRC_URI+=" https://dev.gentoo.org/~leio/distfiles/${PF}-patchset.tar.xz"
 LICENSE="GPL-2+"
 SLOT="0/3" # 0/libmutter_api_version - ONLY gnome-shell (or anything using mutter-clutter-<api_version>.pc) should use the subslot
 
-IUSE="debug elogind gles2 input_devices_wacom +introspection systemd test udev wayland"
+IUSE="debug elogind gles2 input_devices_wacom +introspection screencast systemd test udev wayland"
 # native backend requires gles3 for hybrid graphics blitting support and a logind provider
 REQUIRED_USE="
 	wayland? ( ^^ ( elogind systemd ) )"
@@ -59,6 +59,7 @@ RDEPEND="
 	input_devices_wacom? ( >=dev-libs/libwacom-0.13 )
 	introspection? ( >=dev-libs/gobject-introspection-1.42:= )
 	udev? ( >=virtual/libgudev-232:= )
+	screencast? ( >=media-video/pipewire-0.2.2:0/0.2 )
 	wayland? (
 		>=dev-libs/libinput-1.4
 		>=dev-libs/wayland-1.13.0
@@ -130,11 +131,11 @@ src_configure() {
 		--enable-xlib-egl-platform \
 		--with-default-driver=gl \
 		--with-libcanberra \
-		--disable-remote-desktop \
 		$(usex debug --enable-debug=yes "") \
 		$(use_enable gles2)        \
 		$(use_enable gles2 cogl-gles2) \
 		$(use_enable introspection) \
+		$(use_enable screencast remote-desktop) \
 		$(use_enable wayland) \
 		$(use_enable wayland kms-egl-platform) \
 		$(use_enable wayland native-backend) \

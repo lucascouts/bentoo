@@ -4,13 +4,14 @@
 EAPI=7
 
 XORG_DOC=doc
+XORG_EAUTORECONF="yes"
 inherit xorg-3 multilib flag-o-matic
 EGIT_REPO_URI="https://gitlab.freedesktop.org/xorg/xserver.git"
 
 DESCRIPTION="X.Org X servers"
 SLOT="0/${PV}"
 if [[ ${PV} != 9999* ]]; then
-	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux"
+	KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux"
 fi
 
 IUSE_SERVERS="dmx kdrive wayland xephyr xnest xorg xvfb"
@@ -48,7 +49,7 @@ CDEPEND=">=app-eselect/eselect-opengl-1.3.0
 		>=x11-libs/libXtst-1.0.99.2
 	)
 	glamor? (
-		media-libs/libepoxy[X]
+		media-libs/libepoxy[X,egl(+)]
 		>=media-libs/mesa-18[egl,gbm]
 		!x11-libs/glamor
 	)
@@ -67,13 +68,13 @@ CDEPEND=">=app-eselect/eselect-opengl-1.3.0
 	!minimal? (
 		>=x11-libs/libX11-1.1.5
 		>=x11-libs/libXext-1.0.5
-		>=media-libs/mesa-18
+		>=media-libs/mesa-18[X(+)]
 	)
 	udev? ( virtual/libudev:= )
 	unwind? ( sys-libs/libunwind )
 	wayland? (
 		>=dev-libs/wayland-1.3.0
-		media-libs/libepoxy
+		media-libs/libepoxy[egl(+)]
 		>=dev-libs/wayland-protocols-1.1
 	)
 	>=x11-apps/xinit-1.3.3-r1
@@ -90,7 +91,7 @@ CDEPEND=">=app-eselect/eselect-opengl-1.3.0
 
 DEPEND="${CDEPEND}
 	sys-devel/flex
-	>=x11-base/xorg-proto-2018.3
+	>=x11-base/xorg-proto-2018.4
 	dmx? (
 		doc? (
 			|| (
