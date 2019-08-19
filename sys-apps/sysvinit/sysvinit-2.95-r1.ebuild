@@ -1,7 +1,7 @@
 # Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
 inherit toolchain-funcs flag-o-matic
 
@@ -12,7 +12,7 @@ SRC_URI="mirror://nongnu/${PN}/${P/_/-}.tar.xz"
 LICENSE="GPL-2"
 SLOT="0"
 [[ "${PV}" == *beta* ]] || \
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~riscv ~s390 ~sh ~sparc ~x86"
 IUSE="selinux ibm static kernel_FreeBSD"
 
 CDEPEND="
@@ -30,13 +30,17 @@ S="${WORKDIR}/${P/_*}"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-2.86-kexec.patch" #80220
-	"${FILESDIR}/${PN}-2.86-shutdown-single.patch" #158615
-	"${FILESDIR}/${PN}-2.92_beta-shutdown-h.patch" #449354
+	"${FILESDIR}/${PN}-2.94_beta-shutdown-single.patch" #158615
+	"${FILESDIR}/${PN}-2.95_beta-shutdown-h.patch" #449354
 )
 
 src_prepare() {
 	default
-	sed -i '/^CPPFLAGS =$/d' src/Makefile || die
+
+	sed -i \
+		-e '/^CPPFLAGS =$/d' \
+		-e '/^override CFLAGS +=/s/ -fstack-protector-strong//' \
+		src/Makefile || die
 
 	# last/lastb/mesg/mountpoint/sulogin/utmpdump/wall have moved to util-linux
 	sed -i -r \
@@ -50,9 +54,15 @@ src_prepare() {
 		-e '/^MAN8/s:\<pidof.8\>::g' \
 		src/Makefile || die
 
+	# logsave is already in e2fsprogs
+	sed -i -r \
+		-e '/^(USR)?S?BIN/s:\<logsave\>::g' \
+		-e '/^MAN8/s:\<logsave.8\>::g' \
+		src/Makefile || die
+
 	# Mung inittab for specific architectures
 	cd "${WORKDIR}" || die
-	cp "${FILESDIR}"/inittab-2.91 inittab || die "cp inittab"
+	cp "${FILESDIR}"/inittab-2.95 inittab || die "cp inittab"
 	local insert=()
 	use ppc && insert=( '#psc0:12345:respawn:/sbin/agetty 115200 ttyPSC0 linux' )
 	use arm && insert=( '#f0:12345:respawn:/sbin/agetty 9600 ttyFB0 vt100' )
@@ -100,9 +110,11 @@ src_install() {
 	doins "${WORKDIR}"/inittab
 
 	# dead symlink
-	rm "${ED%/}"/usr/bin/lastb || die
+	rm "${ED}"/usr/bin/lastb || die
 
 	newinitd "${FILESDIR}"/bootlogd.initd bootlogd
+	into /
+	dosbin "${FILESDIR}"/halt.sh
 }
 
 pkg_postinst() {
@@ -121,7 +133,7 @@ pkg_postinst() {
 	elog "sys-apps/util-linux. The pidof tool has been moved to sys-process/procps."
 
 	# Required for new bootlogd service
-	if [[ ! -e "${EROOT%/}/var/log/boot" ]] ; then
-		touch "${EROOT%/}/var/log/boot"
+	if [[ ! -e "${EROOT}/var/log/boot" ]] ; then
+		touch "${EROOT}/var/log/boot"
 	fi
 }
