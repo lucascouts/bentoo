@@ -18,9 +18,7 @@ if [[ ${PV} = 9999* ]]; then
 	SRC_URI=""
 else
 	KEYWORDS="~amd64"
-	COMMIT="f92208be88dd06a70b6f79a1cb95571e2762a9ec"
-	SRC_URI="https://github.com/NVIDIA/${PN}/archive/${COMMIT}.tar.gz -> ${P}.tar.gz"
-	S=${WORKDIR}/${PN}-${COMMIT}
+	SRC_URI="https://github.com/NVIDIA/${PN}/releases/download/v${PV}/${P}.tar.gz"
 fi
 
 LICENSE="MIT"
@@ -34,14 +32,9 @@ RDEPEND="
 DEPEND="${PYTHON_DEPS}
 	${RDEPEND}"
 
-src_unpack() {
-	default
-	[[ $PV = 9999* ]] && git-r3_src_unpack
-}
-
 src_prepare() {
 	default
-	eautoreconf
+	[[ $PV = 9999* ]] && eautoreconf
 }
 
 multilib_src_configure() {
