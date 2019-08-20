@@ -9,9 +9,9 @@ inherit gnome2
 DESCRIPTION="Compiler for the GObject type system"
 HOMEPAGE="https://wiki.gnome.org/Projects/Vala"
 
-LICENSE="LGPL-2.1"
-SLOT="0.42"
-KEYWORDS="alpha amd64 arm arm64 hppa ~ia64 ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~x86-linux"
+LICENSE="LGPL-2.1+"
+SLOT="0.44"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~x86-linux"
 IUSE="test valadoc"
 
 RDEPEND="
@@ -32,10 +32,8 @@ DEPEND="${RDEPEND}
 "
 
 PATCHES=(
-	# From master
-	"${FILESDIR}"/0.40-Allow-disabling-the-build-of-valadoc.patch
 	# Add missing bits to make valadoc parallel installable
-	"${FILESDIR}"/0.40-valadoc-doclets-data-parallel-installable.patch
+	"${FILESDIR}"/0.44-valadoc-doclets-data-parallel-installable.patch
 )
 
 src_configure() {
