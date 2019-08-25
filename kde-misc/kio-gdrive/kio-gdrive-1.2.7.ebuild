@@ -3,6 +3,7 @@
 
 EAPI=7
 
+KDE_APPS_MINIMAL=19.08.0
 KDE_HANDBOOK="forceoptional"
 KDE_TEST="optional"
 inherit kde5
@@ -12,11 +13,12 @@ HOMEPAGE="https://phabricator.kde.org/project/profile/72/"
 
 if [[ ${KDE_BUILD_TYPE} != live ]] ; then
 	SRC_URI="mirror://kde/stable/${PN}/${PV}/src/${P}.tar.xz"
-	KEYWORDS="amd64 x86"
+	KEYWORDS="~amd64 ~x86"
 fi
 
 IUSE="+kaccounts"
 
+BDEPEND="dev-util/intltool"
 COMMON_DEPEND="
 	$(add_frameworks_dep kcoreaddons)
 	$(add_frameworks_dep ki18n)
@@ -34,9 +36,10 @@ DEPEND="${COMMON_DEPEND}
 RDEPEND="${COMMON_DEPEND}
 	kaccounts? ( $(add_kdeapps_dep kaccounts-providers) )
 "
-BDEPEND="dev-util/intltool"
 
 DOCS=( README.md )
+
+PATCHES=( "${FILESDIR}"/${PN}-1.2.6-refresh-credentials.patch )
 
 src_configure() {
 	local mycmakeargs=(
