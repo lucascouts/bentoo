@@ -1,4 +1,4 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -33,6 +33,10 @@ DEPEND="${RDEPEND}
 	nls? ( sys-devel/gettext )
 "
 # gtk-doc-am to install API docs
+
+PATCHES=(
+	"${FILESDIR}"/1.14-glib-2.60-tests-compat.patch
+)
 
 src_configure() {
 	if [[ ${CHOST} == *-interix* ]] ; then

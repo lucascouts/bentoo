@@ -17,6 +17,8 @@ LICENSE="LGPL-2.1+ || ( LGPL-2.1 LGPL-3 )"
 SLOT="0"
 IUSE="alsa debug +network"
 
+S="${WORKDIR}/phonon-backend-gstreamer-${PV}"
+
 BDEPEND="
 	dev-qt/linguist-tools:5
 	virtual/pkgconfig
