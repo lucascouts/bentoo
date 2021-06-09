@@ -24,7 +24,7 @@ Afterwards, simply run `ego sync`, and Portage should seamlessly make all our eb
 Invoke the following:
 
 ```
-# layman -o https://raw.github.com/lucascouts/bentoo/master/repositories.xml -f -a bentoo
+layman -o https://raw.github.com/lucascouts/bentoo/master/repositories.xml -f -a bentoo
 ```
 
 ### Installation guide
