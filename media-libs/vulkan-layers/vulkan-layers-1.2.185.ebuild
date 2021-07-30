@@ -16,7 +16,7 @@ else
 	SNAPSHOT_COMMIT="b3870ead394612d69b435b32d3623caf956ecaba"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${SNAPSHOT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64"
-	S="${WORKDIR}/${PN}-${SNAPSHOT_COMMIT}"
+	S="${WORKDIR}/${MY_PN}-${SNAPSHOT_COMMIT}"
 fi
 
 DESCRIPTION="Vulkan Validation Layers"
