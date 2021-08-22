@@ -216,9 +216,9 @@ llvm_check_deps() {
 
 MOZ_LANGS=(
 	af ar ast be bg br ca cak cs cy	da de dsb el en-CA en-GB en-US
-	es-AR es-ES et eu fa fi fr fy-NL ga-IE gd gl he hr hsb hu hy-AM
+	es-AR es-ES et eu fi fr fy-NL ga-IE gd gl he hr hsb hu hy-AM
 	id is it ja ka kab kk ko lt ms nb-NO nl nn-NO pa-IN pl pt-BR
-	pt-PT rm ro ru si sk sl sq sr sv-SE th tr uz vi zh-CN zh-TW
+	pt-PT rm ro ru sk sl sq sr sv-SE th tr uz vi zh-CN zh-TW
 )
 
 mozilla_set_globals() {
