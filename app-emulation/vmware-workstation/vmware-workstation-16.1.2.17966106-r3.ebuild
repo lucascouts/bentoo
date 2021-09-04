@@ -3,8 +3,8 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6..9} )
-inherit eutils readme.gentoo-r1 gnome2-utils pam python-any-r1 systemd xdg-utils
+PYTHON_COMPAT=( python3_{8..10} )
+inherit eutils readme.gentoo-r1 pam python-any-r1 systemd xdg-utils
 
 MY_PN="VMware-Workstation-Full"
 MY_PV=$(ver_cut 1-3)
@@ -68,6 +68,7 @@ RDEPEND="
 	sys-apps/tcp-wrappers
 	sys-apps/util-linux
 	sys-auth/polkit
+	virtual/libcrypt:*
 	x11-libs/libXxf86vm
 	x11-libs/libdrm
 	x11-libs/libxshmfence
@@ -81,7 +82,9 @@ DEPEND="
 	${PYTHON_DEPS}
 	>=dev-util/patchelf-0.9
 	modules? ( ~app-emulation/vmware-modules-${PV_MODULES} )
-	ovftool? ( app-admin/chrpath )
+"
+BDEPEND="
+	app-admin/chrpath
 "
 
 S=${WORKDIR}/extracted
@@ -185,7 +188,8 @@ src_install() {
 
 	# install the installer
 	insinto "${VM_INSTALL_DIR}"/lib/vmware-installer/${vmware_installer_version}
-	doins -r vmware-installer/{cdsHelper,vmis,vmis-launcher,vmware-cds-helper,vmware-installer,vmware-installer.py}
+	doins -r vmware-installer/{cdsHelper,vmis,vmis-launcher,vmware-cds-helper,vmware-installer,vmware-installer.py,python}
+	chrpath -k -r '/../lib:$ORIGIN/../lib' "${ED}${VM_INSTALL_DIR}"/lib/vmware-installer/${vmware_installer_version}/python/lib/lib-dynload/*.so >/dev/null || die
 	fperms 0755 "${VM_INSTALL_DIR}"/lib/vmware-installer/${vmware_installer_version}/{vmis-launcher,cdsHelper,vmware-installer}
 	dosym "${VM_INSTALL_DIR}"/lib/vmware-installer/${vmware_installer_version}/vmware-installer "${VM_INSTALL_DIR}"/bin/vmware-installer
 	insinto /etc/vmware-installer
@@ -392,6 +396,10 @@ src_install() {
 		fi
 	done
 
+	# metadata
+	mv "${ED}/usr/share/appdata" "${ED}/usr/share/metainfo"
+
+	# readme
 	readme.gentoo_create_doc
 }
 
@@ -399,19 +407,15 @@ pkg_config() {
 	"${VM_INSTALL_DIR}"/bin/vmware-networks --postinstall ${PN},old,new
 }
 
-pkg_preinst() {
-	gnome2_icon_savelist
-}
-
 pkg_postinst() {
 	xdg_desktop_database_update
 	xdg_mimeinfo_database_update
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 	elog "${DOC_CONTENTS}"
 }
 
 pkg_postrm() {
 	xdg_desktop_database_update
 	xdg_mimeinfo_database_update
-	gnome2_icon_cache_update
+	xdg_icon_cache_update
 }
