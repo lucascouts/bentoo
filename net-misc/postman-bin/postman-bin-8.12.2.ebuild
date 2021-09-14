@@ -8,7 +8,7 @@ MY_PN="${PN/-bin/}"
 
 DESCRIPTION="Supercharge your API workflow"
 HOMEPAGE="https://www.postman.com"
-SRC_URI="https://dl.pstmn.io/download/latest/linux64 -> postman-bin-${PV}.tar.gz"
+SRC_URI="https://dl.pstmn.io/download/latest/linux64 -> postman-bin-8.12.2.tar.gz"
 
 LICENSE="MPL-2.0"
 SLOT="0"
@@ -31,6 +31,7 @@ src_install() {
 
 	insinto "${dir}"
 	doins -r *
+	fperms 755 "${dir}"/postman
 	fperms 755 "${dir}"/Postman
 
 	make_wrapper "${PN}" "${dir}/Postman"

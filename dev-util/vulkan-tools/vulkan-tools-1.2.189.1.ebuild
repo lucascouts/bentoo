@@ -4,8 +4,9 @@
 EAPI=7
 
 MY_PN=Vulkan-Tools
-CMAKE_ECLASS="cmake"
-PYTHON_COMPAT=( python3_{7,8,9} )
+CMAKE_ECLASS="cmake-utils"
+CMAKE_MAKEFILE_GENERATOR="emake"
+PYTHON_COMPAT=( python3_{8,9} )
 inherit cmake-multilib python-any-r1
 
 if [[ ${PV} == *9999* ]]; then
@@ -14,7 +15,7 @@ if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64"
+	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv"
 	S="${WORKDIR}"/${MY_PN}-${PV}
 fi
 
@@ -26,7 +27,7 @@ SLOT="0"
 IUSE="cube wayland +X"
 
 # Cube demo only supports one window system at a time
-REQUIRED_USE="!cube? ( || ( X wayland ) ) cube? ( ^^ ( X wayland ) )"
+REQUIRED_USE="cube? ( ^^ ( X wayland ) )"
 
 BDEPEND="${PYTHON_DEPS}
 	>=dev-util/cmake-3.10.2
@@ -57,6 +58,10 @@ pkg_setup() {
 	python-any-r1_pkg_setup
 }
 
+src_prepare() {
+	cmake-utils_src_prepare
+}
+
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_SKIP_RPATH=ON
@@ -65,17 +70,17 @@ multilib_src_configure() {
 		-DBUILD_WSI_WAYLAND_SUPPORT=$(usex wayland)
 		-DBUILD_WSI_XCB_SUPPORT=$(usex X)
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex X)
-		-DVULKAN_HEADERS_INSTALL_DIR="${EPREFIX}/usr"
+		-DVULKAN_HEADERS_INSTALL_DIR="${ESYSROOT}/usr"
 	)
 
 	use cube && mycmakeargs+=(
-		-DGLSLANG_INSTALL_DIR="${EPREFIX}/usr"
+		-DGLSLANG_INSTALL_DIR="${ESYSROOT}/usr"
 		-DCUBE_WSI_SELECTION=$(usex X XCB WAYLAND)
 	)
 
-	cmake_src_configure
+	cmake-utils_src_configure
 }
 
 multilib_src_install() {
-	cmake_src_install
+	cmake-utils_src_install
 }

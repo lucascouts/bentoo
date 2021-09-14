@@ -4,9 +4,9 @@
 EAPI=7
 
 MY_PN=Vulkan-Loader
-CMAKE_ECLASS="cmake"
-PYTHON_COMPAT=( python3_{7,8,9} )
-inherit flag-o-matic cmake-multilib python-any-r1 toolchain-funcs
+CMAKE_ECLASS="cmake-utils"
+CMAKE_MAKEFILE_GENERATOR="emake"
+inherit flag-o-matic cmake-multilib toolchain-funcs
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/KhronosGroup/${MY_PN}.git"
@@ -14,7 +14,7 @@ if [[ ${PV} == *9999* ]]; then
 	inherit git-r3
 else
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64"
+	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}"/${MY_PN}-${PV}
 fi
 
@@ -26,7 +26,7 @@ SLOT="0"
 IUSE="layers wayland X"
 
 BDEPEND=">=dev-util/cmake-3.10.2"
-DEPEND="${PYTHON_DEPS}
+DEPEND="
 	~dev-util/vulkan-headers-${PV}
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
@@ -35,6 +35,10 @@ DEPEND="${PYTHON_DEPS}
 	)
 "
 PDEPEND="layers? ( media-libs/vulkan-layers:=[${MULTILIB_USEDEP}] )"
+
+src_prepare() {
+	cmake-utils_src_prepare
+}
 
 multilib_src_configure() {
 	# Integrated clang assembler doesn't work with x86 - Bug #698164
@@ -51,13 +55,13 @@ multilib_src_configure() {
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex X)
 		-DVULKAN_HEADERS_INSTALL_DIR="${ESYSROOT}/usr"
 	)
-	cmake_src_configure
+	cmake-utils_src_configure
 }
 
 multilib_src_install() {
 	keepdir /etc/vulkan/icd.d
 
-	cmake_src_install
+	cmake-utils_src_install
 }
 
 pkg_postinst() {
