@@ -17,7 +17,7 @@ else
 	EGIT_COMMIT="0cc98ec7acfbdbdbda4be79d5117cf04bda7eccf"
 	SRC_URI="https://github.com/KhronosGroup/Vulkan-Loader/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64"
-	S="${WORKDIR}/${PN}-${EGIT_COMMIT}"
+	S="${WORKDIR}/Vulkan-Loader-${EGIT_COMMIT}"
 fi
 
 DESCRIPTION="Vulkan Validation Layers"
