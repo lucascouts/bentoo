@@ -22,9 +22,8 @@ MOZ_HTTP_URI="https://archive.mozilla.org/pub/${MOZ_PN}/releases"
 inherit eutils multilib pax-utils xdg-utils mozlinguas-v2
 
 DESCRIPTION="Thunderbird Mail Client"
-SRC_URI="${SRC_URI}
-	amd64? ( ${MOZ_HTTP_URI}/${MOZ_PV}/linux-x86_64/en-US/${MOZ_P}.tar.bz2 -> ${PN}_x86_64-${PV}.tar.bz2 )
-	x86? ( ${MOZ_HTTP_URI}/${MOZ_PV}/linux-i686/en-US/${MOZ_P}.tar.bz2 -> ${PN}_i686-${PV}.tar.bz2 )"
+SRC_URI="amd64? ( ${MOZ_HTTP_URI}/${MOZ_PV}/linux-x86_64/en-US/${MOZ_P}.tar.bz2 -> ${PN}_x86_64-${PV}.tar.bz2 )
+	"
 
 HOMEPAGE="https://www.thunderbird.net/"
 RESTRICT="strip mirror"
