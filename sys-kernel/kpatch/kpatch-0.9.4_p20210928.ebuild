@@ -9,7 +9,7 @@ if [[ "${PV}" == "9999" ]]; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/dynup/${PN}.git"
 else
-	EGIT_COMMIT="6de60e79b7e44db30e6eae367a80c2c8ecea48b9"
+	EGIT_COMMIT="cc5200fbf849e145ff4ccd8994cb6802451c9e91"
 	SRC_URI="https://github.com/dynup/${PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64"
 fi
