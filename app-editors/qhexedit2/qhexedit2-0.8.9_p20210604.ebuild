@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -9,7 +9,7 @@ DISTUTILS_OPTIONAL=1
 
 inherit distutils-r1 qmake-utils
 
-EGIT_COMMIT="3477064039454ee4da10683bfd32e04d3c5a0de2"
+EGIT_COMMIT="9f4706a6ff61db58f70a7e4f2cb00848acbe28d9"
 DESCRIPTION="Hex editor library, Qt application written in C++ with Python bindings"
 HOMEPAGE="https://github.com/lancos/qhexedit2/"
 SRC_URI="https://github.com/lancos/${PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
@@ -30,7 +30,7 @@ RDEPEND="
 	dev-qt/qtwidgets:5
 	python? (
 		dev-python/PyQt5[gui,widgets,${PYTHON_USEDEP}]
-		dev-python/sip[${PYTHON_USEDEP}]
+		<dev-python/sip-5[${PYTHON_USEDEP}]
 		${PYTHON_DEPS}
 		)
 "
