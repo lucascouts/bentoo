@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{8..10} )
+PYTHON_COMPAT=( python3_{9,10} )
 PYTHON_REQ_USE="threads(+),xml"
 
 MY_PV="${PV/_alpha/.alpha}"
@@ -44,15 +44,10 @@ unset DEV_URI
 # These are bundles that can't be removed for now due to huge patchsets.
 # If you want them gone, patches are welcome.
 ADDONS_SRC=(
-	# broken against latest upstream release, too many patches on top:
-	# https://github.com/tdf/libcmis/pull/43
-	"${ADDONS_URI}/libcmis-0.5.2.tar.xz"
 	# not packaged in Gentoo, https://www.netlib.org/fp/dtoa.c
 	"${ADDONS_URI}/dtoa-20180411.tgz"
 	# not packaged in Gentoo, https://skia.org/
-	"${ADDONS_URI}/skia-m88-59bafeeaa7de9eb753e3778c414e01dcf013dcd8.tar.xz"
-	# QR code generating library for >=libreoffice-6.4, bug #691740
-	"${ADDONS_URI}/QR-Code-generator-1.4.0.tar.gz"
+	"${ADDONS_URI}/skia-m90-45c57e116ee0ce214bdf78405a4762722e4507d9.tar.xz"
 	"base? (
 		${ADDONS_URI}/commons-logging-1.2-src.tar.gz
 		${ADDONS_URI}/ba2930200c9f019c2d93a8c88c651a0f-flow-engine-0.9.4.zip
@@ -137,9 +132,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=app-text/libwps-0.4
 	app-text/mythes
 	>=dev-cpp/clucene-2.3.3.4-r2
-	>=dev-cpp/libcmis-0.5.2
 	dev-db/unixODBC
-	>=games-engines/box2d-2.4.1:0
 	dev-lang/perl
 	>=dev-libs/boost-1.72.0:=[nls]
 	dev-libs/expat
@@ -155,6 +148,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-libs/nss
 	>=dev-libs/redland-1.0.16
 	>=dev-libs/xmlsec-1.2.28[nss]
+	>=games-engines/box2d-2.4.1:0
 	media-gfx/fontforge
 	media-gfx/graphite2
 	media-libs/fontconfig
@@ -162,12 +156,13 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=media-libs/harfbuzz-0.9.42:=[graphite,icu]
 	media-libs/lcms:2
 	>=media-libs/libcdr-0.1.0
-	>=media-libs/libepoxy-1.3.1[X]
+	>=media-libs/libepoxy-1.3.1
 	>=media-libs/libfreehand-0.1.0
 	media-libs/libpagemaker
 	>=media-libs/libpng-1.4:0=
 	>=media-libs/libvisio-0.1.0
 	media-libs/libzmf
+	media-libs/zxing-cpp
 	>=net-libs/neon-0.31.1:=
 	net-misc/curl
 	sci-mathematics/lpsolve
@@ -175,7 +170,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	virtual/glu
 	virtual/jpeg:0
 	virtual/opengl
-	x11-libs/cairo[X]
+	x11-libs/cairo
 	x11-libs/libXinerama
 	x11-libs/libXrandr
 	x11-libs/libXrender
@@ -201,7 +196,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	)
 	coinmp? ( sci-libs/coinor-mp )
 	cups? ( net-print/cups )
-	dbus? ( sys-apps/dbus[X] )
+	dbus? ( sys-apps/dbus )
 	eds? (
 		dev-libs/glib:2
 		gnome-base/dconf
@@ -216,8 +211,8 @@ COMMON_DEPEND="${PYTHON_DEPS}
 		dev-libs/glib:2
 		dev-libs/gobject-introspection
 		gnome-base/dconf
-		media-libs/mesa[egl(+)]
-		x11-libs/gtk+:3[X]
+		media-libs/mesa[egl]
+		x11-libs/gtk+:3
 		x11-libs/pango
 	)
 	kde? (
@@ -257,8 +252,8 @@ DEPEND="${COMMON_DEPEND}
 	java? (
 		dev-java/ant-core
 		|| (
-			dev-java/openjdk:11
-			dev-java/openjdk-bin:11
+			dev-java/openjdk:15
+			dev-java/openjdk-bin:15
 		)
 	)
 	test? (
@@ -274,8 +269,8 @@ RDEPEND="${COMMON_DEPEND}
 	media-fonts/liberation-fonts
 	|| ( x11-misc/xdg-utils kde-plasma/kde-cli-tools )
 	java? ( || (
-		dev-java/openjdk:11
-		dev-java/openjdk-jre-bin:11
+		dev-java/openjdk:15
+		dev-java/openjdk-jre-bin:15
 		>=virtual/jre-1.8
 	) )
 	kde? ( kde-frameworks/breeze-icons:* )
@@ -294,14 +289,6 @@ PATCHES=(
 	# not upstreamable stuff
 	"${FILESDIR}/${PN}-5.3.4.2-kioclient5.patch"
 	"${FILESDIR}/${PN}-6.1-nomancompress.patch"
-	"${FILESDIR}/${PN}-7.0.3.1-qt5detect.patch"
-
-	# 7.1 branch
-	"${FILESDIR}/${P}-KF5-fix-double-buffer-graphics.patch"
-
-	# master branch
-	"${FILESDIR}/${PN}-7.1.3.2-bashism.patch" # bug 780432
-	"${FILESDIR}/${PN}-7.1.5.2-bison-3.8.patch" # bug 812923
 )
 
 S="${WORKDIR}/${PN}-${MY_PV}"
@@ -358,6 +345,7 @@ src_unpack() {
 }
 
 src_prepare() {
+	cp "${FILESDIR}/skia-freetype2.11.patch" external/skia
 	default
 
 	# sandbox violations on many systems, we don't need it. Bug #646406
@@ -473,7 +461,6 @@ src_configure() {
 	# --without-system-sane: just sane.h header that is used for scan in writer,
 	#   not linked or anything else, worthless to depend on
 	# --disable-pdfium: not yet packaged
-	# --without-system-qrcodegen: has no real build system and LO is the only user
 	local myeconfargs=(
 		--with-system-dicts
 		--with-system-epoxy
@@ -482,22 +469,21 @@ src_configure() {
 		--with-system-libs
 		--enable-build-opensymbol
 		--enable-cairo-canvas
+		--enable-gui
 		--enable-largefile
 		--enable-mergelibs
-		--enable-neon
 		--enable-python=system
 		--enable-randr
 		--enable-release-build
 		--disable-breakpad
 		--disable-bundle-mariadb
-		--disable-ccache
+		--disable-cmis
 		--disable-epm
 		--disable-fetch-external
 		--disable-gtk3-kde5
 		--disable-online-update
 		--disable-openssl
 		--disable-pdfium
-		--disable-vlc
 		--with-extra-buildid="${gentoo_buildid}"
 		--enable-extension-integration
 		--with-external-dict-dir="${EPREFIX}/usr/share/myspell"
@@ -509,17 +495,13 @@ src_configure() {
 		--with-system-ucpp
 		--with-tls=nss
 		--with-vendor="Gentoo Foundation"
-		--with-x
 		--without-fonts
 		--without-myspell-dicts
 		--with-help="html"
 		--without-helppack-integration
 		--with-system-gpgmepp
 		--without-system-jfreereport
-		--without-system_apache_commons
-		--without-system-libcmis
 		--without-system-sane
-		--without-system-qrcodegen
 		$(use_enable base report-builder)
 		$(use_enable bluetooth sdremote-bluetooth)
 		$(use_enable coinmp)
@@ -566,11 +548,13 @@ src_configure() {
 			--without-junit
 			--without-system-hsqldb
 			--with-ant-home="${ANT_HOME}"
+			#--with-jdk-home=$(java-config --jdk-home 2>/dev/null)
+			--with-jvm-path="${EPREFIX}/usr/lib/"
 		)
-		if has_version "dev-java/openjdk:11"; then
-			myeconfargs+=( -with-jdk-home="${EPREFIX}/usr/$(get_libdir)/openjdk-11" )
-		elif has_version "dev-java/openjdk-bin:11"; then
-			myeconfargs+=( --with-jdk-home="/opt/openjdk-bin-11" )
+		if has_version "dev-java/openjdk:15"; then
+			myeconfargs+=( -with-jdk-home="${EPREFIX}/usr/$(get_libdir)/openjdk-15" )
+		elif has_version "dev-java/openjdk-bin:15"; then
+			myeconfargs+=( --with-jdk-home="/opt/openjdk-bin-15" )
 		fi
 
 		use libreoffice_extensions_scripting-beanshell && \
