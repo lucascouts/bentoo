@@ -12,7 +12,7 @@ inherit distutils-r1 qmake-utils
 EGIT_COMMIT="4de8e3bc7d26735c352288b15f1701b551d2b7d8"
 DESCRIPTION="Hex editor library, Qt application written in C++ with Python bindings"
 HOMEPAGE="https://github.com/lancos/qhexedit2/"
-SRC_URI="https://github.com/adioskid/qhexedit2/${PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/adioskid/${PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
