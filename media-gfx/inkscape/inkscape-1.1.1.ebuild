@@ -99,7 +99,7 @@ DEPEND="${COMMON_DEPEND}
 
 RESTRICT="test"
 
-S="${WORKDIR}/${P}_2021-05-24_c4e8f9ed74"
+S="${WORKDIR}/${P}_2021-09-20_3bf5ae0d25"
 
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != binary ]] && use openmp; then
