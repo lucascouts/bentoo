@@ -10,10 +10,7 @@ inherit cmake flag-o-matic xdg toolchain-funcs python-single-r1
 
 DESCRIPTION="SVG based generic vector-drawing program"
 HOMEPAGE="https://inkscape.org/"
-SRC_URI="
-	https://media.inkscape.org/dl/resources/file/${P}_2021-09-20_3bf5ae0d25.tar.xz
-	https://dev.gentoo.org/~dilfridge/distfiles/inkscape-1.1-musl.txz
-"
+SRC_URI="htps://media.inkscape.org/dl/resources/file/${P}_2021-09-20_3bf5ae0d25.tar.xz"
 
 LICENSE="GPL-2 LGPL-2.1"
 SLOT="0"
@@ -108,9 +105,6 @@ pkg_pretend() {
 }
 
 src_prepare() {
-	# Backport from master
-	eapply "${WORKDIR}/inkscape-1.1-musl/"*.patch
-
 	cmake_src_prepare
 	sed -i "/install.*COPYING/d" CMakeScripts/ConfigCPack.cmake || die
 }
