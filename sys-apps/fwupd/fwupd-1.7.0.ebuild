@@ -152,6 +152,7 @@ src_configure() {
 		$(meson_use policykit polkit)
 		$(meson_use systemd)
 		$(meson_use test tests)
+		-Dplugin_logitech_bulkcontroller="false"
 
 		${plugins[@]}
 	)
