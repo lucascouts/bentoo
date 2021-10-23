@@ -51,15 +51,28 @@ S=${WORKDIR}
 src_prepare() {
 	rm -f ${WORKDIR}/.PKGINFO ${WORKDIR}/.INSTALL ${WORKDIR}/.MTREE
 	rmdir usr/share/doc/zoom usr/share/doc
-	sed -i -e 's:Icon=Zoom.png:Icon=Zoom:' "${WORKDIR}/usr/share/applications/Zoom.desktop"
-	sed -i -e 's:Application;::' "${WORKDIR}/usr/share/applications/Zoom.desktop"
+
+	sed -i \
+		-e 's:Icon=Zoom.png:Icon=Zoom:' \
+		-e 's:Application;::' \
+		-e 's:/usr/bin/zoom:&-bin:' \
+		"${WORKDIR}/usr/share/applications/Zoom.desktop"
+
 	chrpath -r '' opt/zoom/platforminputcontexts/libfcitxplatforminputcontextplugin.so
 	scanelf -Xr opt/zoom/platforminputcontexts/libfcitxplatforminputcontextplugin.so
+
+	chrpath -r '' opt/zoom/libturbojpeg.so
+	scanelf -Xr opt/zoom/libturbojpeg.so
+
 	eapply_user
 }
 
 src_install() {
+	rm "${S}"/usr/bin/zoom
+
 	cp -Rp "${S}/"* "${D}"
+
+	dosym ../../opt/zoom/ZoomLauncher /usr/bin/zoom-bin
 }
 
 pkg_preinst() {
