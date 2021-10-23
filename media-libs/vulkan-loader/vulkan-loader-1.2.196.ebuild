@@ -13,10 +13,9 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="aeffbbd6b9075478c932b1d244f8f221d80a07ea"
-	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz  -> ${P}.tar.gz"
+	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
-	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
+	S="${WORKDIR}"/${MY_PN}-${PV}
 fi
 
 DESCRIPTION="Vulkan Installable Client Driver (ICD) Loader"
