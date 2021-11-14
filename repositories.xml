@@ -10,6 +10,7 @@
       <name><![CDATA[Lucas C.S.]]></name>
     </owner>
     <source type="git">git://github.com/lucascouts/bentoo.git</source>
+    <source type="git">https://github.com/adioskid/bentoo.git</source>
     <feed>https://github.com/lucascouts/bentoo/commits/master.atom</feed>
   </repo>
 </repositories>
