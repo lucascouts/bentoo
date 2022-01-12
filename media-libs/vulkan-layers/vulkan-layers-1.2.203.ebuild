@@ -27,7 +27,7 @@ SLOT="0"
 IUSE="wayland X"
 
 BDEPEND=">=dev-util/cmake-3.10.2"
-RDEPEND=">=dev-util/spirv-tools-20210825:=[${MULTILIB_USEDEP}]"
+RDEPEND=">=dev-util/spirv-tools-2021.5_pre20220107:=[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
 	dev-cpp/robin-hood-hashing
