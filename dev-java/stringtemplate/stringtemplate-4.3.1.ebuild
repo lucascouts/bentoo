@@ -34,12 +34,6 @@ S="${WORKDIR}/${PN}4-${PV}"
 JAVA_GENTOO_CLASSPATH_EXTRA="${DISTDIR}/antlr-${ANTLR3}-complete.jar"
 JAVA_SRC_DIR="src"
 
-PATCHES=(
-	# These tests are broken but are probably fixed in current master.
-	"${FILESDIR}/4.0.8-r1-test-fixes.patch"
-	"${FILESDIR}/${P}-fix-tests.patch"
-)
-
 src_unpack() {
 	unpack ${P}.tar.gz
 }
