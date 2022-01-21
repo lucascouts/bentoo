@@ -1,18 +1,22 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="7"
 
-FIREFOX_PATCHSET="firefox-95-patches-02.tar.xz"
+FIREFOX_PATCHSET="firefox-96-patches-02j.tar.xz"
 
 LLVM_MAX_SLOT=13
 
-PYTHON_COMPAT=( python3_{7..10} )
+PYTHON_COMPAT=( python3_{8..10} )
 PYTHON_REQ_USE="ncurses,sqlite,ssl"
 
 WANT_AUTOCONF="2.1"
 
 VIRTUALX_REQUIRED="pgo"
+
+# Librewolf version (please rev-bump if changed)
+# Used when cloning patches repository.
+LIBREWOLF_PV="${PV}-1"
 
 MOZ_ESR=
 
@@ -32,14 +36,14 @@ if [[ -n ${MOZ_ESR} ]] ; then
 	MOZ_PV="${MOZ_PV}esr"
 fi
 
-MOZ_PN="${PN%-bin}"
+MOZ_PN="firefox"
 MOZ_P="${MOZ_PN}-${MOZ_PV}"
 MOZ_PV_DISTFILES="${MOZ_PV}${MOZ_PV_SUFFIX}"
 MOZ_P_DISTFILES="${MOZ_PN}-${MOZ_PV_DISTFILES}"
 
 inherit autotools check-reqs desktop flag-o-matic gnome2-utils linux-info \
 	llvm multiprocessing pax-utils python-any-r1 toolchain-funcs \
-	virtualx xdg
+	virtualx xdg librewolf-r2
 
 MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/releases/${MOZ_PV}"
 
@@ -48,14 +52,14 @@ if [[ ${PV} == *_rc* ]] ; then
 fi
 
 PATCH_URIS=(
-	https://dev.gentoo.org/~{polynomial-c,whissi}/mozilla/patchsets/${FIREFOX_PATCHSET}
+	https://dev.gentoo.org/~{juippis,polynomial-c,whissi}/mozilla/patchsets/${FIREFOX_PATCHSET}
 )
 
 SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz -> ${MOZ_P_DISTFILES}.source.tar.xz
 	${PATCH_URIS[@]}"
 
-DESCRIPTION="Firefox Web Browser"
-HOMEPAGE="https://www.mozilla.com/firefox"
+DESCRIPTION="LibreWolf Web Browser"
+HOMEPAGE="https://librewolf-community.gitlab.io/"
 
 KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 
@@ -117,7 +121,7 @@ BDEPEND="${PYTHON_DEPS}
 	x86? ( >=dev-lang/nasm-2.13 )"
 
 CDEPEND="
-	>=dev-libs/nss-3.72.1
+	>=dev-libs/nss-3.73
 	>=dev-libs/nspr-4.32
 	dev-libs/atk
 	dev-libs/expat
@@ -136,13 +140,14 @@ CDEPEND="
 	>=dev-libs/libffi-3.0.10:=
 	media-video/ffmpeg
 	x11-libs/libX11
-	x11-libs/libxcb
 	x11-libs/libXcomposite
 	x11-libs/libXdamage
 	x11-libs/libXext
 	x11-libs/libXfixes
 	x11-libs/libXrandr
 	x11-libs/libXrender
+	x11-libs/libXtst
+	x11-libs/libxcb
 	dbus? (
 		sys-apps/dbus
 		dev-libs/dbus-glib
@@ -156,7 +161,7 @@ CDEPEND="
 		>=media-libs/harfbuzz-2.8.1:0=
 		>=media-gfx/graphite2-1.3.13
 	)
-	system-icu? ( >=dev-libs/icu-69.1:= )
+	system-icu? ( >=dev-libs/icu-70.1:= )
 	system-jpeg? ( >=media-libs/libjpeg-turbo-1.2.1 )
 	system-libevent? ( >=dev-libs/libevent-2.0:0=[threads] )
 	system-libvpx? ( >=media-libs/libvpx-1.8.2:0=[postproc] )
@@ -197,7 +202,7 @@ DEPEND="${CDEPEND}
 	amd64? ( virtual/opengl )
 	x86? ( virtual/opengl )"
 
-S="${WORKDIR}/${PN}-${PV%_*}"
+S="${WORKDIR}/firefox-${PV%_*}"
 
 # Allow MOZ_GMP_PLUGIN_LIST to be set in an eclass or
 # overridden in the enviromnent (advanced hackers only)
@@ -418,7 +423,7 @@ pkg_pretend() {
 		if use pgo || use lto || use debug ; then
 			CHECKREQS_DISK_BUILD="13500M"
 		else
-			CHECKREQS_DISK_BUILD="6400M"
+			CHECKREQS_DISK_BUILD="6500M"
 		fi
 
 		check-reqs_pkg_pretend
@@ -572,14 +577,13 @@ src_unpack() {
 			unpack ${_src_file}
 		fi
 	done
+
+	librewolf-r1_src_unpack
 }
 
 src_prepare() {
 	use lto && rm -v "${WORKDIR}"/firefox-patches/*-LTO-Only-enable-LTO-*.patch
 	eapply "${WORKDIR}/firefox-patches"
-
-	# Temporary fix to fatal pip check run, #828999
-	eapply "${FILESDIR}"/firefox-95-fix-fatal-pip-invocation.patch
 
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
@@ -695,7 +699,6 @@ src_configure() {
 		--disable-install-strip \
 		--disable-strip \
 		--disable-updater \
-		--enable-official-branding \
 		--enable-release \
 		--enable-system-ffi \
 		--enable-system-pixman \
@@ -947,6 +950,7 @@ src_configure() {
 
 	# Use system's Python environment
 	export MACH_USE_SYSTEM_PYTHON=1
+	export MACH_SYSTEM_ASSERTED_COMPATIBLE_WITH_MACH_SITE=1
 	export PIP_NO_CACHE_DIR=off
 
 	# Disable notification when build system has finished
@@ -958,6 +962,8 @@ src_configure() {
 
 	# Set build dir
 	mozconfig_add_options_mk 'Gentoo default' "MOZ_OBJDIR=${BUILD_DIR}"
+
+	librewolf-r1_src_configure
 
 	# Show flags we will use
 	einfo "Build BINDGEN_CFLAGS:\t${BINDGEN_CFLAGS:-no value set}"
@@ -1029,7 +1035,6 @@ src_install() {
 
 	# Install policy (currently only used to disable application updates)
 	insinto "${MOZILLA_FIVE_HOME}/distribution"
-	newins "${FILESDIR}"/distribution.ini distribution.ini
 	newins "${FILESDIR}"/disable-auto-update.policy.json policies.json
 
 	# Install system-wide preferences
@@ -1085,11 +1090,9 @@ src_install() {
 	fi
 
 	# Install icons
-	local icon_srcdir="${S}/browser/branding/official"
-	local icon_symbolic_file="${FILESDIR}/icon/firefox-symbolic.svg"
+	local icon_srcdir="${S}/browser/branding/${PN}"
 
 	insinto /usr/share/icons/hicolor/symbolic/apps
-	newins "${icon_symbolic_file}" ${PN}-symbolic.svg
 
 	local icon size
 	for icon in "${icon_srcdir}"/default*.png ; do
@@ -1104,8 +1107,8 @@ src_install() {
 	done
 
 	# Install menu
-	local app_name="Mozilla ${MOZ_PN^}"
-	local desktop_file="${FILESDIR}/icon/${PN}-r3.desktop"
+	local app_name="LibreWolf"
+	local desktop_file="${FILESDIR}/icon/${MOZ_PN}-r3.desktop"
 	local desktop_filename="${PN}.desktop"
 	local exec_command="${PN}"
 	local icon="${PN}"
@@ -1126,11 +1129,9 @@ src_install() {
 
 	newmenu "${WORKDIR}/${PN}.desktop-template" "${desktop_filename}"
 
-	rm "${WORKDIR}/${PN}.desktop-template" || die
-
 	# Install wrapper script
 	[[ -f "${ED}/usr/bin/${PN}" ]] && rm "${ED}/usr/bin/${PN}"
-	newbin "${FILESDIR}/${PN}-r1.sh" ${PN}
+	newbin "${FILESDIR}/${MOZ_PN}.sh" ${PN}
 
 	# Update wrapper
 	sed -i \
@@ -1140,6 +1141,8 @@ src_install() {
 		-e "s:@DEFAULT_WAYLAND@:${use_wayland}:" \
 		"${ED}/usr/bin/${PN}" \
 		|| die
+
+	librewolf-r1_src_install
 }
 
 pkg_preinst() {
@@ -1233,8 +1236,8 @@ pkg_postinst() {
 		elog
 		elog "Since ${PN}-91.0 we no longer install multiple shortcuts for"
 		elog "each supported display protocol.  Instead we will only install"
-		elog "one generic Mozilla ${PN^} shortcut."
-		elog "If you still want to be able to select between running Mozilla ${PN^}"
+		elog "one generic ${PN^} shortcut."
+		elog "If you still want to be able to select between running ${PN^}"
 		elog "on X11 or Wayland, you have to re-create these shortcuts on your own."
 	fi
 }
