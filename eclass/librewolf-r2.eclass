@@ -51,7 +51,7 @@ END
 
   # Disable (some) megabar functionality
   # Adapted from https://github.com/WesleyBranton/userChrome.css-Customizations
-  eapply "${WORKDIR}/patches/megabar.patch"
+  eapply "${WORKDIR}/common/patches/removed-patches/megabar.patch"
 
   # Disabling Pocket
   sed -i "s/'pocket'/#'pocket'/g" "${S}"/browser/components/moz.build
