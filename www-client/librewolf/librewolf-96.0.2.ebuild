@@ -154,7 +154,7 @@ CDEPEND="
 	)
 	screencast? ( media-video/pipewire:= )
 	system-av1? (
-		>=media-libs/dav1d-0.9.3:=
+		>=media-libs/dav1d-0.9.2:=
 		>=media-libs/libaom-1.0.0:=
 	)
 	system-harfbuzz? (
