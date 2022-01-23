@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>dev@mtbk.me</email>
+		<name>Matthew Bakhtiari</name>
+	</maintainer>
+	<use>
+		<flag name="xnvctrl">
+			"Use XNVctrl as fall back for older Nvidia devices."
+		</flag>
+		<flag name="glvnd">
+			"Add Nvidia OpenGL support"
+		</flag>
+	</use>
+</pkgmetadata>
