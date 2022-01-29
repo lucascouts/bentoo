@@ -4,7 +4,7 @@
 EAPI=7
 
 CMAKE_ECLASS="cmake"
-PYTHON_COMPAT=( python3_{7,8,9} )
+PYTHON_COMPAT=( python3_{8..10} )
 inherit cmake-multilib python-any-r1
 
 if [[ ${PV} == *9999* ]]; then
@@ -23,7 +23,6 @@ HOMEPAGE="https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/ https:/
 LICENSE="BSD"
 SLOT="0"
 
-RDEPEND="!<media-libs/shaderc-2020.1"
 BDEPEND="${PYTHON_DEPS}"
 
 # Bug 698850
