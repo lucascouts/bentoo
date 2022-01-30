@@ -1,14 +1,14 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 inherit desktop rpm xdg
 
 MY_PN="ExifCleaner"
 DESCRIPTION="Cross-platform desktop GUI app to clean image metadata"
 HOMEPAGE="https://exifcleaner.com/"
-SRC_URI="https://github.com/szTheory/${PN}/releases/download/v3.6.0/${P}.x86_64.rpm"
+SRC_URI="https://github.com/szTheory/${PN}/releases/download/v${PV}/${P}.x86_64.rpm"
 
 LICENSE="MIT License"
 SLOT="0"
@@ -20,8 +20,8 @@ DEPEND=""
 RDEPEND="${DEPEND}
 	x11-base/xorg-x11
 	media-libs/mesa
-	media-video/ffmpeg
-"
+	media-video/ffmpeg"
+	
 BDEPEND="dev-util/patchelf"
 
 QA_PREBUILT="opt/${MY_PN}/*"
@@ -44,6 +44,8 @@ src_install() {
 
 	insinto /usr/share/icons
 	doins -r usr/share/icons/hicolor
+
+	dosym -r /opt/${MY_PN}/exifcleaner /usr/bin/exifcleaner
 }
 
 pkg_postinst() {
