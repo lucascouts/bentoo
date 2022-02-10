@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+  <upstream>
+    <changelog>https://github.com/webtorrent/webtorrent-desktop/blob/master/CHANGELOG.md</changelog>
+    <doc>https://github.com/webtorrent/webtorrent-desktop/blob/master/README.md</doc>
+  </upstream>
+  <longdescription>
+    The streaming torrent app. For Mac, Windows, and Linux.
+  </longdescription>
+  <use>
+    <flag name="xtest">Enable support for x11-libs/libXtst</flag>
+  </use>
+</pkgmetadata>
