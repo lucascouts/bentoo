@@ -3,7 +3,7 @@
 
 EAPI="7"
 
-FIREFOX_PATCHSET="firefox-96-patches-02j.tar.xz"
+FIREFOX_PATCHSET="firefox-97-patches-03j.tar.xz"
 
 LLVM_MAX_SLOT=13
 
@@ -43,19 +43,20 @@ MOZ_P_DISTFILES="${MOZ_PN}-${MOZ_PV_DISTFILES}"
 
 inherit autotools check-reqs desktop flag-o-matic gnome2-utils linux-info \
 	llvm multiprocessing pax-utils python-any-r1 toolchain-funcs \
-	virtualx xdg librewolf-r2
+	virtualx xdg
 
-MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/releases/${MOZ_PV}"
-
-if [[ ${PV} == *_rc* ]] ; then
-	MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/candidates/${MOZ_PV}-candidates/build${PV##*_rc}"
-fi
+# MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/releases/${MOZ_PV}"
+#
+# if [[ ${PV} == *_rc* ]] ; then
+# 	MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/candidates/${MOZ_PV}-candidates/build${PV##*_rc}"
+# fi
+MOZ_SRC_BASE_URI="https://gitlab.com/api/v4/projects/32320088/packages/generic/librewolf-source/${LIBREWOLF_PV}/librewolf-${LIBREWOLF_PV}.source.tar.gz"
 
 PATCH_URIS=(
 	https://dev.gentoo.org/~{juippis,polynomial-c,whissi}/mozilla/patchsets/${FIREFOX_PATCHSET}
 )
 
-SRC_URI="${MOZ_SRC_BASE_URI}/source/${MOZ_P}.source.tar.xz -> ${MOZ_P_DISTFILES}.source.tar.xz
+SRC_URI="${MOZ_SRC_BASE_URI} -> librewolf-${LIBREWOLF_PV}.source.tar.gz
 	${PATCH_URIS[@]}"
 
 DESCRIPTION="LibreWolf Web Browser"
@@ -65,9 +66,8 @@ KEYWORDS="~amd64 ~arm64 ~ppc64 ~x86"
 
 SLOT="0/$(ver_cut 1)"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
-
-IUSE="+clang cpu_flags_arm_neon dbus debug eme-free hardened hwaccel"
-IUSE+=" jack lto +openh264 pgo pulseaudio sndio selinux"
+IUSE="+clang cpu_flags_arm_neon dbus debug eme-free +hardened hwaccel"
+IUSE+=" jack libproxy lto +openh264 pgo pulseaudio sndio selinux"
 IUSE+=" +system-av1 +system-harfbuzz +system-icu +system-jpeg +system-libevent +system-libvpx system-png +system-webp"
 IUSE+=" wayland wifi"
 
@@ -90,7 +90,7 @@ BDEPEND="${PYTHON_DEPS}
 	>=dev-util/cbindgen-0.19.0
 	>=net-libs/nodejs-10.23.1
 	virtual/pkgconfig
-	>=virtual/rust-1.53.0
+	>=virtual/rust-1.57.0
 	|| (
 		(
 			sys-devel/clang:13
@@ -117,11 +117,11 @@ BDEPEND="${PYTHON_DEPS}
 			)
 		)
 	)
-	amd64? ( >=dev-lang/nasm-2.13 )
-	x86? ( >=dev-lang/nasm-2.13 )"
+	amd64? ( >=dev-lang/nasm-2.14 )
+	x86? ( >=dev-lang/nasm-2.14 )"
 
-CDEPEND="
-	>=dev-libs/nss-3.73
+COMMON_DEPEND="
+	>=dev-libs/nss-3.74
 	>=dev-libs/nspr-4.32
 	dev-libs/atk
 	dev-libs/expat
@@ -131,11 +131,11 @@ CDEPEND="
 	>=x11-libs/pango-1.22.0
 	>=media-libs/mesa-10.2:*
 	media-libs/fontconfig
-	>=media-libs/freetype-2.4.10
+	>=media-libs/freetype-2.9
 	kernel_linux? ( !pulseaudio? ( media-libs/alsa-lib ) )
 	virtual/freedesktop-icon-theme
 	>=x11-libs/pixman-0.19.2
-	>=dev-libs/glib-2.26:2
+	>=dev-libs/glib-2.42:2
 	>=sys-libs/zlib-1.2.3
 	>=dev-libs/libffi-3.0.10:=
 	media-video/ffmpeg
@@ -152,9 +152,10 @@ CDEPEND="
 		sys-apps/dbus
 		dev-libs/dbus-glib
 	)
+	libproxy? ( net-libs/libproxy )
 	screencast? ( media-video/pipewire:= )
 	system-av1? (
-		>=media-libs/dav1d-0.9.2:=
+		>=media-libs/dav1d-0.9.3:=
 		>=media-libs/libaom-1.0.0:=
 	)
 	system-harfbuzz? (
@@ -178,7 +179,7 @@ CDEPEND="
 	selinux? ( sec-policy/selinux-mozilla )
 	sndio? ( media-sound/sndio )"
 
-RDEPEND="${CDEPEND}
+RDEPEND="${COMMON_DEPEND}
 	jack? ( virtual/jack )
 	openh264? ( media-libs/openh264:*[plugin] )
 	pulseaudio? (
@@ -189,7 +190,7 @@ RDEPEND="${CDEPEND}
 	)
 	selinux? ( sec-policy/selinux-mozilla )"
 
-DEPEND="${CDEPEND}
+DEPEND="${COMMON_DEPEND}
 	x11-libs/libICE
 	x11-libs/libSM
 	pulseaudio? (
@@ -202,7 +203,7 @@ DEPEND="${CDEPEND}
 	amd64? ( virtual/opengl )
 	x86? ( virtual/opengl )"
 
-S="${WORKDIR}/firefox-${PV%_*}"
+S="${WORKDIR}/librewolf-${LIBREWOLF_PV}"
 
 # Allow MOZ_GMP_PLUGIN_LIST to be set in an eclass or
 # overridden in the enviromnent (advanced hackers only)
@@ -454,19 +455,9 @@ pkg_setup() {
 			[[ -n ${version_lld} ]] && version_lld=$(ver_cut 1 "${version_lld}")
 			[[ -z ${version_lld} ]] && die "Failed to read ld.lld version!"
 
-			# temp fix for https://bugs.gentoo.org/768543
-			# we can assume that rust 1.{49,50}.0 always uses llvm 11
-			local version_rust=$(rustc -Vv 2>/dev/null | grep -F -- 'release:' | awk '{ print $2 }')
-			[[ -n ${version_rust} ]] && version_rust=$(ver_cut 1-2 "${version_rust}")
-			[[ -z ${version_rust} ]] && die "Failed to read version from rustc!"
-
-			if ver_test "${version_rust}" -ge "1.49" && ver_test "${version_rust}" -le "1.50" ; then
-				local version_llvm_rust="11"
-			else
-				local version_llvm_rust=$(rustc -Vv 2>/dev/null | grep -F -- 'LLVM version:' | awk '{ print $3 }')
-				[[ -n ${version_llvm_rust} ]] && version_llvm_rust=$(ver_cut 1 "${version_llvm_rust}")
-				[[ -z ${version_llvm_rust} ]] && die "Failed to read used LLVM version from rustc!"
-			fi
+			local version_llvm_rust=$(rustc -Vv 2>/dev/null | grep -F -- 'LLVM version:' | awk '{ print $3 }')
+			[[ -n ${version_llvm_rust} ]] && version_llvm_rust=$(ver_cut 1 "${version_llvm_rust}")
+			[[ -z ${version_llvm_rust} ]] && die "Failed to read used LLVM version from rustc!"
 
 			if ver_test "${version_lld}" -ne "${version_llvm_rust}" ; then
 				eerror "Rust is using LLVM version ${version_llvm_rust} but ld.lld version belongs to LLVM version ${version_lld}."
@@ -577,16 +568,22 @@ src_unpack() {
 			unpack ${_src_file}
 		fi
 	done
-
-	librewolf-r1_src_unpack
 }
 
 src_prepare() {
 	use lto && rm -v "${WORKDIR}"/firefox-patches/*-LTO-Only-enable-LTO-*.patch
 	eapply "${WORKDIR}/firefox-patches"
+	if use pgo; then
+		einfo "Reverting 'remove-internal-plugin-certs.patch' for PGO"
+		einfo "See: https://gitlab.com/librewolf-community/browser/gentoo/-/issues/39"
+		eapply "${FILESDIR}/revert-remove-internal-plugin-certs.patch"
+	fi
 
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
+
+	# Make cargo respect MAKEOPTS
+	export CARGO_BUILD_JOBS="$(makeopts_jobs)"
 
 	# Make LTO respect MAKEOPTS
 	sed -i \
@@ -697,8 +694,11 @@ src_configure() {
 		--disable-cargo-incremental \
 		--disable-crashreporter \
 		--disable-install-strip \
+		--disable-parental-controls \
 		--disable-strip \
 		--disable-updater \
+		--enable-negotiateauth \
+		--enable-new-pass-manager \
 		--enable-release \
 		--enable-system-ffi \
 		--enable-system-pixman \
@@ -718,6 +718,20 @@ src_configure() {
 		--x-includes="${SYSROOT}${EPREFIX}/usr/include" \
 		--x-libraries="${SYSROOT}${EPREFIX}/usr/$(get_libdir)"
 
+	# Librewolf
+	mozconfig_add_options_ac 'LibreWolf Branding' \
+		--with-app-name="librewolf" \
+		--with-app-basename="LibreWolf" \
+		--with-branding=browser/branding/librewolf
+
+	mozconfig_add_options_mk 'Librewolf Disable Telemetry' \
+		MOZ_CRASHREPORTER=0 \
+		MOZ_DATA_REPORTING=0 \
+		MOZ_SERVICES_HEALTHREPORT=0 \
+		MOZ_TELEMETRY_REPORTING=0
+
+	export MOZ_REQUIRE_SIGNING=
+
 	# Set update channel
 	local update_channel=release
 	[[ -n ${MOZ_ESR} ]] && update_channel=esr
@@ -725,6 +739,15 @@ src_configure() {
 
 	if ! use x86 && [[ ${CHOST} != armv*h* ]] ; then
 		mozconfig_add_options_ac '' --enable-rust-simd
+	fi
+
+	# For future keywording: This is currently (97.0) only supported on:
+	# amd64, arm, arm64 & x86.
+	# Might want to flip the logic around if Firefox is to support more arches.
+	if use ppc64; then
+		mozconfig_add_options_ac '' --disable-sandbox
+	else
+		mozconfig_add_options_ac '' --enable-sandbox
 	fi
 
 	if [[ -s "${S}/api-google.key" ]] ; then
@@ -768,12 +791,13 @@ src_configure() {
 	mozconfig_use_with system-harfbuzz system-graphite2
 	mozconfig_use_with system-icu
 	mozconfig_use_with system-jpeg
-	mozconfig_use_with system-libevent system-libevent "${SYSROOT}${EPREFIX}/usr"
+	mozconfig_use_with system-libevent
 	mozconfig_use_with system-libvpx
 	mozconfig_use_with system-png
 	mozconfig_use_with system-webp
 
 	mozconfig_use_enable dbus
+	mozconfig_use_enable libproxy
 
 	use eme-free && mozconfig_add_options_ac '+eme-free' --disable-eme
 
@@ -808,10 +832,8 @@ src_configure() {
 			mozconfig_add_options_ac "forcing ld=lld due to USE=clang and USE=lto" --enable-linker=lld
 
 			mozconfig_add_options_ac '+lto' --enable-lto=cross
-		else
-			# ld.gold is known to fail:
-			# /usr/lib/gcc/x86_64-pc-linux-gnu/11.2.1/../../../../x86_64-pc-linux-gnu/bin/ld.gold: internal error in set_xindex, at /var/tmp/portage/sys-devel/binutils-2.37_p1-r1/work/binutils-2.37/gold/object.h:1050
 
+		else
 			# ThinLTO is currently broken, see bmo#1644409
 			mozconfig_add_options_ac '+lto' --enable-lto=full
 			mozconfig_add_options_ac "linker is set to bfd" --enable-linker=bfd
@@ -926,7 +948,7 @@ src_configure() {
 			if use clang ; then
 				# Nothing to do
 				:;
-			elif tc-ld-is-gold || use lto ; then
+			elif use lto ; then
 				append-ldflags -Wl,--no-keep-memory
 			else
 				append-ldflags -Wl,--no-keep-memory -Wl,--reduce-memory-overheads
@@ -951,6 +973,7 @@ src_configure() {
 	# Use system's Python environment
 	export MACH_USE_SYSTEM_PYTHON=1
 	export MACH_SYSTEM_ASSERTED_COMPATIBLE_WITH_MACH_SITE=1
+	export MACH_SYSTEM_ASSERTED_COMPATIBLE_WITH_BUILD_SITE=1
 	export PIP_NO_CACHE_DIR=off
 
 	# Disable notification when build system has finished
@@ -962,8 +985,6 @@ src_configure() {
 
 	# Set build dir
 	mozconfig_add_options_mk 'Gentoo default' "MOZ_OBJDIR=${BUILD_DIR}"
-
-	librewolf-r1_src_configure
 
 	# Show flags we will use
 	einfo "Build BINDGEN_CFLAGS:\t${BINDGEN_CFLAGS:-no value set}"
@@ -1024,6 +1045,12 @@ src_install() {
 
 	DESTDIR="${D}" ./mach install || die
 
+	## LibreWolf
+	# For some reason 'local-settings.js' doesn't get properly packaged.
+	# Install it manually
+	insinto "${MOZILLA_FIVE_HOME}/defaults/pref"
+	doins "${S}/lw/local-settings.js"
+
 	# Upstream cannot ship symlink but we can (bmo#658850)
 	rm "${ED}${MOZILLA_FIVE_HOME}/${PN}-bin" || die
 	dosym ${PN} ${MOZILLA_FIVE_HOME}/${PN}-bin
@@ -1033,9 +1060,10 @@ src_install() {
 		rm -v "${ED}${MOZILLA_FIVE_HOME}/llvm-symbolizer" || die
 	fi
 
+	## Disabled for LibreWolf
 	# Install policy (currently only used to disable application updates)
-	insinto "${MOZILLA_FIVE_HOME}/distribution"
-	newins "${FILESDIR}"/disable-auto-update.policy.json policies.json
+	# insinto "${MOZILLA_FIVE_HOME}/distribution"
+	# newins "${FILESDIR}"/disable-auto-update.policy.json policies.json
 
 	# Install system-wide preferences
 	local PREFS_DIR="${MOZILLA_FIVE_HOME}/browser/defaults/preferences"
@@ -1141,8 +1169,6 @@ src_install() {
 		-e "s:@DEFAULT_WAYLAND@:${use_wayland}:" \
 		"${ED}/usr/bin/${PN}" \
 		|| die
-
-	librewolf-r1_src_install
 }
 
 pkg_preinst() {

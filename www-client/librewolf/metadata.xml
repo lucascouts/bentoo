@@ -12,6 +12,7 @@
 	<flag name="gmp-autoupdate">Allow Gecko Media Plugins (binary blobs) to be automatically
 		downloaded and kept up-to-date in user profiles</flag>
 	<flag name="hwaccel">Force-enable hardware-accelerated rendering (Mozilla bug 594876)</flag>
+	<flag name="libproxy">Enable libproxy support</flag>
 	<flag name="lto">Enable Link Time Optimization (LTO). Requires Gold linker when using GCC
 		or LDD linker when using Clang</flag>
 	<flag name="openh264">Use <pkg>media-libs/openh264</pkg> for H.264 support
@@ -32,6 +33,8 @@
 		instead of bundled.</flag>
 	<flag name="system-libvpx">Use the system-wide <pkg>media-libs/libvpx</pkg>
 		instead of bundled.</flag>
+	<flag name="system-png">Use the system-wide <pkg>media-libs/libpng</pkg>
+		instead of bundled (requires APNG patches).</flag>
 	<flag name="system-webp">Use the system-wide <pkg>media-libs/libwebp</pkg>
 		instead of bundled.</flag>
 
