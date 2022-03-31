@@ -5,7 +5,7 @@ EAPI=7
 
 MY_PN=Vulkan-ValidationLayers
 CMAKE_ECLASS="cmake"
-PYTHON_COMPAT=( python3_{8..10} )
+PYTHON_COMPAT=( python3_{8,9} )
 inherit cmake-multilib python-any-r1
 
 if [[ ${PV} == *9999* ]]; then
@@ -13,26 +13,30 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	SNAPSHOT_COMMIT="a131fcaebf147ffc15377320a97f2fb4d9234191"
-	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${SNAPSHOT_COMMIT}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
-	S="${WORKDIR}/${MY_PN}-${SNAPSHOT_COMMIT}"
+	S="${WORKDIR}"/${MY_PN}-v${PV}
 fi
 
 DESCRIPTION="Vulkan Validation Layers"
 HOMEPAGE="https://github.com/KhronosGroup/Vulkan-ValidationLayers"
+
+PATCHES=(
+	"${FILESDIR}"/${P}-Fix-dependency-detection.patch
+	"${FILESDIR}"/${P}-Dont-use-static-spirv-tools.patch
+)
 
 LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="wayland X"
 
 BDEPEND=">=dev-util/cmake-3.10.2"
-RDEPEND="dev-util/spirv-tools:=[${MULTILIB_USEDEP}]"
+RDEPEND="~dev-util/spirv-tools-${PV}:=[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
 	>=dev-cpp/robin-hood-hashing-3.11.5
-	dev-util/glslang
-	dev-util/vulkan-headers
+	~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}]
+	~dev-util/vulkan-headers-${PV}
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
 		x11-libs/libX11:=[${MULTILIB_USEDEP}]
@@ -50,11 +54,7 @@ multilib_src_configure() {
 		-DBUILD_WSI_XCB_SUPPORT=$(usex X)
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex X)
 		-DBUILD_TESTS=OFF
-		-DGLSLANG_INSTALL_DIR="${ESYSROOT}/usr"
 		-DCMAKE_INSTALL_INCLUDEDIR="${EPREFIX}/usr/include/"
-		-DBUILD_LAYERS=ON
-		-DUSE_ROBIN_HOOD_HASHING=OFF
-		#-DROBIN_HOOD_HASHING_INSTALL_DIR="${EPREFIX}/usr/include/"
 	)
 	cmake_src_configure
 }
