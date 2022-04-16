@@ -6,7 +6,7 @@ inherit rpm xdg
  
 DESCRIPTION="The Bridge is an application that runs on your computer in the background and seamlessly encrypts and decrypts your mail as it enters and leaves your computer."
 HOMEPAGE="https://protonmail.com/bridge/"
-SRC_URI="https://protonmail.com/download/bridge/protonmail-bridge-${PV}-1.x86_64.rpm -> protonmail-bridge-bin-${PV}.rpm"
+SRC_URI="https://github.com/ProtonMail/proton-bridge/releases/download/v${PV}/protonmail-bridge-${PV}-1.x86_64.rpm -> protonmail-bridge-bin-${PV}.rpm"
  
 LICENSE="GPL-3"
 SLOT="0"
@@ -26,6 +26,7 @@ RDEPEND="${DEPEND}
 	sys-libs/glibc
 	dev-libs/glib
 	media-fonts/dejavu
+	app-admin/pass
 "
 BDEPEND=""
 
