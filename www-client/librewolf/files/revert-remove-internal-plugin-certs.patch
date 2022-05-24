@@ -1,0 +1,16 @@
+--- b/toolkit/mozapps/extensions/internal/XPIInstall.jsm
++++ a/toolkit/mozapps/extensions/internal/XPIInstall.jsm
+@@ -832,11 +832,11 @@
+       }
+ 
+       if (aCert.organizationalUnit == "Mozilla Components") {
++        return AddonManager.SIGNEDSTATE_SYSTEM;
+-        return AddonManager.SIGNEDSTATE_SIGNED;
+       }
+ 
+       if (aCert.organizationalUnit == "Mozilla Extensions") {
++        return AddonManager.SIGNEDSTATE_PRIVILEGED;
+-        return AddonManager.SIGNEDSTATE_SIGNED;
+       }
+ 
+       return /preliminary/i.test(aCert.organizationalUnit)
