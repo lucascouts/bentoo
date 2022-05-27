@@ -6,7 +6,7 @@ inherit linux-info linux-mod
 
 DESCRIPTION="Driver for Realtek 810x/840x based PCI-E/PCI Ethernet Cards (PCI_ID 10ec:8136)"
 HOMEPAGE="http://www.realtek.com.tw/downloads/downloadsView.aspx?Langid=1&PNid=14&PFid=7&Level=5&Conn=4&DownTypeID=3&GetDown=false#2"
-SRC_URI="https://binhost.bentoo.info/${P}.tar.bz2 -> ${P}.tar.gz"
+SRC_URI="https://binhost.bentoo.info/${P}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
