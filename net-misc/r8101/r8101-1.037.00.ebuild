@@ -10,7 +10,6 @@ SRC_URI="https://binhost.bentoo.info/${P}.tar.bz2 -> ${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="binhost"
 KEYWORDS="*"
 
 MODULE_NAMES="r8101(net/ethernet::src)"
@@ -20,11 +19,10 @@ IUSE="use-firmware"
 CONFIG_CHECK="!R8169"
 ERROR_R8169="${P} requires Realtek 8169 PCI Gigabit Ethernet adapter (CONFIG_R8169) to be DISABLED"
 
-S="${WORKDIR}/${P}"
-
 pkg_setup() {
-    linux-mod_pkg_setup
-    BUILD_PARAMS="KERNELDIR=${KV_DIR}"
+	linux-mod_pkg_setup
+	BUILD_PARAMS="KERNELDIR=${KV_DIR}"
+	BUILD_PARAMS+=" ENABLE_USE_FIRMWARE_FILE=$(usex use-firmware y n)"
 }
 
 src_install() {
