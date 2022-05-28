@@ -75,7 +75,6 @@ PATCHES=(
 	"${FILESDIR}/tdesktop-3.6.0-jemalloc-only-telegram.patch"
 	"${FILESDIR}/tdesktop-3.3.0-fix-enchant.patch"
 	"${FILESDIR}/tdesktop-3.5.2-musl.patch"
-	"${FILESDIR}/tdesktop-3.6.0-support-ffmpeg5.patch"
 	"${FILESDIR}/tdesktop-3.6.1-fix-kwayland-5.93.patch"
 	"${FILESDIR}/tdesktop-3.6.1-fix-use-after-free.patch"
 )
