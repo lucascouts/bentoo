@@ -29,14 +29,22 @@ RDEPEND="
 	>=x11-libs/wxGTK-3.0.4:${WX_GTK_VER}[X]
 	x11-misc/xdg-utils"
 DEPEND="${RDEPEND}"
+RESTRICT="fetch"
 
 S="${WORKDIR}"
+
+pkg_nofetch() {
+	einfo "Please download"
+	#einfo "  - FileZilla_Pro_${PV}_x86_64-linux-gnu.tar.bz2"
+	einfo "  - ${A}"
+	einfo "from ${HOMEPAGE} and place it in your DISTDIR directory."
+}
 
 src_unpack() {
 	unpack ${A} || die
 	cd ${WORKDIR} || die
 	mkdir opt || die
-	mv Filezilla3 opt/ || die
+	mv FileZilla3 opt/ || die
 }
 
 src_install() {
