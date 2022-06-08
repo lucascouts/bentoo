@@ -5,7 +5,7 @@ EAPI=8
 
 WX_GTK_VER="3.0-gtk3"
 
-inherit autotools wxwidgets xdg
+inherit autotools wxwidgets xdg desktop
 
 MY_PV="${PV/_/-}"
 MY_P="FileZilla_Pro_${MY_PV}"
@@ -29,7 +29,6 @@ RDEPEND="
 	>=x11-libs/wxGTK-3.0.4:${WX_GTK_VER}[X]
 	x11-misc/xdg-utils"
 DEPEND="${RDEPEND}"
-RESTRICT="fetch"
 
 S="${WORKDIR}"
 
@@ -40,30 +39,23 @@ pkg_nofetch() {
 	einfo "from ${HOMEPAGE} and place it in your DISTDIR directory."
 }
 
-src_unpack() {
-	unpack ${A} || die
-	cd ${WORKDIR} || die
-	mkdir opt || die
-	mv FileZilla3 opt/ || die
+src_unpack(){
+	unpack "${A}"
 }
 
 src_install() {
-	doins -r opt
-	fperms +x /opt/FileZilla3/bin/filezilla
-	fperms +x /opt/FileZilla3/bin/fzputtygen
-	fperms +x /opt/FileZilla3/bin/fzsftp
-	fperms +x /opt/FileZilla3/bin/fzstorj
-	dodir /opt/bin
-	dosym ../FileZilla3/bin/filezilla /opt/bin/filezilla
-	dosym ../FileZilla3/bin/fzputtygen /opt/bin/fzputtygen
-	dosym ../FileZilla3/bin/fzsftp /opt/bin/fzsftp
-	dosym ../FileZilla3/bin/fzstorj /opt/bin/fzstorj
+	insinto /opt/${PN}
+	doins -r ${A}/* || die
+	
+	fperms +x "/opt/${PN}/filezilla"
+	dosym "/opt/${PN}/filezilla" /usr/bin/filezilla
 
-	domenu usr/share/applications/filezilla.desktop
+	newicon share/pixmaps/filezilla.png filezilla.png
+	domenu share/applications/filezilla.desktop
 
 	local x
 	for x in 16 32 48 64 256 512; do
-		doicon -s ${x} usr/share/icons/hicolor/${x}*/*
+		doicon -s ${x} /share/icons/hicolor/${x}*/*
 	done
 }
 
