@@ -41,15 +41,15 @@ src_unpack() {
 
 src_install() {
 	doins -r opt
-	fperms +x /opt/FileZilla3bin/filezilla
-	fperms +x /opt/FileZilla3bin/fzputtygen
-	fperms +x /opt/FileZilla3bin/fzsftp
-	fperms +x /opt/FileZilla3bin/fzstorj
+	fperms +x /opt/FileZilla3/bin/filezilla
+	fperms +x /opt/FileZilla3/bin/fzputtygen
+	fperms +x /opt/FileZilla3/bin/fzsftp
+	fperms +x /opt/FileZilla3/bin/fzstorj
 	dodir /opt/bin
-	dosym ../FileZilla3bin/filezilla /opt/bin/filezilla
-	dosym ../FileZilla3bin/fzputtygen /opt/bin/fzputtygen
-	dosym ../FileZilla3bin/fzsftp /opt/bin/fzsftp
-	dosym ../FileZilla3bin/fzstorj /opt/bin/fzstorj
+	dosym ../FileZilla3/bin/filezilla /opt/bin/filezilla
+	dosym ../FileZilla3/bin/fzputtygen /opt/bin/fzputtygen
+	dosym ../FileZilla3/bin/fzsftp /opt/bin/fzsftp
+	dosym ../FileZilla3/bin/fzstorj /opt/bin/fzstorj
 }
 
 pkg_postinst() {
