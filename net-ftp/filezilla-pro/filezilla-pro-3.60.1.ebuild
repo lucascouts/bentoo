@@ -36,20 +36,20 @@ src_unpack() {
 	unpack ${A} || die
 	cd ${WORKDIR} || die
 	mkdir opt || die
-	mv FilezillaPro opt/ || die
+	mv Filezilla3 opt/ || die
 }
 
 src_install() {
 	doins -r opt
-	fperms +x /opt/FilezillaPro/bin/filezilla
-	fperms +x /opt/FilezillaPro/bin/fzputtygen
-	fperms +x /opt/FilezillaPro/bin/fzsftp
-	fperms +x /opt/FilezillaPro/bin/fzstorj
+	fperms +x /opt/FileZilla3bin/filezilla
+	fperms +x /opt/FileZilla3bin/fzputtygen
+	fperms +x /opt/FileZilla3bin/fzsftp
+	fperms +x /opt/FileZilla3bin/fzstorj
 	dodir /opt/bin
-	dosym ../FilezillaPro/bin/filezilla /opt/bin/filezilla
-	dosym ../FilezillaPro/bin/fzputtygen /opt/bin/fzputtygen
-	dosym ../FilezillaPro/bin/fzsftp /opt/bin/fzsftp
-	dosym ../FilezillaPro/bin/fzstorj /opt/bin/fzstorj
+	dosym ../FileZilla3bin/filezilla /opt/bin/filezilla
+	dosym ../FileZilla3bin/fzputtygen /opt/bin/fzputtygen
+	dosym ../FileZilla3bin/fzsftp /opt/bin/fzsftp
+	dosym ../FileZilla3bin/fzstorj /opt/bin/fzstorj
 }
 
 pkg_postinst() {
