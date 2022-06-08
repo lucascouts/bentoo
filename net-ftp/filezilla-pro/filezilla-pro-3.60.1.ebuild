@@ -30,7 +30,7 @@ RDEPEND="
 	x11-misc/xdg-utils"
 DEPEND="${RDEPEND}"
 
-S="${WORKDIR}"
+S="${WORKDIR}/FileZilla3"
 
 pkg_nofetch() {
 	einfo "Please download"
@@ -39,13 +39,9 @@ pkg_nofetch() {
 	einfo "from ${HOMEPAGE} and place it in your DISTDIR directory."
 }
 
-src_unpack(){
-	unpack "${A}"
-}
-
 src_install() {
 	insinto /opt/${PN}
-	doins -r ${A}/* || die
+	doins -r * || die
 	
 	fperms +x "/opt/${PN}/filezilla"
 	dosym "/opt/${PN}/filezilla" /usr/bin/filezilla
