@@ -48,7 +48,6 @@ src_unpack() {
 }
 
 src_install() {
-	insinto /opt
 	doins -r opt
 	fperms +x /opt/FileZilla3/bin/filezilla
 	fperms +x /opt/FileZilla3/bin/fzputtygen
