@@ -50,8 +50,8 @@ src_install() {
 	domenu share/applications/filezilla.desktop
 
 	local x
-	for x in 16 32 48 64 256 512; do
-		doicon -s ${x} /share/icons/hicolor/${x}*/*
+	for x in 16 32 48 480 scable; do
+		doicon -s ${x} /share/icons/hicolor/${x}/apps/filezilla.png
 	done
 }
 
