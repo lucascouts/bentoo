@@ -46,12 +46,12 @@ src_install() {
 	fperms +x "/opt/${PN}/bin/filezilla"
 	dosym "/opt/${PN}/bin/filezilla" /usr/bin/filezilla
 
-	newicon share/pixmaps/filezilla.png filezilla.png
-	domenu share/applications/filezilla.desktop
+	newicon usr/share/pixmaps/filezilla.png filezilla.png
+	domenu usr/share/applications/filezilla.desktop
 
 	local x
 	for x in 16 32 48 480 scable; do
-		doicon -s ${x} /share/icons/hicolor/${x}/apps/filezilla.png
+		doicon -s ${x} usr/share/icons/hicolor/${x}/apps/filezilla.png
 	done
 }
 
