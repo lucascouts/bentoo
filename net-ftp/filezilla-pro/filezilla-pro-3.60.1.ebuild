@@ -43,8 +43,8 @@ src_install() {
 	insinto /opt/${PN}
 	doins -r * || die
 	
-	fperms +x "/opt/${PN}/filezilla"
-	dosym "/opt/${PN}/filezilla" /usr/bin/filezilla
+	fperms +x "/opt/${PN}/bin/filezilla"
+	dosym "/opt/${PN}/bin/filezilla" /usr/bin/filezilla
 
 	newicon share/pixmaps/filezilla.png filezilla.png
 	domenu share/applications/filezilla.desktop
