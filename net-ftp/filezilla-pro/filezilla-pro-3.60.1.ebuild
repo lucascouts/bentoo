@@ -46,6 +46,15 @@ src_install() {
 	fperms +x "/opt/${PN}/bin/filezilla"
 	dosym "/opt/${PN}/bin/filezilla" /usr/bin/filezilla
 
+	fperms +x "/opt/${PN}/bin/fzputtygen"
+	dosym "/opt/${PN}/bin/fzputtygen" /usr/bin/fzputtygen
+
+	fperms +x "/opt/${PN}/bin/fzsftp"
+	dosym "/opt/${PN}/bin/fzsftp" /usr/bin/fzsftp
+
+	fperms +x "/opt/${PN}/bin/fzstorj"
+	dosym "/opt/${PN}/bin/fzstorj" /usr/bin/fzstorj
+
 	newicon share/pixmaps/filezilla.png filezilla.png
 	domenu share/applications/filezilla.desktop
 }
