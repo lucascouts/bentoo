@@ -9,7 +9,7 @@ MY_PN="Bitwarden"
 
 DESCRIPTION="Bitwarden password manager desktop client"
 HOMEPAGE="https://bitwarden.com/"
-SRC_URI="https://github.com/bitwarden/desktop/releases/download/v${PV}/Bitwarden-${PV}-amd64.deb"
+SRC_URI="https://github.com/bitwarden/clients/releases/download/desktop-v${PV}/${MY_PN}-${PV}-amd64.deb"
 S="${WORKDIR}"
 
 LICENSE="GPL-3"
