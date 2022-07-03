@@ -38,6 +38,12 @@ pkg_nofetch() {
 	einfo "from ${HOMEPAGE} and place it in your DISTDIR directory."
 }
 
+src_prepare() {
+	default
+	cd ${WORKDIR}/FileZilla3/share/applications/
+	mv filezilla.desktop filezilla-pro.desktop
+}
+
 src_install() {
 	insinto /opt/${PN}
 	doins -r * || die
@@ -55,7 +61,7 @@ src_install() {
 	dosym "/opt/${PN}/bin/fzstorj" /usr/bin/fzstorj-pro
 
 	newicon share/pixmaps/filezilla.png filezilla-pro.png
-	#domenu share/applications/filezilla.desktop filezilla-pro.desktop
+	domenu share/applications/filezilla-pro.desktop
 }
 
 pkg_postinst() {
