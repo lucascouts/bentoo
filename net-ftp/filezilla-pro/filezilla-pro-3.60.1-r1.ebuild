@@ -20,7 +20,6 @@ KEYWORDS="~amd64"
 
 # pugixml 1.7 minimal dependency is for c++11 proper configuration
 RDEPEND="
-	!!net-ftp/filezilla
 	>=app-eselect/eselect-wxwidgets-0.7-r1
 	>=dev-libs/nettle-3.1:=
 	>=dev-db/sqlite-3.7
