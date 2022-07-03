@@ -55,7 +55,7 @@ src_install() {
 	dosym "/opt/${PN}/bin/fzstorj" /usr/bin/fzstorj-pro
 
 	newicon share/pixmaps/filezilla.png filezilla-pro.png
-	domenu share/applications/filezilla-pro.desktop
+	domenu share/applications/filezilla.desktop filezilla-pro.desktop
 }
 
 pkg_postinst() {
