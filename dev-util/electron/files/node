@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-ELECTRON_RUN_AS_NODE=1 $(dirname "$0")/electron "${@}"
