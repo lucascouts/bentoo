@@ -1,21 +1,23 @@
+# Copyright 2019-2022 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
 EAPI=7
 
-inherit desktop eutils unpacker xdg-utils
+inherit desktop unpacker xdg
 
 DESCRIPTION="The decentralized bitcoin exchange (non-atomic, with arbitration)"
 HOMEPAGE="https://bisq.network/ https://github.com/bisq-network/exchange/"
 SRC_URI="https://bisq.network/downloads/v${PV}/Bisq-64bit-${PV}.deb"
 
-LICENSE="GPLv3"
+LICENSE="AGPL-3"
 SLOT="0"
-KEYWORDS="amd64 x86"
-IUSE=""
+KEYWORDS="~amd64"
 
 DEPEND="
 	dev-java/openjfx
 	net-libs/libnet
-	virtual/jre
-	x11-libs/gtk+:2"
+	virtual/jre:*
+	x11-libs/gtk+:3"
 
 RESTRICT="mirror strip"
 
@@ -25,31 +27,13 @@ REQUIRES_EXCLUDE="libgstreamer-lite.so libavplugin-53.so libavplugin-54.so libav
 
 S="${WORKDIR}"
 
-src_unpack() {
-	unpack_deb "${A}"
-}
-
 src_compile() {
 	:
 }
 
 src_install() {
-	dodir /opt
-	sed -i -E 's@^Categories=Network$@Categories=Office\;Finance\;P2P\;Network\;@' "${S}"/opt/bisq/lib/bisq-Bisq.desktop
 	cp -ar "${S}"/opt/bisq "${ED}"/opt/
-	dosym ../bisq/bin/Bisq /opt/bin/Bisq
+	dosym ../Bisq/Bisq /opt/bisq/bin/Bisq
 	domenu opt/bisq/lib/bisq-Bisq.desktop
-        doicon opt/bisq/lib/Bisq.png
-}
-
-pkg_postinst() {
-	xdg_desktop_database_update
-	xdg_icon_cache_update
-	xdg_mimeinfo_database_update
-}
-
-pkg_postrm() {
-	xdg_desktop_database_update
-	xdg_icon_cache_update
-	xdg_mimeinfo_database_update
+	doicon opt/bisq/lib/Bisq.png
 }

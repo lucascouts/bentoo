@@ -1,7 +1,7 @@
-# Copyright 1999-2021 Gentoo Authors
+# Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 ECM_TEST="true"
 PYTHON_COMPAT=( python3_{9..10} )
@@ -11,9 +11,10 @@ inherit ecm python-single-r1
 DESCRIPTION="Distribution-independent installer framework"
 HOMEPAGE="https://calamares.io"
 SRC_URI="https://github.com/${PN}/${PN}/releases/download/v${PV}/${P}.tar.gz"
-KEYWORDS="~amd64"
-SLOT=5
+
 LICENSE="GPL-3"
+SLOT="5"
+KEYWORDS="~amd64"
 IUSE="+bootloader +btrfs +displaymanager doas +finished +fstab +grubcfg +keyboard +locale +machineid +mount +networkmanager +packages +partition pythonqt +removeuser +services-openrc +shellprocess +umount +unpackfs +upower +users webview +welcome xfs"
 
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
@@ -24,7 +25,7 @@ BDEPEND="
 COMMON_DEPEND="${PYTHON_DEPS}
 	dev-cpp/yaml-cpp:=
 	$(python_gen_cond_dep '
-		>=dev-libs/boost-1.55:=[python,${PYTHON_USEDEP}]
+		dev-libs/boost:=[python,${PYTHON_USEDEP}]
 		dev-libs/libpwquality[${PYTHON_USEDEP}]
 	')
 	dev-qt/qtconcurrent:5
@@ -57,7 +58,7 @@ RDEPEND="${COMMON_DEPEND}
 	doas? ( app-admin/doas )
 	dev-libs/libatasmart
 	net-misc/rsync
-	>=sys-block/parted-3.0
+	sys-block/parted
 	|| ( sys-boot/grub:2 sys-boot/systemd-boot )
 	sys-boot/os-prober
 	sys-fs/squashfs-tools
@@ -92,6 +93,26 @@ src_configure() {
 	)
 
 	ecm_src_configure
+}
+
+src_test() {
+	local myctestargs=(
+		# Skipped tests:
+		# load-dracut: tries and fails to find Dracut config
+		# libcalamaresnetworktest: needs network
+		# libcalamaresutilstest: inspects /tmp (expects namespace?)
+		#
+		# Need investigation:
+		# test_libcalamaresuipaste
+		# validate-netinstall
+		# validate-services-systemd
+		# localetest
+		# machineidtest
+		# packagechoosertest
+		-E "(load-dracut|libcalamaresnetworktest|libcalamaresutilstest|test_libcalamaresuipaste|validate-netinstall|validate-services-systemd|localetest|machineidtest|packagechoosertest)"
+	)
+
+	cmake_src_test
 }
 
 src_install() {
