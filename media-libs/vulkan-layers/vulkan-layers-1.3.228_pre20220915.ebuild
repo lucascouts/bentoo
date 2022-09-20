@@ -12,9 +12,10 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+	EGIT_COMMIT="2a340202f7127bf42813b54695cc73fa435acf43"
+	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~riscv ~x86"
-	S="${WORKDIR}"/${MY_PN}-${PV}
+	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
 DESCRIPTION="Vulkan Validation Layers"
