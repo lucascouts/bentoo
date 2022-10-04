@@ -19,7 +19,6 @@ RESTRICT="mirror strip"
 
 DEPEND=""
 RDEPEND="${DEPEND}
-	x11-base/xorg-x11
 	media-libs/mesa
 	media-video/ffmpeg"
 	
