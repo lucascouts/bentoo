@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{7,8,9} )
+PYTHON_COMPAT=( python3_{8..10} )
 inherit desktop distutils-r1 xdg
 
 DESCRIPTION="Share files, host websites, and chat with friends using the Tor network."
@@ -26,7 +26,7 @@ RESTRICT="test"
 
 DOCS=(../../CHANGELOG.md ../../README.md)
 
-S=${WORKDIR}/${P}/desktop/src
+S=${WORKDIR}/${PN}/desktop/src
 
 python_install() {
 	distutils-r1_python_install
