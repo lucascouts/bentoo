@@ -24,7 +24,7 @@ BDEPEND="dev-python/setuptools[${PYTHON_USEDEP}]"
 
 RESTRICT="test"
 
-DOCS=(../../CHANGELOG.md ../../README.md)
+DOCS=(../CHANGELOG.md ../README.md)
 
 S=${WORKDIR}/${PN}/desktop
 
