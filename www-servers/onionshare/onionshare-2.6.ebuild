@@ -26,7 +26,7 @@ RESTRICT="test"
 
 DOCS=(../../CHANGELOG.md ../../README.md)
 
-S=${WORKDIR}/${PN}/desktop/src
+S=${WORKDIR}/${PN}/desktop
 
 python_install() {
 	distutils-r1_python_install
