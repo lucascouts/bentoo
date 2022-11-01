@@ -6,9 +6,6 @@
 		<description>All modifications to this package must be approved by the wxwidgets herd.</description>
 	</maintainer>
 	<use>
-		<flag name="egl">
-			Enable EGL support.
-		</flag>
 		<flag name="gstreamer">
 			Enable the wxMediaCtrl class for playing audio and video through
 			gstreamer.
