@@ -4,7 +4,7 @@
 EAPI=8
 
 CONFIG_CHECK="~ADVISE_SYSCALLS"
-PYTHON_COMPAT=( python3_{8..11} )
+PYTHON_COMPAT=( python3_{9..11} )
 PYTHON_REQ_USE="threads(+)"
 
 inherit bash-completion-r1 check-reqs flag-o-matic linux-info pax-utils python-any-r1 toolchain-funcs xdg-utils
@@ -24,7 +24,7 @@ else
 	S="${WORKDIR}/node-v${PV}"
 fi
 
-IUSE="cpu_flags_x86_sse2 debug doc +icu inspector lto +npm pax-kernel +snapshot +ssl +system-icu +system-ssl systemtap test"
+IUSE="cpu_flags_x86_sse2 debug doc +icu inspector lto +npm pax-kernel +snapshot +ssl +system-icu +system-ssl test"
 REQUIRED_USE="inspector? ( icu ssl )
 	npm? ( ssl )
 	system-icu? ( icu )
@@ -43,7 +43,6 @@ RDEPEND=">=app-arch/brotli-1.0.9:=
 BDEPEND="${PYTHON_DEPS}
 	sys-apps/coreutils
 	virtual/pkgconfig
-	systemtap? ( dev-util/systemtap )
 	test? ( net-misc/curl )
 	pax-kernel? ( sys-apps/elfix )"
 DEPEND="${RDEPEND}"
@@ -125,13 +124,7 @@ src_configure() {
 	xdg_environment_reset
 
 	# LTO compiler flags are handled by configure.py itself
-	filter-flags '-flto*'
-	# nodejs unconditionally links to libatomic #869992
-	# specifically it requires __atomic_is_lock_free which
-	# is not yet implemented by sys-libs/compiler-rt (see
-	# https://reviews.llvm.org/D85044?id=287068), therefore
-	# we depend on gcc and force using libgcc as the support lib
-	tc-is-clang && append-ldflags "--rtlib=libgcc --unwindlib=libgcc"
+	#filter-flags '-flto*'
 
 	local myconf=(
 		--shared-brotli
@@ -158,6 +151,8 @@ src_configure() {
 		myconf+=( --without-ssl )
 	fi
 
+	myconf+=( --without-corepack )
+
 	local myarch=""
 	case "${ARCH}:${ABI}" in
 		*:amd64) myarch="x64";;
@@ -177,7 +172,6 @@ src_configure() {
 	"${EPYTHON}" configure.py \
 		--prefix="${EPREFIX}"/usr \
 		--dest-cpu=${myarch} \
-		$(use_with systemtap dtrace) \
 		"${myconf[@]}" || die
 }
 
