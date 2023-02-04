@@ -16,7 +16,7 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="BSD GPL-3-with-openssl-exception LGPL-2+"
 SLOT="0"
-KEYWORDS="amd64 ~arm64 ~ppc64 ~riscv"
+KEYWORDS="~amd64 ~arm64 ~ppc64 ~riscv"
 IUSE="+dbus enchant +fonts +hunspell +jemalloc screencast +spell qt6 qt6-imageformats wayland +X"
 REQUIRED_USE="
 	spell? (
@@ -41,11 +41,11 @@ RDEPEND="
 	dev-libs/xxhash
 	media-libs/fontconfig:=
 	media-libs/libjpeg-turbo:=
-	~media-libs/libtgvoip-2.4.4_p20220503
+	~media-libs/libtgvoip-2.4.4_p20221208
 	media-libs/openal
 	media-libs/opus:=
 	media-libs/rnnoise
-	~media-libs/tg_owt-0_pre20220507:=[screencast=,X=]
+	~media-libs/tg_owt-0_pre20230105:=[screencast=,X=]
 	media-video/ffmpeg:=[opus]
 	sys-libs/zlib:=[minizip]
 	virtual/opengl
@@ -88,7 +88,6 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}/tdesktop-4.2.4-jemalloc-only-telegram.patch"
-	"${FILESDIR}/tdesktop-4.3.4-qt5-incompatibility-2.patch"
 	"${FILESDIR}/tdesktop-4.4.1-fix-dupe-main-decl.patch"
 )
 

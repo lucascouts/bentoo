@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
-  <maintainer type="person" proxied="yes">
+  <maintainer type="person">
     <email>chiitoo@gentoo.org</email>
     <name>Jimi Huotari</name>
-  </maintainer>
-  <maintainer type="project" proxied="proxy">
-    <email>proxy-maint@gentoo.org</email>
-    <name>Proxy Maintainers</name>
   </maintainer>
   <longdescription>
     A rewrite of what was formerly known as "Open Broadcaster Software",
@@ -24,6 +20,7 @@
     <flag name="speex">Build with Speex noise suppression filter support.</flag>
     <flag name="ssl">Build with TLS/SSL support for RTMPS connections.</flag>
     <flag name="vlc">Build with VLC media source support.</flag>
+    <flag name="websocket">Build with WebSocket API support.</flag>
   </use>
   <upstream>
     <remote-id type="github">obsproject/obs-studio</remote-id>
