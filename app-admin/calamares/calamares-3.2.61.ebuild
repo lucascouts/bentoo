@@ -1,4 +1,4 @@
-# Copyright 1999-2022 Gentoo Authors
+# Copyright 1999-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -54,8 +54,7 @@ DEPEND="${COMMON_DEPEND}
 	test? ( dev-qt/qttest:5 )
 "
 RDEPEND="${COMMON_DEPEND}
-	!doas? ( app-admin/sudo )
-	doas? ( app-admin/doas )
+	app-admin/sudo
 	dev-libs/libatasmart
 	net-misc/rsync
 	sys-block/parted
