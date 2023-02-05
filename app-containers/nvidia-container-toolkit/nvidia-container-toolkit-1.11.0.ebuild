@@ -22,7 +22,7 @@ else
 	SRC_URI="
 		https://github.com/NVIDIA/${PN}/archive/v${PV/_rc/-rc.}.tar.gz -> ${P}.tar.gz
 	"
-	S="${WORKDIR}/${PN}-${PV/_rc/-rc.}"
+	S="${WORKDIR}/${P}"
 	KEYWORDS="~amd64"
 fi
 
@@ -47,9 +47,9 @@ src_compile() {
 }
 
 src_install() {
-	dobin "${P}"
+	dobin "${PN}"
 	into "/usr/bin"
-	dosym "${P}" "/usr/bin/nvidia-container-runtime-hook"
+	dosym "${PN}" "/usr/bin/nvidia-container-runtime-hook"
 	insinto "/etc/nvidia-container-runtime"
 	doins "${FILESDIR}/config.toml"
 }
