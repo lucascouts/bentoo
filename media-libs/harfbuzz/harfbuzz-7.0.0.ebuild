@@ -46,10 +46,6 @@ BDEPEND="
 	introspection? ( dev-util/glib-utils )
 "
 
-PATCHES=(
-	"${FILESDIR}"/${P}-gcc-13.patch
-)
-
 pkg_setup() {
 	python-any-r1_pkg_setup
 	if ! use debug ; then
