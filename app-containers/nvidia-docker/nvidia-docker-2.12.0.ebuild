@@ -14,8 +14,8 @@ IUSE=""
 DEPEND=""
 
 RDEPEND="${DEPEND}
-    app-emulation/docker
-    app-emulation/nvidia-container-runtime
+    app-containers/docker
+    app-containers/nvidia-container-runtime
     x11-drivers/nvidia-drivers"
 
 src_compile() {
