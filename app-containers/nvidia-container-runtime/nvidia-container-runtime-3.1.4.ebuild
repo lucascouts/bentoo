@@ -19,15 +19,15 @@ RDEPEND="$COMMON_DEPEND seccomp? ( sys-libs/libseccomp )"
 TARBALL_PV=${PV}
 GITHUB_REPO="runc"
 GITHUB_USER="opencontainers"
-GITHUB_TAG="1.1.4"
+GITHUB_TAG="1.0.0-rc8" # 2019-04-01
 
 NV_GITHUB_REPO="nvidia-container-runtime"
 NV_GITHUB_USER="NVIDIA"
-NV_GITHUB_TAG="68b81a2"
+NV_GITHUB_TAG="03af0a8" # 2019-04-01
 
 SRC_URI="https://www.github.com/${GITHUB_USER}/${GITHUB_REPO}/archive/v${GITHUB_TAG}.tar.gz -> ${GITHUB_REPO}-${GITHUB_TAG}.tar.gz
 https://www.github.com/${NV_GITHUB_USER}/${NV_GITHUB_REPO}/archive/v${PV}.tar.gz -> ${NV_GITHUB_REPO}-${PV}.tar.gz"
-#S=$WORKDIR/src/github.com/opencontainers/runc
+S=$WORKDIR/src/github.com/opencontainers/runc
 
 src_unpack() {
     unpack ${A}
