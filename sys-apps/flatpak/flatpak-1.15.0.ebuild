@@ -1,8 +1,8 @@
-# Copyright 2020-2022 Gentoo Authors
+# Copyright 2020-2023 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-PYTHON_COMPAT=( python3_{8,9,10} )
+PYTHON_COMPAT=( python3_{9,10,11} )
 
 inherit linux-info python-any-r1
 
@@ -12,7 +12,7 @@ HOMEPAGE="https://flatpak.org/"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~riscv ~x86"
+KEYWORDS="amd64 ~arm arm64 ~loong ~ppc64 ~riscv x86"
 IUSE="doc introspection policykit seccomp systemd X"
 RESTRICT+=" test"
 
@@ -33,7 +33,7 @@ RDEPEND="
 	>=gnome-base/dconf-0.26:=
 	gnome-base/gsettings-desktop-schemas
 	net-misc/curl:=
-	sys-apps/bubblewrap
+	>=sys-apps/bubblewrap-0.5.0
 	sys-apps/dbus
 	>=sys-fs/fuse-2.9.9:0=
 	sys-apps/xdg-dbus-proxy
@@ -103,4 +103,6 @@ src_install() {
 	default
 	# https://projects.gentoo.org/qa/policy-guide/installed-files.html#pg0303
 	find "${ED}" -name '*.la' -delete || die
+	# resolve conflict with acct-user/flatpak for #856706
+	rm -rf "${ED}/usr/lib/sysusers.d"
 }
