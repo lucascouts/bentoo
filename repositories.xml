@@ -4,12 +4,13 @@
   <repo quality="experimental" status="unofficial">
     <name><![CDATA[bentoo]]></name>
     <description lang="en"><![CDATA[bentoo]]></description>
-    <homepage>https://github.com/adioskid/bentoo</homepage>
+    <homepage>https://github.com/lucascouts/bentoo</homepage>
     <owner type="person">
       <email>lucascs@protonmail.com</email>
       <name><![CDATA[Lucas C.S.]]></name>
     </owner>
-    <source type="git">git://github.com/adioskid/bentoo.git</source>
-    <feed>https://github.com/adioskid/bentoo/commits/master.atom</feed>
+    <source type="git">git://github.com/lucascouts/bentoo.git</source>
+    <source type="git">https://github.com/adioskid/bentoo.git</source>
+    <feed>https://github.com/lucascouts/bentoo/commits/master.atom</feed>
   </repo>
 </repositories>
