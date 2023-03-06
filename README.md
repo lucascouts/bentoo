@@ -1,26 +1,41 @@
-# Bentoo 'Gentoo musl+clang'
+# Bentoo
 
-Bentōō is an initiative to distribute an user-friendly version of Gentoo and Funtoo linux Stage4/5 to new users, with more updated packages, focusing on agility, security, privacy and games.
+Bentōō is an initiative to distribute an user-friendly version of Funtoo linux Stage4 to new users, with more update packages, focusing on agility, security privacy and games.
+
+our Telegram group -> https://t.me/joinchat/U3szsfOjRK9AGDdW
 
 ## with local overlays
 
-[Local overlays](https://wiki.gentoo.org/wiki/Creating_an_ebuild_repository) should be managed via `/etc/portage/repos.conf/`.
+[Local overlays](https://www.funtoo.org/Local_Overlay) should be managed via `/etc/portage/repos.conf/`.
 create a `/etc/portage/repos.conf/bentoo.conf` file containing precisely:
 
 ```
 [bentoo]
-location = /var/db/repos/bentoo
+location = /usr/local/portage/bentoo
 sync-type = git
 sync-uri = https://github.com/lucascouts/bentoo.git
 priority= 99
 ```
-#### then change to new branch.
+
+Afterwards, simply run `ego sync`, and Portage should seamlessly make all our ebuilds available.
+
+## with layman
+
+Invoke the following:
+
 ```
-cd /var/db/repos && git clone https://github.com/lucascouts/bentoo.git && cd bentoo && git checkout gentoo_musl_clang
+layman -o https://raw.github.com/lucascouts/bentoo/master/repositories.xml -f -a bentoo
 ```
 
-Afterwards, simply run `emaint sync -r bentoo`, and Portage should seamlessly make all our ebuilds available.
+### Installation guide
 
-### Bentoo Portage config
+To install just follow the Funtoo installation steps and replace the downloaded stage3 with the Bentoo Stage4.
+```
+https://www.funtoo.org/install
+```
 
-Here you can see the portage files configurations : https://github.com/adioskid/bentoo-cfg
+
+## Bentoo Portage config
+
+Here you can see the portage files configurations : https://github.com/lucascouts/bentoo-cfg
+
