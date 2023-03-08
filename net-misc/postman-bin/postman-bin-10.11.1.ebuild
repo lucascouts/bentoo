@@ -1,23 +1,31 @@
-# Distributed under the terms of the GNU General Public License v2
+# Copyright 2020-2022 Gianni Bombelli <bombo82@giannibombelli.it>
+# Distributed under the terms of the GNU General Public License  as published by the Free Software Foundation;
+# either version 2 of the License, or (at your option) any later version.
 
-EAPI=7
+EAPI=8
 
-inherit desktop eutils pax-utils xdg
+inherit desktop pax-utils xdg wrapper
 
 MY_PN="${PN/-bin/}"
 
 DESCRIPTION="Supercharge your API workflow"
-HOMEPAGE="https://www.postman.com"
-SRC_URI="https://dl.pstmn.io/download/latest/linux_64 -> postman-bin-${PV}.tar.gz"
+HOMEPAGE="https://www.postman.com/"
+SRC_URI="
+	amd64? ( https://bombo82-overlay.doesntexist.xyz/postman-bin/${P/-bin/}-linux-x64.tar.gz )
+"
 
 LICENSE="MPL-2.0"
 SLOT="0"
-KEYWORDS="*"
-IUSE="pax_kernel"
-RESTRICT="mirror strip"
+KEYWORDS="~amd64"
+IUSE="pax-kernel"
+RESTRICT="bindist mirror strip"
 
 DEPEND=""
-RDEPEND="${DEPEND}"
+RDEPEND="
+	x11-libs/gtk+
+"
+
+QA_FLAGS_IGNORED="CFLAGS LDFLAGS"
 
 S="${WORKDIR}/${MY_PN^}/app"
 
@@ -31,12 +39,12 @@ src_install() {
 
 	insinto "${dir}"
 	doins -r *
-	fperms 755 "${dir}"/postman
 	fperms 755 "${dir}"/Postman
+	fperms 755 "${dir}"/postman
 
 	make_wrapper "${PN}" "${dir}/Postman"
 	newicon "resources/app/assets/icon.png" "${PN}.png"
 	make_desktop_entry "${PN}" "Postman" "${PN}" "Development;IDE;"
 
-	use pax_kernel && pax-mark m "${ED}/opt/${MY_PN}/${MY_PN^}"
+	use pax-kernel && pax-mark m "${ED}/opt/${MY_PN}/${MY_PN^}"
 }
