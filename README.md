@@ -1,4 +1,4 @@
-# Bentoo 'Gentoo musl+clang'
+# Bentoo 'Gentoo GO'
 
 Bentōō is an initiative to distribute an user-friendly version of Gentoo and Funtoo linux Stage4/5 to new users, with more updated packages, focusing on agility, security, privacy and games.
 
@@ -16,7 +16,7 @@ priority= 99
 ```
 #### then change to new branch.
 ```
-cd /var/db/repos && git clone https://github.com/lucascouts/bentoo.git && cd bentoo && git checkout gentoo_musl_clang
+cd /var/db/repos && git clone https://github.com/lucascouts/bentoo.git && cd bentoo && git checkout GG
 ```
 
 Afterwards, simply run `emaint sync -r bentoo`, and Portage should seamlessly make all our ebuilds available.
