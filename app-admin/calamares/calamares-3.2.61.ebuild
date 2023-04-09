@@ -4,7 +4,7 @@
 EAPI=8
 
 ECM_TEST="true"
-PYTHON_COMPAT=( python3_{9..10} )
+PYTHON_COMPAT=( python3_{9..11} )
 
 inherit ecm python-single-r1
 
