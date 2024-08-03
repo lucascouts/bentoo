@@ -27,7 +27,7 @@ SLOT="0"
 # in the generated library. Easily hit with non-standard compiler flags
 RESTRICT="test"
 
-DEPEND="~dev-util/spirv-headers-${PV}"
+DEPEND="dev-util/spirv-headers"
 # RDEPEND=""
 BDEPEND="${PYTHON_DEPS}"
 

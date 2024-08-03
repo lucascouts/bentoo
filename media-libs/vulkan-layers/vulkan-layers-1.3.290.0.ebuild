@@ -24,14 +24,14 @@ LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="wayland X"
 
-RDEPEND="~dev-util/spirv-tools-${PV}[${MULTILIB_USEDEP}]"
+RDEPEND="dev-util/spirv-tools[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
 	>=dev-cpp/robin-hood-hashing-3.11.5
-	~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}]
-	~dev-util/spirv-headers-${PV}
-	~dev-util/vulkan-headers-${PV}
-	~dev-util/vulkan-utility-libraries-${PV}:=[${MULTILIB_USEDEP}]
+	dev-util/glslang:=[${MULTILIB_USEDEP}]
+	dev-util/spirv-headers
+	dev-util/vulkan-headers
+	dev-util/vulkan-utility-libraries:=[${MULTILIB_USEDEP}]
 	wayland? ( dev-libs/wayland:=[${MULTILIB_USEDEP}] )
 	X? (
 		x11-libs/libX11:=[${MULTILIB_USEDEP}]
