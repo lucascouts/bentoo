@@ -1,8 +1,10 @@
-# Bentoo 'Gentoo GO'
+# Bentoo
 
-Bentōō is an initiative to distribute an user-friendly version of Gentoo and Funtoo linux Stage4/5 to new users, with more updated packages, focusing on agility, security, privacy and games.
+Bentōō is an initiative to distribute an user-friendly version of Gentoo linux Stage[5] to new users, with more updated packages, focusing on agility, security, privacy and games.
 
-## with local overlays
+## Overlays
+
+### local Overlay
 
 [Local overlays](https://wiki.gentoo.org/wiki/Creating_an_ebuild_repository) should be managed via `/etc/portage/repos.conf/`.
 create a `/etc/portage/repos.conf/bentoo.conf` file containing precisely:
@@ -14,13 +16,13 @@ sync-type = git
 sync-uri = https://github.com/lucascouts/bentoo.git
 priority= 99
 ```
-#### then change to new branch.
+### eselect repository
 ```
-cd /var/db/repos && git clone https://github.com/lucascouts/bentoo.git && cd bentoo && git checkout GG
+eselect repository add bentoo git https://github.com/lucascouts/bentoo.git
 ```
 
-Afterwards, simply run `emaint sync -r bentoo`, and Portage should seamlessly make all our ebuilds available.
+Afterwards, simply run `emerge --sync bentoo`, and Portage should seamlessly make all our ebuilds available.
 
-### Bentoo Portage config
+### Bentoo Portage
 
-Here you can see the portage files configurations : https://github.com/lucascouts/bentoo-cfg
+Here you can see the portage files configurations : https://github.com/lucascouts/bentoo-files
