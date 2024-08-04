@@ -3,9 +3,9 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-115esr-patches-09.tar.xz"
+FIREFOX_PATCHSET="firefox-115esr-patches-11.tar.xz"
 
-LLVM_MAX_SLOT=( 17 18 )
+LLVM_MAX_SLOT=18
 
 PYTHON_COMPAT=( python3_{10..12} )
 PYTHON_REQ_USE="ncurses,sqlite,ssl"
@@ -14,7 +14,7 @@ WANT_AUTOCONF="2.1"
 
 VIRTUALX_REQUIRED="manual"
 
-MOZ_ESR=yes
+MOZ_ESR=ON
 
 MOZ_PV=${PV}
 MOZ_PV_SUFFIX=
@@ -78,7 +78,7 @@ REQUIRED_USE="|| ( X wayland )
 TB_ONLY_DEPEND="!<x11-plugins/enigmail-2.2
 	selinux? ( sec-policy/selinux-thunderbird )
 	!system-librnp? ( dev-libs/jsoncpp )
-	system-librnp? ( dev-util/librnp )"
+	system-librnp? ( >=dev-util/librnp-0.17.1 )"
 BDEPEND="${PYTHON_DEPS}
 	|| (
 		(
@@ -124,13 +124,10 @@ BDEPEND="${PYTHON_DEPS}
 	>=dev-util/cbindgen-0.24.3
 	net-libs/nodejs
 	virtual/pkgconfig
-	!clang? (
-		>=virtual/rust-1.65
-		<virtual/rust-1.78
-	)
+	!clang? ( virtual/rust )
 	!elibc_glibc? (
 		|| (
-			<dev-lang/rust-1.78
+			dev-lang/rust
 			<dev-lang/rust-bin-1.73
 		)
 	)
@@ -691,6 +688,10 @@ src_prepare() {
 	# Clear cargo checksums from crates we have patched
 	# moz_clear_vendor_checksums crate
 	moz_clear_vendor_checksums audio_thread_priority
+	moz_clear_vendor_checksums bindgen
+	moz_clear_vendor_checksums encoding_rs
+	moz_clear_vendor_checksums any_all_workaround
+	moz_clear_vendor_checksums packed_simd
 
 	# Create build dir
 	BUILD_DIR="${WORKDIR}/${PN}_build"
