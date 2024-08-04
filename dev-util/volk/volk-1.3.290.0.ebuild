@@ -23,9 +23,9 @@ SLOT="0"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
-RDEPEND="~media-libs/vulkan-loader-${PV}:=[${MULTILIB_USEDEP}]"
+RDEPEND="media-libs/vulkan-loader:=[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
-	~dev-util/vulkan-headers-${PV}
+	dev-util/vulkan-headers
 "
 
 multilib_src_configure() {
