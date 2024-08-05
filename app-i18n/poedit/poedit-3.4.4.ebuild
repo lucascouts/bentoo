@@ -37,6 +37,7 @@ BDEPEND="
 "
 
 src_prepare() {
+	default
 	my_rm_loc() {
 		sed -i -e "/^POEDIT_LINGUAS = /s: ${1}::" locales/Makefile.in || die
 		rm "locales/${1}.mo" || die
