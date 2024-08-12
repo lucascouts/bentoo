@@ -5,7 +5,7 @@ EAPI=8
 
 inherit cmake desktop go-module systemd xdg-utils
 
-MY_PN="${PN/-mail/}"
+MY_PN="proton-bridge"
 MY_P="${MY_PN}-${PV}"
 
 go_mod="3.10.0"
@@ -13,7 +13,7 @@ go_mod="3.10.0"
 DESCRIPTION="Serves Proton Mail to IMAP/SMTP clients"
 HOMEPAGE="https://proton.me/mail/bridge https://github.com/ProtonMail/proton-bridge/"
 SRC_URI="https://github.com/ProtonMail/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://dev.gentoo.org/~marecki/dists/${CATEGORY}/${PN}/${PN}-${go_mod}-deps.tar.xz"
+	https://distfiles.obentoo.org/${P}-deps.tar.xz"
 
 LICENSE="Apache-2.0 BSD BSD-2 GPL-3+ ISC LGPL-3+ MIT MPL-2.0 Unlicense"
 SLOT="0"
