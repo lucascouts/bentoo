@@ -11,7 +11,7 @@ inherit distutils-r1
 
 DESCRIPTION="Securely and anonymously share files of any size behind a TOR hidden service."
 HOMEPAGE="https://onionshare.org"
-SRC_URI="https://github.com/onionshare/onionshare/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/onionshare/onionshare/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
