@@ -9,7 +9,7 @@ MY_PV=$(ver_cut 1-3)
 
 DESCRIPTION="Official Beta Proton Mail Linux app"
 HOMEPAGE="https://proton.me https://github.com/ProtonMail/inbox-desktop"
-SRC_URI="https://github.com/ProtonMail/inbox-desktop/releases/download/${MY_PV}/proton-mail-${MY_PV}-1.x86_64.rpm -> ${P}.rpm"
+SRC_URI="https://proton.me/download/mail/linux/${PV}/ProtonMail-desktop-beta.rpm -> ${P}.rpm"
 S="${WORKDIR}"
 
 LICENSE="GPL-3"
@@ -28,12 +28,12 @@ DEPEND="
 		app-misc/trash-cli
 		kde-plasma/kde-cli-tools
 	)
-        pulseaudio? (
-                || (
-                        media-libs/libpulse
-                        media-sound/apulse
-                )
-        )
+	pulseaudio? (
+		|| (
+				media-libs/libpulse
+				media-sound/apulse
+		)
+	)
 
 "
 
