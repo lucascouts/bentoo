@@ -11,10 +11,10 @@ SRC_URI="https://github.com/Kangie/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~ppc ~ppc64 ~sparc ~x86"
 IUSE="debug +silent"
 
-DEPEND="sys-apps/openrc"
+DEPEND="|| ( >=sys-apps/openrc-0.55 >=sys-apps/openrc-navi-0.60_beta3 )"
 RDEPEND="${DEPEND}
 	sys-boot/plymouth
 	sys-apps/openrc
