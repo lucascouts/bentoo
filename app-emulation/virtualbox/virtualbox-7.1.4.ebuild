@@ -36,7 +36,8 @@ S="${WORKDIR}/${MY_PN}-${PV}"
 LICENSE="GPL-2+ GPL-3 LGPL-2.1 MIT dtrace? ( CDDL )"
 SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~amd64"
-IUSE="alsa dbus debug doc dtrace +gui java lvm nls pam pch pulseaudio +opengl python +sdk +sdl +udev vboxwebsrv vde +vmmraw vnc"
+IUSE="alsa dbus debug doc dtrace +gui java lvm nls pam pch pulseaudio +opengl python +sdk +sdl test +udev vboxwebsrv vde +vmmraw vnc"
+RESTRICT="!test? ( test )"
 
 unset WATCOM #856769
 
@@ -150,7 +151,14 @@ BDEPEND="
 	gui? ( dev-qt/qttools:6[linguist] )
 	nls? ( dev-qt/qttools:6[linguist] )
 	java? ( virtual/jdk:1.8 )
-	python? ( ${PYTHON_DEPS} )
+	python? (
+		${PYTHON_DEPS}
+		test? (
+			$(python_gen_cond_dep '
+				dev-python/pytest[${PYTHON_USEDEP}]
+			')
+		)
+	)
 "
 
 QA_FLAGS_IGNORED="
@@ -225,6 +233,12 @@ pkg_setup() {
 
 src_prepare() {
 	default
+
+	if use python; then
+		mkdir test
+		cp "${FILESDIR}"/test_python.py test/
+		python_fix_shebang test/test_python.py
+	fi
 
 	# Only add nopie patch when we're on hardened
 	if gcc-specs-pie; then
@@ -488,6 +502,21 @@ src_compile() {
 	fi
 
 	MAKE="kmk" emake "${myemakeargs[@]}" all
+}
+
+src_test() {
+	if use python; then
+		local -x VBOX_APP_HOME="${S}"/out/linux.${ARCH}/$(usex debug debug release)
+		local -x VBOX_INSTALL_PATH="${VBOX_APP_HOME}"
+		local -x VBOX_PROGRAM_PATH="${VBOX_APP_HOME}"/bin
+		local -x VBOX_SDK_PATH="${VBOX_PROGRAM_PATH}"/sdk
+		local -x PYTHONPATH="${VBOX_SDK_PATH}"/installer/python/vboxapi/src
+		einfo "VBOX_APP_HOME ${VBOX_APP_HOME}"
+		einfo "VBOX_PROGRAM_PATH ${VBOX_PROGRAM_PATH}"
+		einfo "VBOX_SDK_PATH ${VBOX_SDK_PATH}"
+		einfo "PYTHONPATH ${PYTHONPATH}"
+		LD_LIBRARY_PATH="${VBOX_PROGRAM_PATH}" epytest test/
+	fi
 }
 
 src_install() {
