@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		Bentoo Utils provides a command-line interface for managing Git operations
+		specifically tailored for the Bentoo project. It includes functionality for
+		adding changes, checking status, committing with auto-generated messages,
+		and managing user configurations.
+	</longdescription>
+</pkgmetadata>
