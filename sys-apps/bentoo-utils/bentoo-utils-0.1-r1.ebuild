@@ -16,7 +16,7 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 
 RDEPEND="
-	dev-lang/python[${PYTHON_USEDEP}]
+	python? ( ${PYTHON_DEPS} )
 	dev-vcs/git
 "
 
