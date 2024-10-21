@@ -30,7 +30,6 @@ python_install_all() {
 	# Ensure the .bentoo directory and config file are created
 	keepdir /home/.bentoo
 	insinto /home/.bentoo
-	newins "${FILESDIR}/config.json.example" config.json
 
 	# Create a wrapper script in /usr/bin
 	cat > "${T}"/bentoo <<-EOF
