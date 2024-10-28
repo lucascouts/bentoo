@@ -4,7 +4,6 @@
 EAPI=8
 
 MY_PN=Vulkan-Utility-Libraries
-PV_S="${PV%??}"
 PYTHON_COMPAT=( python3_{10..13} )
 PYTHON_REQ_USE="xml(+)"
 inherit cmake-multilib python-any-r1
@@ -13,9 +12,9 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/KhronosGroup/${MY_PN}.git"
 	inherit git-r3
 else
-	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/refs/tags/v${PV_S}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv x86"
-	S="${WORKDIR}"/${MY_PN}-${PV_S}
+	S="${WORKDIR}"/${MY_PN}-${PV}
 fi
 
 DESCRIPTION="Share code across various Vulkan repositories"

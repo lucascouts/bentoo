@@ -4,7 +4,6 @@
 EAPI=8
 
 MY_PN=Vulkan-Tools
-PV_S="${PV%??}"
 PYTHON_COMPAT=( python3_{10..13} )
 
 inherit cmake-multilib python-any-r1
@@ -14,9 +13,9 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/refs/tags/v${PV_S}.tar.gz -> ${P}.tar.gz"
+	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv"
-	S="${WORKDIR}"/${MY_PN}-${PV_S}
+	S="${WORKDIR}"/${MY_PN}-${PV}
 fi
 
 DESCRIPTION="Official Vulkan Tools and Utilities for Windows, Linux, Android, and MacOS"
