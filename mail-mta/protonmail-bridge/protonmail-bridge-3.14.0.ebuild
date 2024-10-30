@@ -13,7 +13,7 @@ go_mod="3.10.0"
 DESCRIPTION="Serves Proton Mail to IMAP/SMTP clients"
 HOMEPAGE="https://proton.me/mail/bridge https://github.com/ProtonMail/proton-bridge/"
 SRC_URI="https://github.com/ProtonMail/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://distfiles.obentoo.org/${P}-deps.tar.xz"
+	https://distfiles.obentoo.org/${P}-deps.tar.gz"
 
 LICENSE="Apache-2.0 BSD BSD-2 GPL-3+ ISC LGPL-3+ MIT MPL-2.0 Unlicense"
 SLOT="0"
@@ -38,7 +38,7 @@ RDEPEND="app-crypt/libsecret
 DEPEND="${RDEPEND}"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-3.3.2-gui_gentoo.patch
+	"${FILESDIR}"/${PN}-3.14.0-gui_gentoo.patch
 )
 
 S="${WORKDIR}"/${MY_P}
