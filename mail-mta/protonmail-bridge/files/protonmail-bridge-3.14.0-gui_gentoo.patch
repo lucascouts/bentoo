@@ -72,7 +72,7 @@ index 8c21436..c804410 100644
  QString const bridgeLock = "bridge-v3.lock"; ///< The file name used for the bridge-gui lock file.
  QString const bridgeGUILock = "bridge-v3-gui.lock"; ///< The file name used for the bridge-gui lock file.
 -QString const exeName = "bridge" + exeSuffix; ///< The bridge executable file name.*
-+QString const exeName = "proton-mail-bridge" + exeSuffix; ///< The bridge executable file name.*
++QString const exeName = "protonmail-bridge" + exeSuffix; ///< The bridge executable file name.*
  qint64 constexpr grpcServiceConfigWaitDelayMs = 180000; ///< The wait delay for the gRPC config file in milliseconds.
  QString const waitFlag = "--wait"; ///< The wait command-line flag.
  QString const orphanInstanceException =  "An orphan instance of bridge is already running. Please terminate it and relaunch the application.";
