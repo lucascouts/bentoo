@@ -29,6 +29,7 @@ BDEPEND="${PYTHON_DEPS}
 	cube? ( ~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}] )
 "
 RDEPEND="
+	dev-util/vulkan-headers:=[${MULTILIB_USEDEP}]
 	dev-util/volk:=[${MULTILIB_USEDEP}]
 	media-libs/vulkan-loader[${MULTILIB_USEDEP},wayland?,X?]
 	wayland? ( dev-libs/wayland[${MULTILIB_USEDEP}] )
@@ -38,7 +39,6 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
-	dev-util/vulkan-headers
 	X? ( x11-libs/libXrandr[${MULTILIB_USEDEP}] )
 "
 
