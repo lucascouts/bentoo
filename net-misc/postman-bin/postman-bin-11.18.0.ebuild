@@ -3,44 +3,43 @@
 # either version 2 of the License, or (at your option) any later version.
 
 EAPI=8
+MY_PN=${PN/-bin/}
 
-inherit desktop pax-utils xdg wrapper
+inherit desktop xdg
 
-MY_PN="${PN/-bin/}"
-
-DESCRIPTION="Supercharge your API workflow"
+DESCRIPTION="API platform for building and using APIs"
 HOMEPAGE="https://www.postman.com/"
-SRC_URI="https://dl.pstmn.io/download/latest/linux_64 -> postman-bin-${PV}.tar.gz"
+SRC_URI="https://dl.pstmn.io/download/version/${PV}/linux64 -> ${P}.tar.gz"
 
-S="${WORKDIR}/${MY_PN^}/app"
-LICENSE="MPL-2.0"
-SLOT="0"
 KEYWORDS="~amd64"
-IUSE="pax-kernel"
-RESTRICT="bindist mirror strip"
+LICENSE="postman"
+SLOT="0"
+IUSE=""
 
-RDEPEND="
-	x11-libs/gtk+
-"
+RDEPEND=""
+DEPEND="${RDEPEND}"
 
-QA_FLAGS_IGNORED="CFLAGS LDFLAGS"
+RESTRICT="strip mirror"
 
-src_prepare() {
-	mv _Postman Postman
-	default
-}
+S="${WORKDIR}/Postman/app"
 
 src_install() {
-	local dir="/opt/${PN}"
-
-	insinto "${dir}"
+	insinto /opt/${MY_PN}
 	doins -r *
-	fperms 755 "${dir}"/Postman
-	fperms 755 "${dir}"/postman
 
-	make_wrapper "${PN}" "${dir}/Postman"
-	newicon "resources/app/assets/icon.png" "${PN}.png"
-	make_desktop_entry "${PN}" "Postman" "${PN}" "Development;IDE;"
+	exeinto /opt/${MY_PN}
+	doexe Postman
+	doexe postman
+	doexe chrome_crashpad_handler
+	doexe chrome-sandbox
 
-	use pax-kernel && pax-mark m "${ED}/opt/${MY_PN}/${MY_PN^}"
+	dosym /opt/${MY_PN}/Postman /usr/bin/${MY_PN}
+
+	newicon resources/app/assets/icon.png postman.png
+
+	make_desktop_entry "postman %U" \
+		"Postman" \
+		"postman" \
+		"Development;Utility;" \
+		"StartupWMClass=postman\nMimeType=x-scheme-handler/postman"
 }
