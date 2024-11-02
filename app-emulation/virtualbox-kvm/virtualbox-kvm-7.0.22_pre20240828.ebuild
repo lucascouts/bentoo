@@ -34,7 +34,7 @@ DESCRIPTION="Family of powerful x86 virtualization products for enterprise and h
 HOMEPAGE="https://www.virtualbox.org/ https://github.com/cyberus-technology/virtualbox-kvm"
 SRC_URI="
 	https://gitweb.gentoo.org/proj/virtualbox-patches.git/snapshot/virtualbox-patches-${PATCHES_PV}.tar.bz2
-	https://github.com/cyberus-technology/virtualbox-kvm/archive/dev-${MY_PV}.tar.gz -> ${P}.tar.gz
+	https://github.com/cyberus-technology/virtualbox-kvm/archive/dev-${MY_PV}.tar.gz -> ${PN}-${MY_PV}.tar.gz
 	https://download.virtualbox.org/virtualbox/${ORIGIN_PV}/${MY_P}.tar.bz2
 	gui? ( !doc? ( https://dev.gentoo.org/~ceamac/${CATEGORY}/${MY_PN}/${MY_PN}-help-${ORIGIN_PV}.tar.xz ) )
 "
@@ -42,6 +42,7 @@ S="${WORKDIR}/${ORIGIN_PN}-${ORIGIN_PV}"
 
 LICENSE="GPL-2+ GPL-3 LGPL-2.1 MIT dtrace? ( CDDL )"
 SLOT="0"
+KEYWORDS="~amd64"
 IUSE="alsa dbus debug doc dtrace +gui +hardened java lvm nls pam pch pulseaudio +opengl python +sdk +sdl +udev vboxwebsrv vde +vmmraw vnc"
 
 unset WATCOM #856769
