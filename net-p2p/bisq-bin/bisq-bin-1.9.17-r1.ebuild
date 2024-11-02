@@ -17,22 +17,32 @@ KEYWORDS="~amd64"
 RESTRICT="mirror strip"
 
 DEPEND="
-	dev-java/openjfx
-	net-libs/libnet
-	virtual/jre:*
-	x11-libs/gtk+:3"
+    dev-java/openjfx
+    net-libs/libnet
+    virtual/jre:*
+    x11-libs/gtk+:3"
 
 # Bundled java, and seems to mostly work without an old ffmpeg
-QA_PREBUILT="opt/Bisq/Bisq opt/Bisq/libpackager.so opt/Bisq/runtime/*"
+QA_PREBUILT="opt/bisq/bin/Bisq opt/bisq/lib/libapplauncher.so opt/bisq/lib/runtime/*"
 REQUIRES_EXCLUDE="libgstreamer-lite.so libavplugin-53.so libavplugin-54.so libavplugin-55.so libavplugin-56.so libavplugin-57.so libavplugin-ffmpeg-56.so libavplugin-ffmpeg-57.so"
 
 src_compile() {
-	:
+    :
 }
 
 src_install() {
-	cp -ar "${S}"/opt/bisq "${ED}"/opt/
-	dosym ../Bisq/Bisq /opt/bisq/bin/Bisq
-	domenu opt/bisq/lib/bisq-Bisq.desktop
-	doicon opt/bisq/lib/Bisq.png
+    # Criar estrutura base do Bisq
+    dodir /opt/bisq/bin
+    dodir /opt/bisq/lib
+    
+    # Instalar o executável principal
+    cp -a "${S}"/usr/lib/bisq/Bisq "${ED}"/opt/bisq/bin/ || die
+
+    # Instalar bibliotecas e runtime
+    cp -a "${S}"/usr/lib/bisq/lib/* "${ED}"/opt/bisq/lib/ || die
+    cp -a "${S}"/usr/lib/bisq/runtime "${ED}"/opt/bisq/lib/ || die
+
+    # Instalar arquivos de desktop e ícones
+    domenu "${S}"/usr/share/applications/bisq-Bisq.desktop
+    doicon "${S}"/usr/share/pixmaps/Bisq.png
 }
