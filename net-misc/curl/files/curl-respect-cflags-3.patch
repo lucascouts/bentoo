@@ -1,0 +1,14 @@
+diff --git a/configure.ac b/configure.ac
+index a8bd87e..43afc40 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -508,9 +508,6 @@ dnl **********************************************************************
+ CURL_CHECK_COMPILER
+ CURL_CHECK_NATIVE_WINDOWS
+ CURL_SET_COMPILER_BASIC_OPTS
+-CURL_SET_COMPILER_DEBUG_OPTS
+-CURL_SET_COMPILER_OPTIMIZE_OPTS
+-CURL_SET_COMPILER_WARNING_OPTS
+ 
+ if test "$compiler_id" = "INTEL_UNIX_C"; then
+   #
