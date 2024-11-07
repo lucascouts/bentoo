@@ -29,7 +29,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="c61116a2a667af9d7d8e27560cd3b2e182fafe27"
+	EGIT_COMMIT="b130cc0af7226f8e01f0f744ad7dfaf6d4f0508f"
 	SRC_URI="https://gitlab.freedesktop.org/mesa/mesa/-/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
@@ -41,7 +41,7 @@ SRC_URI+="
 	${CARGO_CRATE_URIS}
 "
 
-S="${WORKDIR}/${MY_P}"
+S="${WORKDIR}/${PN}-${EGIT_COMMIT}"
 EGIT_CHECKOUT_DIR=${S}
 
 LICENSE="MIT SGI-B-2.0"
@@ -194,7 +194,7 @@ src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
 		git-r3_src_unpack
 	else
-		unpack ${MY_P}.tar.gz
+		unpack ${P}.tar.gz
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet
