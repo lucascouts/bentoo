@@ -194,7 +194,7 @@ src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
 		git-r3_src_unpack
 	else
-		unpack ${MY_P}.tar.xz
+		unpack ${MY_P}.tar.gz
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet
