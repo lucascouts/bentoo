@@ -1,0 +1,90 @@
+--- a/python/dnet.pyx
++++ b/python/dnet.pyx
+@@ -25,8 +25,8 @@ cdef extern from "dnet.h":
+ cdef extern from "Python.h":
+     object  PyBytes_FromStringAndSize(char *s, int len)
+     int     PyBytes_Size(object o)
+-    int     PyObject_AsReadBuffer(object o, char **pp, int *lenp)
+-    int     PyLong_Check(object o)
++    int     PyObject_AsReadBuffer(object o, const void **pp, Py_ssize_t *lenp) except -1
++    int     PyLong_AsLong(object o)
+     int     PyLong_Check(object o)
+     long    PyLong_AsLong(object o)
+     unsigned long PyLong_AsUnsignedLong(object o)
+@@ -293,27 +293,26 @@ def ip_checksum(pkt):
+     pkt -- binary string representing an IP packet
+     """
+     cdef char buf[2048]
+-    cdef char *p
+-    cdef int n
+-    if PyObject_AsReadBuffer(pkt, &p, &n) == 0:
++    cdef const void *p_void
++    cdef char *p_char
++    cdef Py_ssize_t n
++    if PyObject_AsReadBuffer(pkt, &p_void, &n) == 0:
+         if n < 2048:
+-            memcpy(buf, p, n)
++            memcpy(buf, <char*>p_void, n)
+             __ip_checksum(buf, n)
+             return PyBytes_FromStringAndSize(buf, n)
+-        p = malloc(n)
+-        memcpy(p, pkt, n)
+-        __ip_checksum(p, n)
+-        s = PyBytes_FromStringAndSize(p, n)
+-        free(p)
++        p_char = <char*>malloc(n)
++        memcpy(p_char, <char*>p_void, n)
++        __ip_checksum(p_char, n)
++        s = PyBytes_FromStringAndSize(p_char, n)
++        free(p_char)
+         return s
+     raise TypeError
+ 
+ def ip_cksum_add(buf, int sum):
+-    cdef char *p
+-    cdef int n
+-    if PyObject_AsReadBuffer(buf, &p, &n) == 0:
+-        return __ip_cksum_add(p, n, sum)
+-    else:
++    cdef const void *p_void
++    cdef Py_ssize_t n
++    if PyObject_AsReadBuffer(buf, &p_void, &n) == 0:
++        return __ip_cksum_add(<char*>p_void, n, sum)
+         raise TypeError
+ 
+@@ -757,7 +756,7 @@ cdef class arp:
+         arg      -- optional callback argument
+         """
+         _arg = (callback, arg)
+-        return arp_loop(self.arp, __arp_callback, <void *>_arg)
++        return arp_loop(self.arp, <arp_handler>__arp_callback, <void *>_arg)
+ 
+     def __iter__(self):
+         l = []
+@@ -1057,7 +1056,7 @@ cdef class intf:
+         arg      -- optional callback argument
+         """
+         _arg = (callback, arg)
+-        return intf_loop(self.intf, __intf_callback, <void *>_arg)
++        return intf_loop(self.intf, <intf_handler>__intf_callback, <void *>_arg)
+ 
+     def __iter__(self):
+         l = []
+@@ -1156,7 +1155,7 @@ cdef class route:
+         arg      -- optional callback argument
+         """
+         _arg = (callback, arg)
+-        return route_loop(self.route, __route_callback, <void *>_arg)
++        return route_loop(self.route, <route_handler>__route_callback, <void *>_arg)
+     
+     def __iter__(self):
+         l = []
+@@ -1292,7 +1291,7 @@ cdef class fw:
+         arg      -- optional callback argument
+         """
+         _arg = (callback, arg)
+-        return fw_loop(self.fw, __fw_callback, <void *>_arg)
++        return fw_loop(self.fw, <fw_handler>__fw_callback, <void *>_arg)
+ 
+     def __iter__(self):
+         l = []

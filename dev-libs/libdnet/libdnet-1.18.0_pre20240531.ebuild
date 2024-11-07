@@ -38,6 +38,10 @@ BDEPEND="
 
 DOCS=( README.md THANKS )
 
+PATCHES=(
+	"${FILESDIR}/python-compat.patch"
+)
+
 src_prepare() {
 	default
 
