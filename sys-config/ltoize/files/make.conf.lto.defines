@@ -1,0 +1,68 @@
+#This file contains the definitions for the optimization settings used by GentooLTO.
+#source this file directly in your make.conf if you want to cherry-pick settings
+#and don't want to use the make.conf.lto default configuration, defining the number of threads
+#to use during the LTO process beforehand:
+
+#NTHREADS="12"
+
+#source make.conf.lto.defines
+
+#Guidelines:
+#* Your CFLAGS should contain ${FLTO}
+#* If you want Graphite, include "${GRAPHITE}" in your CFLAGS
+#* If you want -fipa-pta, include "${IPAPTA}" in your CFLAGS
+#* Anything else is up to you, such as -march, -pipe, -O{3,2,s,1}, etc...
+#* CXXFLAGS should be set to CFLAGS
+#* Optionally, set other *FLAGS for languages compiled with GCC as well
+#* LDFLAGS of your Gentoo profile should be respected.
+#  See make.conf.lto for more details.
+
+FLTO="-flto=${NTHREADS}"
+
+#FLTO is of the form -flto[=n] where n is the number of threads to use during linking.
+#It's usually a good idea to set this to the number of hardware threads in your system
+#You may also set this to "auto" to have gcc determine optimal number of cores (GCC 10+)
+
+GRAPHITE="-fgraphite-identity -floop-nest-optimize"
+
+#GRAPHITE contains Graphite specific optimizations and other optimizations that are disabled at O3 but don't influence the compiler's judgement.
+#Since GCC 8.1.0, -ftree-loop-distribution is enabled by default at -O3
+#NOTE: To use graphite, make sure you have gcc compiled with graphite support (add graphite to your USE).  Otherwise GCC will complain!
+
+IPAPTA="-fipa-pta"
+
+#IPAPTA contains -fipa* opts that are disabled by default in GCC.  These are interprocedural optimizations.  For now this is only -fipa-pta.
+#This option increases compile times, but can potentially produce better binaries, especially with LTO.
+#Essentially, it allows the compiler to look into called function bodies when performing alias analysis
+
+SEMINTERPOS="-fno-semantic-interposition"
+
+#With -fno-semantic-interposition the compiler assumes that if interposition happens for functions
+#the overwriting function will have precisely the same semantics (and side effects).
+#Similarly if interposition happens for variables, the constructor of the variable will be the same.
+#The flag has no effect for functions explicitly declared inline (where it is never allowed for interposition to change semantics) and for symbols explicitly declared weak.
+
+NOCOMMON="-fno-common"
+
+# This option only affects C code.  Only non-conformant C code needs -fcommon, which is enabled by default.  Clear Linux leaves this flag off by default.
+# This is enabled by default with GCC 10 and is kept here only for documentation purposes.  Use `-fcommon` to restore
+# GCC 9.x behaviour and below.
+
+SAFEST_FAST_MATH="-fno-math-errno -fno-trapping-math"
+SAFER_UNSAFE_MATH_OPTS="-fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math"
+SAFER_FAST_MATH="${SAFER_UNSAFE_MATH_OPTS} -fno-math-errno -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range -fexcess-precision=fast"
+
+#These are flags left off by default that we're planning to start using.  Clear Linux uses these in lieu of full -ffast-math optimizations
+#They DO break compliance with ISO C++, so we'll be careful about introducing these.
+#Relevant discussion: https://gcc.gnu.org/ml/gcc/2017-09/msg00079.html
+#We may end up just going full -Ofast, with exceptions done in the usual way.
+
+DEVIRTLTO="-fdevirtualize-at-ltrans"
+
+#This allows GCC to perform devirtualization across object file boundaries using LTO.
+
+NOPLT="-fno-plt"
+
+#This option omits the PLT from the executable, making calls go through the GOT directly.
+#It inhibits lazy binding, so this is not enabled by default.  If you use prelink, this is
+#strictly better than lazy binding.

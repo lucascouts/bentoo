@@ -179,7 +179,7 @@ BDEPEND="
 		video_cards_nvk? (
 			>=dev-util/bindgen-0.68.1
 			>=dev-util/cbindgen-0.26.0
-			>=virtual/rust-1.74.1
+			>=virtual/rust-1.74.1[rustfmt]
 		)
 	)
 	wayland? ( dev-util/wayland-scanner )

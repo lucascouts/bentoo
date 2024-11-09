@@ -1,0 +1,96 @@
+#! /bin/bash
+
+display_help()
+{
+echo -e "
+Usage: lto-rebuild [OPTION]
+
+lto-rebuild can be used to avoid a full system rebuild after upgrading GCC
+when using GentooLTO. It searches in /usr/lib, /usr/lib32, and /usr/lib64
+on your system for all installed static archives that were built using
+a different GCC than the current one.
+
+Note: make sure your system is as up to date as possible before doing this.
+If an installed package does not have a corresponding ebuild available,
+this command will fail. You can use -l to manually intervene.
+
+Options:
+
+-h	Display this help
+-a	Only list the archives that were built with other GCC versions
+-l	Only list the packages that would be rebuilt (and their slots)
+-r	Rebuild the packages using emerge (will ask for confirmation)
+"
+}
+
+perform_action()
+{
+local prefix="${EROOT%/}/usr/lib"
+local suffix="\.a"
+local archives=()
+local packages=()
+local GCC_VER=""
+
+GCC_VER=$(gcc -dumpversion)
+
+echo -e "Searching in
+	${prefix}
+	${prefix}64
+	${prefix}32
+for static archives that were built using a different GCC...\n" >&2
+
+# Exclude /usr/lib/gcc/<arch> because these are internal
+# to the [cross-]compilers on the system
+mapfile -t archives < <(
+	find "${prefix}"{,64,32} -type f -name "*${suffix}" \
+	-exec readelf -p .comment {} + \
+	-o -path "${prefix}64/gcc" -prune \
+	-o -path "${prefix}32/gcc" -prune \
+	-o -path "${prefix}/gcc" -prune 2> /dev/null | \
+	grep -v "${GCC_VER}" | grep -B3 "GCC:" | \
+	grep -o "${prefix}.*${suffix}" | uniq
+)
+
+if [[ ${#archives[@]} -eq 0 ]]
+then
+	echo "No problems found!" >&2
+	exit 0
+fi
+
+if [[ "${1}" != "-a" ]]
+then
+	mapfile -t packages < <(qfile -qS "${archives[@]}" | sort -u)
+fi
+
+case "${1}" in
+	"-a")
+		echo "The following static archives were built" >&2
+		echo -e "using a different GCC:\n" >&2
+		printf "%s\n" "${archives[@]}"
+		;;
+	"-l")
+		echo "The following packages installed static archives" >&2
+		echo -e "that were built using a different GCC:\n" >&2 
+		printf "%s\n" "${packages[@]}"
+		;;
+	"-r")
+		emerge -1a "${packages[@]}"
+		;;
+	*)
+		exit 1
+		;;
+esac
+}
+
+case "${1}" in
+	"" | "-h")
+		display_help
+		;;
+	"-l" | "-a" | "-r")
+		perform_action "${1}"
+		;;
+	*)
+		exit 1
+		;;
+esac
+
