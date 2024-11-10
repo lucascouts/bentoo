@@ -188,10 +188,6 @@ BDEPEND="
 	wayland? ( dev-util/wayland-scanner )
 "
 
-PATCHES=(
-	"${FILESDIR}"/${PV}-dril-Fixup-order-of-pixel-formats-in-drilConfigs.patch
-)
-
 QA_WX_LOAD="
 x86? (
 	usr/lib/libglapi.so.0.0.0
