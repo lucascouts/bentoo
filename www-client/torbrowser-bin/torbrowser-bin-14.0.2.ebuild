@@ -44,7 +44,20 @@ RDEPEND="
     x11-libs/pango
 "
 
-QA_PREBUILT="opt/${PN}/*"
+QA_PREBUILT="
+    opt/${PN}/Browser/firefox
+    opt/${PN}/Browser/firefox.real
+    opt/${PN}/Browser/libmozavcodec.so
+    opt/${PN}/Browser/libmozavutil.so
+    opt/${PN}/Browser/libxul.so
+    opt/${PN}/Browser/TorBrowser/Tor/tor
+    opt/${PN}/Browser/TorBrowser/Tor/libevent-2.1.so.7
+    opt/${PN}/Browser/TorBrowser/Tor/libssl.so.3
+    opt/${PN}/Browser/TorBrowser/Tor/libcrypto.so.3
+    opt/${PN}/Browser/TorBrowser/Tor/PluggableTransports/conjure-client
+    opt/${PN}/Browser/TorBrowser/Tor/PluggableTransports/snowflake-client
+    opt/${PN}/Browser/TorBrowser/Tor/PluggableTransports/lyrebird
+"
 
 S="${WORKDIR}"
 
@@ -71,10 +84,11 @@ EOF
 
     # Set permissions
     fperms 755 "${MOZILLA_FIVE_HOME}/Browser/"{firefox.real,TorBrowser/Tor/tor,start-tor-browser,execdesktop}
+    fperms 755 "${MOZILLA_FIVE_HOME}/Browser/TorBrowser/Tor/PluggableTransports/"{conjure-client,snowflake-client,lyrebird}
 
     # Install icons
     local size icon_path="${ED}${MOZILLA_FIVE_HOME}/Browser/browser/chrome/icons/default"
-    for size in 16 32 48 64 128 256 512; do
+    for size in 16 32 48 64 128; do
         newicon -s ${size} "${icon_path}/default${size}.png" "${PN}.png"
     done
 
