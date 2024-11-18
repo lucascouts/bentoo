@@ -22,13 +22,11 @@ DEPEND="
     virtual/jre:*
     x11-libs/gtk+:3"
 
-# Bundled java e bibliotecas nativas
 QA_PREBUILT="
     opt/bisq/bin/Bisq
     opt/bisq/lib/runtime/*
     opt/bisq/lib/libapplauncher.so"
 
-# Exclusão de bibliotecas incompatíveis/desnecessárias
 REQUIRES_EXCLUDE="
     libgstreamer-lite.so
     libavplugin-53.so
@@ -44,13 +42,17 @@ src_compile() {
 }
 
 src_install() {
-    # Instalação dos arquivos principais
-    cp -ar "${S}"/opt/bisq "${ED}"/opt/
+    dodir /opt/bisq
+
+    cp -r "${S}"/opt/bisq/* "${ED}"/opt/bisq/ || die
     
-    # Criação do symlink correto
+    if [[ ! -d "${ED}"/opt/bisq/bin ]]; then
+        dodir /opt/bisq/bin
+        mv "${ED}"/opt/bin/Bisq "${ED}"/opt/bisq/bin/ || die
+    fi
+
     dosym ../../opt/bisq/bin/Bisq /usr/bin/bisq
-    
-    # Instalação do arquivo .desktop e ícone
-    domenu opt/bisq/lib/bisq-Bisq.desktop
-    doicon opt/bisq/lib/Bisq.png
+
+    domenu "${S}"/opt/bisq/lib/bisq-Bisq.desktop
+    doicon "${S}"/opt/bisq/lib/Bisq.png
 }
