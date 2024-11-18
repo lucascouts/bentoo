@@ -26,7 +26,7 @@ SLOT="0"
 IUSE="test"
 RESTRICT="!test? ( test )"
 
-DEPEND="~dev-util/vulkan-headers-${PV}
+DEPEND="dev-util/vulkan-headers
 	test? (
 		dev-cpp/gtest
 		>=dev-cpp/magic_enum-0.9.2
