@@ -12,7 +12,7 @@ EAPI=8
 # changes its ABI then this package will be rebuilt needlessly. Hence, such a
 # package is free _not_ to := depend on FFmpeg but I would strongly encourage
 # doing so since such a case is unlikely.
-FFMPEG_SUBSLOT=58.60.60
+FFMPEG_SUBSLOT=59.61.61
 
 SOC_PATCH="ffmpeg-rpi-7.0.patch"
 

@@ -85,6 +85,7 @@ EOF
     # Set permissions
     fperms 755 "${MOZILLA_FIVE_HOME}/Browser/"{firefox.real,TorBrowser/Tor/tor,start-tor-browser,execdesktop}
     fperms 755 "${MOZILLA_FIVE_HOME}/Browser/TorBrowser/Tor/PluggableTransports/"{conjure-client,snowflake-client,lyrebird}
+    fperms +x "${MOZILLA_FIVE_HOME}/Browser/"start-tor-browser
 
     # Install icons
     local size icon_path="${ED}${MOZILLA_FIVE_HOME}/Browser/browser/chrome/icons/default"
