@@ -7,7 +7,6 @@ inherit cmake desktop go-module systemd xdg-utils
 
 MY_PN="proton-bridge"
 MY_P="${MY_PN}-${PV}"
-PV="${PV:0:6}"
 
 go_mod="3.10.0"
 
