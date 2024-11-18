@@ -1,4 +1,4 @@
-# Copyright 2019-2022 Gentoo Authors
+# Copyright 2019-2024 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -22,27 +22,35 @@ DEPEND="
     virtual/jre:*
     x11-libs/gtk+:3"
 
-# Bundled java, and seems to mostly work without an old ffmpeg
-QA_PREBUILT="opt/bisq/bin/Bisq opt/bisq/lib/libapplauncher.so opt/bisq/lib/runtime/*"
-REQUIRES_EXCLUDE="libgstreamer-lite.so libavplugin-53.so libavplugin-54.so libavplugin-55.so libavplugin-56.so libavplugin-57.so libavplugin-ffmpeg-56.so libavplugin-ffmpeg-57.so"
+# Bundled java e bibliotecas nativas
+QA_PREBUILT="
+    opt/bisq/bin/Bisq
+    opt/bisq/lib/runtime/*
+    opt/bisq/lib/libapplauncher.so"
+
+# Exclusão de bibliotecas incompatíveis/desnecessárias
+REQUIRES_EXCLUDE="
+    libgstreamer-lite.so
+    libavplugin-53.so
+    libavplugin-54.so
+    libavplugin-55.so
+    libavplugin-56.so
+    libavplugin-57.so
+    libavplugin-ffmpeg-56.so
+    libavplugin-ffmpeg-57.so"
 
 src_compile() {
     :
 }
 
 src_install() {
-    # Criar estrutura base do Bisq
-    dodir /opt/bisq/bin
-    dodir /opt/bisq/lib
+    # Instalação dos arquivos principais
+    cp -ar "${S}"/opt/bisq "${ED}"/opt/
     
-    # Instalar o executável principal
-    cp -a "${S}"/usr/lib/bisq/Bisq "${ED}"/opt/bisq/bin/ || die
-
-    # Instalar bibliotecas e runtime
-    cp -a "${S}"/usr/lib/bisq/lib/* "${ED}"/opt/bisq/lib/ || die
-    cp -a "${S}"/usr/lib/bisq/runtime "${ED}"/opt/bisq/lib/ || die
-
-    # Instalar arquivos de desktop e ícones
-    domenu "${S}"/usr/share/applications/bisq-Bisq.desktop
-    doicon "${S}"/usr/share/pixmaps/Bisq.png
+    # Criação do symlink correto
+    dosym ../../opt/bisq/bin/Bisq /usr/bin/bisq
+    
+    # Instalação do arquivo .desktop e ícone
+    domenu opt/bisq/lib/bisq-Bisq.desktop
+    doicon opt/bisq/lib/Bisq.png
 }
