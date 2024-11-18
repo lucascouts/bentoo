@@ -23,7 +23,7 @@ else
 	GIT_COMMIT="4d23156127520177a176d7dad127cfea36a87929"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
-	S="${WORKDIR}/mesa-${MY_PV}"
+	S="${WORKDIR}/mesa-${GIT_COMMIT}"
 fi
 
 LICENSE="MIT SGI-B-2.0"
