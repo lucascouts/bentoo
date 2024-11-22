@@ -8,9 +8,7 @@ PYTHON_COMPAT=( python3_{10..13} )
 
 inherit llvm-r1 meson python-any-r1
 
-PN="mesa"
-MY_P="${P/_/-}"
-MY_PV="${PV:0:4}"
+MY_PV="${PV/_/-}"
 
 DESCRIPTION="intel_clc tool used for building OpenCL C to SPIR-V"
 HOMEPAGE="https://mesa3d.org/"
@@ -20,10 +18,9 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="4d23156127520177a176d7dad127cfea36a87929"
-	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
+	S="${WORKDIR}/mesa-${MY_PV}"
+	SRC_URI="https://archive.mesa3d.org/mesa-${MY_PV}.tar.xz"
 	KEYWORDS="~amd64 ~x86"
-	S="${WORKDIR}/mesa-${GIT_COMMIT}"
 fi
 
 LICENSE="MIT SGI-B-2.0"
