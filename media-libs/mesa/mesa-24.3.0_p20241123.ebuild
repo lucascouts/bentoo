@@ -11,6 +11,7 @@ PYTHON_COMPAT=( python3_{10..13} )
 inherit flag-o-matic llvm-r1 meson-multilib python-any-r1 linux-info rust-toolchain
 
 MY_P="${P/_/-}"
+MY_PV="${PV:0:4}"
 
 CRATES="
 	syn@2.0.68
@@ -32,9 +33,8 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	SRC_URI="
-		https://archive.mesa3d.org/${MY_P}.tar.xz
-	"
+	GIT_COMMIT="6088a4373c695811745f070a805ecf1890a735b0"
+	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
 
@@ -45,7 +45,7 @@ SRC_URI+="
 	${CARGO_CRATE_URIS}
 "
 
-S="${WORKDIR}/${MY_P}"
+S="${WORKDIR}/${PN}-${GIT_COMMIT}"
 EGIT_CHECKOUT_DIR=${S}
 
 LICENSE="MIT SGI-B-2.0"
@@ -197,7 +197,7 @@ src_unpack() {
 	if [[ ${PV} == 9999 ]]; then
 		git-r3_src_unpack
 	else
-		unpack ${MY_P}.tar.xz
+		unpack ${MY_P}.tar.gz
 	fi
 
 	# We need this because we cannot tell meson to use DISTDIR yet
