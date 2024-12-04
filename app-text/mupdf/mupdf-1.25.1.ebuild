@@ -48,9 +48,8 @@ DEPEND="${RDEPEND}
 BDEPEND="virtual/pkgconfig"
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-1.15-CFLAGS.patch
 	"${FILESDIR}"/${PN}-1.19.0-Makefile.patch
-	"${FILESDIR}"/${P}-add-desktop-pc-files.patch
+	"${FILESDIR}"/${PN}-1.24.8-add-desktop-pc-files.patch
 	"${FILESDIR}"/${PN}-1.24.1-cross-fixes.patch
 	"${FILESDIR}"/${PN}-1.24.1-darwin.patch
 	# See bugs #662352
