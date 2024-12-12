@@ -20,7 +20,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="dfc2f054b6bf2631aa2d98c02bfc307487d2719f"
+	GIT_COMMIT="4d1aa9a2d0858c975e365a63234301256fa9cc77"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 	S="${WORKDIR}/mesa-${GIT_COMMIT}"
@@ -37,8 +37,8 @@ RDEPEND="
 	x11-libs/libdrm
 	$(llvm_gen_dep '
 		dev-util/spirv-llvm-translator:${LLVM_SLOT}
-		sys-devel/clang:${LLVM_SLOT}=
-		sys-devel/llvm:${LLVM_SLOT}=
+		llvm-core/clang:${LLVM_SLOT}=
+		llvm-core/llvm:${LLVM_SLOT}=
 	')
 "
 DEPEND="${RDEPEND}

@@ -33,7 +33,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="dfc2f054b6bf2631aa2d98c02bfc307487d2719f"
+	GIT_COMMIT="4d1aa9a2d0858c975e365a63234301256fa9cc77"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
@@ -97,10 +97,10 @@ RDEPEND="
 	unwind? ( sys-libs/libunwind[${MULTILIB_USEDEP}] )
 	llvm? (
 		$(llvm_gen_dep "
-			sys-devel/llvm:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
+			llvm-core/llvm:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
 			opencl? (
 				dev-util/spirv-llvm-translator:\${LLVM_SLOT}
-				sys-devel/clang:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
+				llvm-core/clang:\${LLVM_SLOT}[llvm_targets_AMDGPU(+),${MULTILIB_USEDEP}]
 			)
 		")
 		video_cards_r600? (
@@ -113,7 +113,7 @@ RDEPEND="
 	lm-sensors? ( sys-apps/lm-sensors:=[${MULTILIB_USEDEP}] )
 	opencl? (
 		>=virtual/opencl-3
-		dev-libs/libclc[spirv(-)]
+		llvm-core/libclc[spirv(-)]
 		>=dev-util/spirv-tools-1.3.231.0
 		virtual/libelf:0=
 	)
@@ -172,7 +172,7 @@ BDEPEND="
 	")
 	video_cards_intel? (
 		~dev-util/intel_clc-${PV}
-		dev-libs/libclc[spirv(-)]
+		llvm-core/libclc[spirv(-)]
 		$(python_gen_any_dep "dev-python/ply[\${PYTHON_USEDEP}]")
 	)
 	vulkan? (
@@ -276,8 +276,8 @@ python_check_deps() {
 
 pkg_setup() {
 	# warning message for bug 459306
-	if use llvm && has_version sys-devel/llvm[!debug=]; then
-		ewarn "Mismatch between debug USE flags in media-libs/mesa and sys-devel/llvm"
+	if use llvm && has_version llvm-core/llvm[!debug=]; then
+		ewarn "Mismatch between debug USE flags in media-libs/mesa and llvm-core/llvm"
 		ewarn "detected! This can cause problems. For details, see bug 459306."
 	fi
 
