@@ -30,10 +30,6 @@ RDEPEND="${DEPEND}
 "
 BDEPEND=">=dev-qt/qttools-${QTMIN}:6[linguist]"
 
-PATCHES=(
-	"${FILESDIR}/${PN}-6.7.0-use-qt-textrendering-w-highdpi.patch" # KDE-bug #479891
-)
-
 CMAKE_SKIP_TESTS=(
 	# bug 926509
 	animationspeedmodifiertest
