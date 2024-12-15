@@ -39,8 +39,6 @@ RDEPEND="${COMMON_DEPEND}
 "
 BDEPEND="wayland? ( >=dev-qt/qtwayland-${QTMIN}:6 )"
 
-PATCHES=( "${FILESDIR}/${PN}-6.7.0-dont-access-QDBusMessage.patch" ) # bug 944927
-
 src_configure() {
 	local mycmakeargs=(
 		-DBUILD_GEO_SCHEME_HANDLER=ON
