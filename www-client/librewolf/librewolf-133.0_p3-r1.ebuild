@@ -101,7 +101,7 @@ BDEPEND="${PYTHON_DEPS}
 		llvm-core/llvm:${LLVM_SLOT}
 		clang? (
 			llvm-core/lld:${LLVM_SLOT}
-			pgo? ( llvm-core/compiler-rt-sanitizers:${LLVM_SLOT}[profile] )
+			pgo? ( llvm-runtimes/compiler-rt-sanitizers:${LLVM_SLOT}[profile] )
 		)
 		wasm? ( llvm-core/lld:${LLVM_SLOT} )
 	')
@@ -232,8 +232,8 @@ llvm_check_deps() {
 	fi
 
 	if use pgo ; then
-		if ! has_version -b "=llvm-core/compiler-rt-sanitizers-${LLVM_SLOT}*[profile]" ; then
-			einfo "=llvm-core/compiler-rt-sanitizers-${LLVM_SLOT}*[profile] is missing!" >&2
+		if ! has_version -b "=llvm-runtimes/compiler-rt-sanitizers-${LLVM_SLOT}*[profile]" ; then
+			einfo "=llvm-runtimes/compiler-rt-sanitizers-${LLVM_SLOT}*[profile] is missing!" >&2
 			einfo "Cannot use LLVM slot ${LLVM_SLOT} ..." >&2
 			return 1
 		fi
