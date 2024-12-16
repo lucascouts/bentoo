@@ -9,7 +9,7 @@ MY_PV="${PV/_/-}"
 MY_PV="${MY_PV/-beta/-test/-pre}"
 MY_P="${PN}-${MY_PV}"
 
-GIT_COMMIT="64d46c2ba05c591b381306b8c7db1ae72ae0342a"
+GIT_COMMIT="fc986201634c7f3f9dc1560c807d8d14b2e3fbed"
 SRC_URI="https://code.videolan.org/videolan/vlc/-/archive/${GIT_COMMIT}/vlc-${GIT_COMMIT}.tar.gz"
 S="${WORKDIR}/vlc-${GIT_COMMIT}"
 KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv -sparc ~x86"

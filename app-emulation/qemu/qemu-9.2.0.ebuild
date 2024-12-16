@@ -73,7 +73,7 @@ COMMON_TARGETS="
 	aarch64
 	alpha
 	arm
-	cris
+	avr
 	hppa
 	i386
 	loongarch64
@@ -89,11 +89,13 @@ COMMON_TARGETS="
 	ppc64
 	riscv32
 	riscv64
+	rx
 	s390x
 	sh4
 	sh4eb
 	sparc
 	sparc64
+	tricore
 	x86_64
 	xtensa
 	xtensaeb
