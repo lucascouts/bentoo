@@ -9,7 +9,7 @@ MY_PV="${PV/_/-}"
 MY_PV="${MY_PV/-beta/-test/-pre}"
 MY_P="${PN}-${MY_PV}"
 
-GIT_COMMIT="fc986201634c7f3f9dc1560c807d8d14b2e3fbed"
+GIT_COMMIT="2cfdc164d1f407b1cbb810521db1c71507061682"
 SRC_URI="https://code.videolan.org/videolan/vlc/-/archive/${GIT_COMMIT}/vlc-${GIT_COMMIT}.tar.gz"
 S="${WORKDIR}/vlc-${GIT_COMMIT}"
 KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv -sparc ~x86"
@@ -220,11 +220,7 @@ DEPEND="${RDEPEND}
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-2.1.0-fix-libtremor-libs.patch # build system
-	"${FILESDIR}"/${PN}-3.0.6-fdk-aac-2.0.0.patch # bug 672290
-	"${FILESDIR}"/${PN}-3.0.11.1-configure_lua_version.patch
-	"${FILESDIR}"/${PN}-3.0.18-drop-minizip-dep.patch
-	"${FILESDIR}"/${PN}-3.0.21-freerdp-2.patch # bug 919296, 590164
-	"${FILESDIR}"/${PN}-3.0.21-vaapi-without-ffmepg4.patch # bug 864721, thx Fedora
+	"${FILESDIR}"/${PN}-4.0.0-configure_lua_version.patch
 )
 
 DOCS=( AUTHORS THANKS NEWS README doc/fortunes.txt )
@@ -248,9 +244,6 @@ src_prepare() {
 	if [[ ${PV} = *9999 ]] ; then
 		./bootstrap
 	fi
-
-	# Make it build with libtool 1.5
-	rm m4/lt* m4/libtool.m4 || die
 
 	# We are not in a real git checkout due to the absence of a .git directory.
 	touch src/revision.txt || die
