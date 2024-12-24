@@ -233,7 +233,7 @@ src_install() {
 	dodoc ChangeLog NEWS
 	newdoc README README.download
 	cd doc || die
-	dodoc HOWTO README* *.txt
+	dodoc HOWTO README.limits
 
 	if use elibc_musl; then
 		QA_CONFIG_IMPL_DECL_SKIP+=( sgetsgent )
