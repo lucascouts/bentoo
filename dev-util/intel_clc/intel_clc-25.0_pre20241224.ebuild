@@ -20,7 +20,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="47227089d63a508d570c96602dc1be07330b0db5"
+	GIT_COMMIT="dff14d102dfe006b69fcde3ea3cf04c2697d9689"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
 	S="${WORKDIR}/mesa-${GIT_COMMIT}"
