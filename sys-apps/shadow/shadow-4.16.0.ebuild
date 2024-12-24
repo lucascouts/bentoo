@@ -230,10 +230,10 @@ src_install() {
 	fi
 
 	cd "${S}" || die
-	dodoc ChangeLog NEWS TODO
+	dodoc ChangeLog NEWS
 	newdoc README README.download
 	cd doc || die
-	dodoc HOWTO README* WISHLIST *.txt
+	dodoc HOWTO README* *.txt
 
 	if use elibc_musl; then
 		QA_CONFIG_IMPL_DECL_SKIP+=( sgetsgent )
