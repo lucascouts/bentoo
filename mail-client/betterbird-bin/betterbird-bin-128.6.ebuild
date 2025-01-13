@@ -5,7 +5,7 @@ EAPI=8
 
 inherit desktop xdg
 
-BUILD="2esr-bb19"
+BUILD="0esr-bb20"
 
 DESCRIPTION="Betterbird is a fine-tuned version of Mozilla Thunderbird."
 HOMEPAGE="https://github.com/Betterbird/thunderbird-patches/ https://betterbird.eu/"
