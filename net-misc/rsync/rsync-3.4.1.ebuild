@@ -76,11 +76,6 @@ else
 	BDEPEND+=" verify-sig? ( sec-keys/openpgp-keys-waynedavison )"
 fi
 
-PATCHES=(
-	# Temporary just for the bug #948106 CVE fixes
-	"${FILESDIR}"/3.3.0
-)
-
 pkg_setup() {
 	# - USE=examples needs Python itself at runtime, but nothing else
 	# - 9999 needs commonmark at build time

@@ -115,6 +115,7 @@ src_unpack() {
 }
 
 src_prepare() {
+	rm "${WORKDIR}"/${MY_PATCH}/0003-dircolors-Add-more-dir-file-colors.patch
 	# TODO: past 2025, we may need to add our own hack for bug #907474.
 	local PATCHES=(
 		# Upstream patches
