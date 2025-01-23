@@ -35,7 +35,6 @@ RDEPEND="${DEPEND}
 
 PATCHES=(
 	"${FILESDIR}/${PN}-6.1.80-build-only-kdesu.patch" # downstream split
-	"${FILESDIR}/${PN}-6.1.5-fix-without-x11.patch" # bug 939735, git master
 )
 
 src_prepare() {
