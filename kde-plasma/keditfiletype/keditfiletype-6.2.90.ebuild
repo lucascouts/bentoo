@@ -42,7 +42,6 @@ BDEPEND=">=kde-frameworks/kcmutils-${KFMIN}:6"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-6.2.4-build-restrict.patch" # downstream split
-	"${FILESDIR}/${PN}-6.2.4-unused-dep.patch" # in 6.3
 	"${FILESDIR}/${PN}-6.2.4-unused-include.patch" # pending for 6.3
 )
 
