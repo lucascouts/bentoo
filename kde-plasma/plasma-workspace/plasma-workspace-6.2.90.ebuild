@@ -154,11 +154,6 @@ BDEPEND="
 	test? ( >=dev-qt/qtwayland-${QTMIN}:6[compositor] )
 "
 
-PATCHES=(
-	"${FILESDIR}/${PN}-5.22.5-krunner-cwd-at-home.patch" # TODO upstream: KDE-bug 432975, bug 767478
-	"${FILESDIR}/${P}-cameraindicator-optional.patch" # in 6.3
-)
-
 src_prepare() {
 	ecm_src_prepare
 
