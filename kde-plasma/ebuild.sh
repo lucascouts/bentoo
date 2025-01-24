@@ -7,12 +7,12 @@ for dir in */; do
         cd "$dir"
         
         # Remove ebuilds 6.2.4
-        rm -f *6.2.4.ebuild
+        #rm -f *6.2.4.ebuild
         
         # Renomeia 6.2.5 para 6.2.90
-        for file in *6.2.5.ebuild; do
+        for file in *6.2.90.ebuild; do
             if [ -f "$file" ]; then
-                newfile=$(echo "$file" | sed 's/6.2.5/6.2.90/')
+                newfile=$(echo "$file" | sed 's/6.2.90/6.2.91/')
                 mv "$file" "$newfile"
                 echo "Renomeado: $file -> $newfile"
             fi
