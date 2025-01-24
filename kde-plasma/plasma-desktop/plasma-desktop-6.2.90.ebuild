@@ -127,7 +127,6 @@ BDEPEND="
 
 PATCHES=(
 	"${FILESDIR}/${PN}-6.1.80-override-include-dirs.patch" # downstream patch
-	"${FILESDIR}/${PN}-6.2.3-tablet-kcm-optional.patch" # bug 942817
 )
 
 src_prepare() {
