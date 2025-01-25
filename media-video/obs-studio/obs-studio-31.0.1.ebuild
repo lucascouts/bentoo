@@ -145,8 +145,6 @@ RDEPEND="${DEPEND}
 	qsv? ( media-libs/intel-mediasdk )
 "
 
-PATCHES=( "${FILESDIR}"/${PN}-31.0.0-libx11-link.patch )
-
 QA_PREBUILT="
 	usr/lib*/obs-plugins/chrome-sandbox
 	usr/lib*/obs-plugins/libcef.so
