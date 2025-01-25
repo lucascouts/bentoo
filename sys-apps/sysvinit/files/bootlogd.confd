@@ -1,2 +1,0 @@
-# Put your bootlog options into this
-#BOOTLOGD_ARGS="-l /var/log/boot"
