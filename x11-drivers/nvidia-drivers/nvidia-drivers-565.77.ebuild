@@ -94,7 +94,7 @@ QA_PREBUILT="lib/firmware/* opt/bin/* usr/lib*"
 PATCHES=(
 	"${FILESDIR}"/nvidia-modprobe-390.141-uvm-perms.patch
 	"${FILESDIR}"/nvidia-settings-530.30.02-desktop.patch
-	"${FILESDIR}"/
+	"${FILESDIR}"/nvidia-470xx-fix-linux-6.13.patch
 )
 
 pkg_setup() {
