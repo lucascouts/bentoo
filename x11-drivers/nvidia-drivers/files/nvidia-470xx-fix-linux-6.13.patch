@@ -1,10 +1,3 @@
-Patch found here:
-https://gist.github.com/joanbm/d1f89391a4b20f4b56ba931ef6ca62da
-
-More details here:
-https://github.com/NVIDIA/open-gpu-kernel-modules/issues/747
-https://github.com/AOSC-Tracking/nvidia-open/commit/74962a62abfc350c26d1cf7cc066ef7113a30108
-
 diff --git a/kernel/nvidia/nvidia.Kbuild b/kernel/nvidia/nvidia.Kbuild
 index f0b1855..5704f14 100644
 --- a/kernel/nvidia/nvidia.Kbuild
