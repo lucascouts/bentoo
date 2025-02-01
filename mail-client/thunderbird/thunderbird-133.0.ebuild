@@ -507,6 +507,7 @@ src_prepare() {
 	# Remove old pacthes
 	rm -v "${WORKDIR}"/firefox-patches/0013-bmo-1196777-Set-GDK_FOCUS_CHANGE_MASK.patch || die
 	rm -v "${WORKDIR}"/firefox-patches/0016-bgo-907963-rustflags-single-string.patch || die
+	rm -v "${WORKDIR}"/firefox-patches/0027-bmo-1917964-fix-swgl-build-with-gcc15-1.patch || die
 
 	if [[ ${use_lto} == "yes" ]]; then
 		rm -v "${WORKDIR}"/firefox-patches/*-LTO-Only-enable-LTO-*.patch || die
