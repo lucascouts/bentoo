@@ -11,7 +11,6 @@ PYTHON_COMPAT=( python3_{10..13} )
 inherit flag-o-matic llvm-r1 meson-multilib python-any-r1 linux-info rust-toolchain
 
 MY_P="${P/_/-}"
-MY_PV="${PV:0:4}"
 
 CRATES="
 	syn@2.0.68
