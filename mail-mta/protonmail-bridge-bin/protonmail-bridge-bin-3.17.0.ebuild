@@ -17,7 +17,7 @@ DEPEND=""
 RDEPEND="${DEPEND}
 	media-libs/libglvnd
 	app-crypt/libsecret
-  dev-qt/qtcore
+    dev-qt/qtcore
 	dev-qt/qtdeclarative
 	dev-qt/qtmultimedia
 	dev-qt/qtsvg
