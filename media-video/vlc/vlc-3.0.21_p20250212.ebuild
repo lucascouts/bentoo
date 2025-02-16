@@ -1,26 +1,20 @@
-# Copyright 2000-2024 Gentoo Authors
+# Copyright 2000-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
+COMMIT=120f41a5741fc502b1a73d835093212cccbcb87d
 LUA_COMPAT=( lua5-{1..2} )
-
-MY_PV="${PV/_/-}"
-MY_PV="${MY_PV/-beta/-test/-pre}"
-MY_P="${PN}-${MY_PV}"
-
-GIT_COMMIT="2cfdc164d1f407b1cbb810521db1c71507061682"
-SRC_URI="https://code.videolan.org/videolan/vlc/-/archive/${GIT_COMMIT}/vlc-${GIT_COMMIT}.tar.gz"
-S="${WORKDIR}/vlc-${GIT_COMMIT}"
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv -sparc ~x86"
-
 inherit autotools flag-o-matic lua-single toolchain-funcs virtualx xdg
 
 DESCRIPTION="Media player and framework with support for most multimedia files and streaming"
 HOMEPAGE="https://www.videolan.org/vlc/"
+SRC_URI="https://code.videolan.org/videolan/${PN}/-/archive/${COMMIT}/${PN}-${COMMIT}.tar.bz2 -> ${P}.tar.bz2"
+S="${WORKDIR}/${PN}-${COMMIT}"
 
 LICENSE="LGPL-2.1 GPL-2"
 SLOT="0/5-9" # vlc - vlccore
+KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv -sparc ~x86"
 
 IUSE="a52 alsa aom archive aribsub bidi bluray cddb chromaprint chromecast dav1d dbus
 	dc1394 debug directx dts +dvbpsi dvd +encode faad fdk +ffmpeg flac fluidsynth
@@ -45,7 +39,10 @@ REQUIRED_USE="
 	vaapi? ( ffmpeg X )
 	vdpau? ( ffmpeg X )
 "
+# snapshots need bison+flex
 BDEPEND="
+	sys-devel/bison
+	sys-devel/flex
 	>=sys-devel/gettext-0.19.8
 	virtual/pkgconfig
 	lua? ( ${LUA_DEPS} )
@@ -182,7 +179,7 @@ RDEPEND="
 		gnome-base/librsvg:2
 		x11-libs/cairo
 	)
-	taglib? ( <media-libs/taglib-2 )
+	taglib? ( media-libs/taglib:= )
 	theora? ( media-libs/libtheora )
 	tremor? ( media-libs/tremor )
 	truetype? (
@@ -220,7 +217,10 @@ DEPEND="${RDEPEND}
 
 PATCHES=(
 	"${FILESDIR}"/${PN}-2.1.0-fix-libtremor-libs.patch # build system
-	"${FILESDIR}"/${PN}-4.0.0-configure_lua_version.patch
+	"${FILESDIR}"/${PN}-3.0.6-fdk-aac-2.0.0.patch # bug 672290
+	"${FILESDIR}"/${PN}-3.0.11.1-configure_lua_version.patch
+	"${FILESDIR}"/${PN}-3.0.18-drop-minizip-dep.patch
+	"${FILESDIR}"/${PN}-3.0.21-freerdp-2.patch # bug 919296, 590164
 )
 
 DOCS=( AUTHORS THANKS NEWS README doc/fortunes.txt )
@@ -241,9 +241,12 @@ src_prepare() {
 		eapply "${FILESDIR}"/${PN}-2.2.8-libupnp-slot-1.8.patch
 
 	# Bootstrap when we are on a git checkout.
-	if [[ ${PV} = *9999 ]] ; then
+	if [[ ${PV} == *9999* || ${PV} == *_p[0-9]* ]] ; then
 		./bootstrap
 	fi
+
+	# Make it build with libtool 1.5
+	rm m4/lt* m4/libtool.m4 || die
 
 	# We are not in a real git checkout due to the absence of a .git directory.
 	touch src/revision.txt || die
@@ -267,10 +270,14 @@ src_prepare() {
 }
 
 src_configure() {
+	# snapshots need bison+flex
+	unset LEX YACC
+
 	local -x BUILDCC="$(tc-getBUILD_CC)"
 
 	local myeconfargs=(
 		--disable-aa
+		--disable-amf-frc # DirectX specific
 		--disable-optimizations
 		--disable-rpath
 		--disable-update-check
