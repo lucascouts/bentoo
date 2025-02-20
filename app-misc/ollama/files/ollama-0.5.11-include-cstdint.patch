@@ -1,0 +1,19 @@
+From d711567ba482e80520b5cc36026c80f55f721319 Mon Sep 17 00:00:00 2001
+From: Paul Zander <negril.nx@gmail.com>
+Date: Sat, 25 Jan 2025 19:00:31 +0100
+Subject: [PATCH] include cstdint
+
+---
+ llama/llama-mmap.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/llama/llama.cpp/src/llama-mmap.h b/llama/llama.cpp/src/llama-mmap.h
+index 6bcddee..8a63b8f 100644
+--- a/llama/llama.cpp/src/llama-mmap.h
++++ b/llama/llama.cpp/src/llama-mmap.h
+@@ -1,5 +1,6 @@
+ #pragma once
+ 
++#include <cstdint>
+ #include <memory>
+ #include <vector>
