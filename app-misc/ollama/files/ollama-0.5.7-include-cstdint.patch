@@ -7,13 +7,18 @@ Subject: [PATCH] include cstdint
  llama/llama-mmap.h | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/llama/llama.cpp/src/llama-mmap.h b/llama/llama.cpp/src/llama-mmap.h
-index 6bcddee..8a63b8f 100644
---- a/llama/llama.cpp/src/llama-mmap.h
-+++ b/llama/llama.cpp/src/llama-mmap.h
-@@ -1,5 +1,6 @@
+diff --git a/llama/llama-mmap.h b/llama/llama-mmap.h
+index ebd7dc16..4c8e3929 100644
+--- a/llama/llama-mmap.h
++++ b/llama/llama-mmap.h
+@@ -26,6 +26,7 @@
+ 
  #pragma once
  
 +#include <cstdint>
  #include <memory>
  #include <vector>
+ 
+-- 
+2.48.0
+

@@ -6,7 +6,7 @@ Subject: [PATCH] include cstdint
 Signed-off-by: Paul Zander <negril.nx@gmail.com>
 
 diff --git a/llama/llama.cpp/src/llama-mmap.h b/llama/llama.cpp/src/llama-mmap.h
-index 6bcddee..8a63b8f 100644
+index 6bcddee8..8a63b8fd 100644
 --- a/llama/llama.cpp/src/llama-mmap.h
 +++ b/llama/llama.cpp/src/llama-mmap.h
 @@ -1,5 +1,6 @@
@@ -15,3 +15,7 @@ index 6bcddee..8a63b8f 100644
 +#include <cstdint>
  #include <memory>
  #include <vector>
+ 
+-- 
+2.48.1
+
