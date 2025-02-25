@@ -35,10 +35,10 @@ HOMEPAGE="https://www.virtualbox.org/ https://github.com/cyberus-technology/virt
 SRC_URI="
 	https://gitweb.gentoo.org/proj/virtualbox-patches.git/snapshot/virtualbox-patches-${PATCHES_PV}.tar.bz2
 	https://github.com/cyberus-technology/virtualbox-kvm/archive/dev-${MY_PV}.tar.gz -> ${PN}-${MY_PV}.tar.gz
-	https://download.virtualbox.org/virtualbox/${ORIGIN_PV}/${MY_P}.tar.bz2
+	https://download.virtualbox.org/virtualbox/${ORIGIN_PV%*a}/${MY_P}.tar.bz2
 	gui? ( !doc? ( https://dev.gentoo.org/~ceamac/${CATEGORY}/${MY_PN}/${MY_PN}-help-${ORIGIN_PV}.tar.xz ) )
 "
-S="${WORKDIR}/${ORIGIN_PN}-${ORIGIN_PV}"
+S="${WORKDIR}/${ORIGIN_PN}-${ORIGIN_PV%*a}"
 
 LICENSE="GPL-2+ GPL-3 LGPL-2.1 MIT dtrace? ( CDDL )"
 SLOT="0/$(ver_cut 1-2)"

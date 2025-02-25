@@ -3,7 +3,7 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-134-patches-01.tar.xz"
+FIREFOX_PATCHSET="firefox-135-patches-02.tar.xz"
 
 LLVM_COMPAT=( 17 18 19 )
 
@@ -463,7 +463,7 @@ pkg_pretend() {
 		elif tc-is-lto ; then
 			CHECKREQS_DISK_BUILD="10600M"
 		else
-			CHECKREQS_DISK_BUILD="6800M"
+			CHECKREQS_DISK_BUILD="7400M"
 		fi
 
 		check-reqs_pkg_pretend
@@ -501,7 +501,7 @@ pkg_setup() {
 		elif [[ ${use_lto} == "yes" ]] ; then
 			CHECKREQS_DISK_BUILD="10600M"
 		else
-			CHECKREQS_DISK_BUILD="6800M"
+			CHECKREQS_DISK_BUILD="7400M"
 		fi
 
 		check-reqs_pkg_setup
@@ -794,7 +794,6 @@ src_configure() {
 		--enable-negotiateauth \
 		--enable-new-pass-manager \
 		--enable-release \
-		--enable-system-ffi \
 		--enable-system-pixman \
 		--enable-system-policies \
 		--host="${CBUILD:-${CHOST}}" \
@@ -804,6 +803,7 @@ src_configure() {
 		--without-ccache \
 		--with-intl-api \
 		--with-libclang-path="$(llvm-config --libdir)" \
+		--with-system-ffi \
 		--with-system-nspr \
 		--with-system-nss \
 		--with-system-zlib \
@@ -834,7 +834,7 @@ src_configure() {
 	# Set update channel
 	local update_channel=release
 	[[ -n ${MOZ_ESR} ]] && update_channel=esr
-	mozconfig_add_options_ac '' --update-channel=${update_channel}
+	mozconfig_add_options_ac '' --enable-update-channel=${update_channel}
 
 	if ! use x86 ; then
 		mozconfig_add_options_ac '' --enable-rust-simd
