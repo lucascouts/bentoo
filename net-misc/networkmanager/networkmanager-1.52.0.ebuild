@@ -3,13 +3,15 @@
 
 EAPI=8
 GNOME_ORG_MODULE="NetworkManager"
-PYTHON_COMPAT=( python3_{10..12} )
+PYTHON_COMPAT=( python3_{11..13} )
 
 inherit gnome.org linux-info meson-multilib flag-o-matic python-any-r1 \
 		readme.gentoo-r1 systemd toolchain-funcs udev vala virtualx
 
 DESCRIPTION="A set of co-operative tools that make networking simple and straightforward"
 HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
+
+SRC_URI="https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/archive/${PV}/NetworkManager-${PV}.tar.gz"
 
 LICENSE="GPL-2+ LGPL-2.1+"
 SLOT="0"
