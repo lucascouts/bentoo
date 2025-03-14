@@ -3,7 +3,7 @@
 
 EAPI=8
 
-LLVM_COMPAT=( {16..19} )
+LLVM_COMPAT=( {16..20} )
 LLVM_OPTIONAL=1
 CARGO_OPTIONAL=1
 PYTHON_COMPAT=( python3_{10..13} )
@@ -33,7 +33,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="e63acdd2b7b1ef80e09545cfdfa5fea5d42d6159"
+	GIT_COMMIT="773f84ccc9aada8d2c6299380976c24a5fd197e5"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
@@ -159,8 +159,9 @@ DEPEND="${RDEPEND}
 BDEPEND="
 	${PYTHON_DEPS}
 	opencl? (
+		>=dev-build/meson-1.7.0
+		>=dev-util/bindgen-0.71.0
 		${RUST_DEPEND}
-		>=dev-util/bindgen-0.58.0
 	)
 	>=dev-build/meson-1.4.1
 	app-alternatives/yacc
@@ -179,7 +180,8 @@ BDEPEND="
 	vulkan? (
 		dev-util/glslang
 		video_cards_nvk? (
-			>=dev-util/bindgen-0.68.1
+			>=dev-build/meson-1.7.0
+			>=dev-util/bindgen-0.71.0
 			>=dev-util/cbindgen-0.26.0
 			${RUST_DEPEND}
 		)
