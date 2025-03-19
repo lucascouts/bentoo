@@ -93,5 +93,5 @@ src_configure() {
 
 src_install() {
 	dobin "${BUILD_DIR}"/src/compiler/clc/mesa_clc
-	dobin "${BUILD_DIR}"/src/compiler/spirv/vtn_bindgen
+	dobin "${BUILD_DIR}"/src/compiler/spirv/vtn_bindgen2
 }
