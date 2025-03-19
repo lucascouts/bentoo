@@ -7,13 +7,13 @@ LUA_COMPAT=( luajit )
 PYTHON_COMPAT=( python3_{10..13} )
 VALA_USE_DEPEND=vapigen
 
-inherit lua-single flag-o-matic meson python-single-r1 toolchain-funcs vala xdg
+inherit flag-o-matic lua-single meson python-single-r1 toolchain-funcs vala xdg
 
 DESCRIPTION="GNU Image Manipulation Program"
 HOMEPAGE="https://www.gimp.org/"
-SRC_URI="mirror://gimp/v$(ver_cut 1-2)/${PN}-$(ver_cut 1-3)-RC2.tar.xz"
+SRC_URI="mirror://gimp/v$(ver_cut 1-2)/${PN}-$(ver_cut 1-3)-RC3.tar.xz"
 
-S="${WORKDIR}/${PN}-$(ver_cut 1-3)-RC2"
+S="${WORKDIR}/${PN}-$(ver_cut 1-3)-RC3"
 LICENSE="GPL-3+ LGPL-3+"
 SLOT="0/3"
 
@@ -47,7 +47,7 @@ COMMON_DEPEND="
 	>=media-libs/babl-0.1.110[introspection,lcms,vala?]
 	>=media-libs/fontconfig-2.12.6
 	>=media-libs/freetype-2.10.2
-	>=media-libs/gegl-0.4.52:0.4[cairo,introspection,lcms,vala?]
+	>=media-libs/gegl-0.4.54:0.4[cairo,introspection,lcms,vala?]
 	>=media-libs/gexiv2-0.14.0
 	>=media-libs/harfbuzz-2.6.5:=
 	>=media-libs/lcms-2.13.1:2
@@ -59,7 +59,7 @@ COMMON_DEPEND="
 	sys-libs/zlib
 	>=x11-libs/cairo-1.16.0[X=]
 	>=x11-libs/gdk-pixbuf-2.40.0:2[introspection]
-	>=x11-libs/gtk+-3.24.16:3[introspection,X=]
+	>=x11-libs/gtk+-3.24.48:3[introspection,X=]
 	>=x11-libs/pango-1.50.0[X=]
 	aalib? ( media-libs/aalib )
 	alsa? ( >=media-libs/alsa-lib-1.0.0 )
@@ -108,7 +108,6 @@ BDEPEND="
 	dev-util/gdbus-codegen
 	>=sys-devel/gettext-0.21
 	doc? (
-		app-text/yelp-tools
 		dev-libs/gobject-introspection[doctool]
 		dev-util/gi-docgen
 	)
@@ -116,6 +115,10 @@ BDEPEND="
 "
 
 DOCS=( "AUTHORS" "NEWS" "README" "README.i18n" )
+
+PATCHES=(
+	"${FILESDIR}/${P}_debug_self_gdb_optional.patch" # Bug 949910
+)
 
 pkg_pretend() {
 	[[ ${MERGE_TYPE} != binary ]] && use openmp && tc-check-openmp
@@ -171,6 +174,7 @@ src_configure() {
 		-Denable-default-bin=enabled
 
 		-Dcheck-update=no
+		-Ddebug-self-in-build=false
 		-Denable-multiproc=true
 		-Dappdata-test=disabled
 		-Dbug-report-url=https://bugs.gentoo.org/
@@ -196,7 +200,6 @@ src_configure() {
 		$(meson_feature wmf)
 		$(meson_feature X xcursor)
 		$(meson_feature xpm)
-		$(meson_use doc g-ir-doc)
 		$(meson_use lua)
 		$(meson_use unwind libunwind)
 		$(meson_use vector-icons)
