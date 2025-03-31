@@ -3,7 +3,8 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-136-patches-01.tar.xz"
+FIREFOX_PATCHSET="firefox-136-patches-04.tar.xz"
+FIREFOX_LOONG_PATCHSET="firefox-136-loong-patches-01.tar.xz"
 
 LLVM_COMPAT=( 17 18 19 )
 
@@ -50,7 +51,7 @@ MOZ_P="${MOZ_PN}-${MOZ_PV}"
 MOZ_PV_DISTFILES="${MOZ_PV}${MOZ_PV_SUFFIX}"
 MOZ_P_DISTFILES="${MOZ_PN}-${MOZ_PV_DISTFILES}"
 
-inherit check-reqs desktop flag-o-matic gnome2-utils linux-info llvm-r1 multiprocessing \
+inherit autotools check-reqs desktop flag-o-matic gnome2-utils linux-info llvm-r1 multiprocessing \
 	optfeature pax-utils python-any-r1 readme.gentoo-r1 rust toolchain-funcs virtualx xdg
 
 MOZ_SRC_BASE_URI="https://archive.mozilla.org/pub/${MOZ_PN}/releases/${MOZ_PV}"
@@ -68,6 +69,9 @@ DESCRIPTION="LibreWolf Web Browser"
 HOMEPAGE="https://librewolf.net/"
 SRC_URI="${LIBREWOLF_SRC_URI} -> librewolf-${LIBREWOLF_PV}.source.tar.gz
 	${PATCH_URIS[@]}
+	loong? (
+		https://dev.gentoo.org/~xen0n/distfiles/www-client/${MOZ_PN}/${FIREFOX_LOONG_PATCHSET}
+	)
 	wasm-sandbox? (
 		amd64? ( https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_VER/.*/}/wasi-sdk-${WASI_SDK_VER}-x86_64-linux.tar.gz )
 		arm64? ( https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_VER/.*/}/wasi-sdk-${WASI_SDK_VER}-arm64-linux.tar.gz )
@@ -449,12 +453,6 @@ virtwl() {
 
 pkg_pretend() {
 	if [[ ${MERGE_TYPE} != binary ]] ; then
-		if use pgo ; then
-			if ! has usersandbox $FEATURES ; then
-				die "You must enable usersandbox as X server can not run as root!"
-			fi
-		fi
-
 		# Ensure we have enough disk space to compile
 		if use pgo || use debug ; then
 			CHECKREQS_DISK_BUILD="14300M"
@@ -594,6 +592,7 @@ src_prepare() {
 	fi
 
 	eapply "${WORKDIR}/firefox-patches"
+	use loong && eapply "${WORKDIR}/firefox-loong-patches"
 
 	# Allow user to apply any additional patches without modifing ebuild
 	eapply_user
@@ -609,6 +608,10 @@ src_prepare() {
 			export RUST_TARGET="i686-unknown-linux-musl"
 		elif use arm64 ; then
 			export RUST_TARGET="aarch64-unknown-linux-musl"
+		elif use loong; then
+			# Only the LP64D ABI of LoongArch64 is actively supported among
+			# the wider Linux ecosystem, so the assumption is safe.
+			export RUST_TARGET="loongarch64-unknown-linux-musl"
 		elif use ppc64 ; then
 			export RUST_TARGET="powerpc64le-unknown-linux-musl"
 		elif use riscv ; then
@@ -843,7 +846,7 @@ src_configure() {
 	# amd64, arm, arm64 & x86.
 	# Might want to flip the logic around if Firefox is to support more arches.
 	# bug 833001, bug 903411#c8
-	if use ppc64 || use riscv; then
+	if use loong || use ppc64 || use riscv; then
 		mozconfig_add_options_ac '' --disable-sandbox
 	elif use valgrind; then
 		mozconfig_add_options_ac 'valgrind requirement' --disable-sandbox
@@ -851,9 +854,11 @@ src_configure() {
 		mozconfig_add_options_ac '' --enable-sandbox
 	fi
 
-	# Enable JIT on riscv64 explicitly
-	# Can be removed once upstream enable it by default in the future.
-	use riscv && mozconfig_add_options_ac 'Enable JIT for RISC-V 64' --enable-jit
+	# riscv-related options, bgo#947337, bgo#947338
+	if use riscv ; then
+		mozconfig_add_options_ac 'Disable JIT for RISC-V 64' --disable-jit
+		mozconfig_add_options_ac 'Disable webrtc for RISC-V' --disable-webrtc
+	fi
 
 	if [[ -s "${S}/api-google.key" ]] ; then
 		local key_origin="Gentoo default"
@@ -892,7 +897,6 @@ src_configure() {
 	fi
 
 	mozconfig_use_with system-av1
-	use system-av1 && append-ldflags "-laom"
 	mozconfig_use_with system-harfbuzz
 	mozconfig_use_with system-icu
 	mozconfig_use_with system-jpeg
@@ -1043,8 +1047,8 @@ src_configure() {
 		else
 			mozconfig_add_options_ac 'relr elf-hack' --enable-elf-hack=relr
 		fi
-	elif use ppc64 || use riscv ; then
-		# '--disable-elf-hack' is not recognized on ppc64/riscv,
+	elif use loong || use ppc64 || use riscv ; then
+		# '--disable-elf-hack' is not recognized on loong/ppc64/riscv,
 		# see bgo #917049, #930046
 		:;
 	else
