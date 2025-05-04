@@ -3,7 +3,7 @@
 
 EAPI=8
 
-FIREFOX_PATCHSET="firefox-137-patches-01.tar.xz"
+FIREFOX_PATCHSET="firefox-137-patches-02.tar.xz"
 FIREFOX_LOONG_PATCHSET="firefox-137-loong-patches-01.tar.xz"
 
 LLVM_COMPAT=( 19 )
