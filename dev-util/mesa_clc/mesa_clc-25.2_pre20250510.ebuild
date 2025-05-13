@@ -19,7 +19,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="a752f242e5527977d7030ca3a68fa6563fbf36fa"
+	GIT_COMMIT="da7c7168696b1454d4da422e36544d3c74b1e536"
 	S="${WORKDIR}/mesa-${GIT_COMMIT}"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
@@ -27,7 +27,12 @@ fi
 
 LICENSE="MIT"
 SLOT="0"
-IUSE="debug"
+
+VIDEO_CARDS="asahi panfrost"
+for card in ${VIDEO_CARDS}; do
+	IUSE_VIDEO_CARDS+=" video_cards_${card}"
+done
+IUSE="${IUSE_VIDEO_CARDS} debug"
 
 RDEPEND="
 	dev-util/spirv-tools
@@ -65,6 +70,14 @@ pkg_setup() {
 }
 
 src_configure() {
+	tools_enable video_cards_asahi asahi
+	tools_enable video_cards_panfrost panfrost
+
+	tools_list() {
+		local tools="$(sort -u <<< "${1// /$'\n'}")"
+		echo "${tools//$'\n'/,}"
+	}
+
 	PKG_CONFIG_PATH="$(get_llvm_prefix)/$(get_libdir)/pkgconfig"
 
 	use debug && EMESON_BUILDTYPE=debug
@@ -74,6 +87,9 @@ src_configure() {
 		-Dshared-llvm=enabled
 		-Dmesa-clc=enabled
 		-Dinstall-mesa-clc=true
+		-Dprecomp-compiler=enabled
+		-Dinstall-precomp-compiler=true
+		-Dtools=$(tools_list "${TOOLS[*]}")
 
 		-Dgallium-drivers=''
 		-Dvulkan-drivers=''
@@ -88,10 +104,22 @@ src_configure() {
 
 		-Db_ndebug=$(usex debug false true)
 	)
+
 	meson_src_configure
 }
 
 src_install() {
 	dobin "${BUILD_DIR}"/src/compiler/clc/mesa_clc
 	dobin "${BUILD_DIR}"/src/compiler/spirv/vtn_bindgen2
+	use video_cards_asahi && dobin "${BUILD_DIR}"/src/asahi/clc/asahi_clc
+	use video_cards_panfrost && dobin "${BUILD_DIR}"/src/panfrost/clc/panfrost_compile
+}
+
+# $1 - VIDEO_CARDS flag (check skipped for "--")
+# other args - names of tools to enable
+tools_enable() {
+	if [[ $1 == -- ]] || use $1; then
+		shift
+		TOOLS+=("$@")
+	fi
 }
