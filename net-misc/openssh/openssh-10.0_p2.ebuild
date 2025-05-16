@@ -18,7 +18,7 @@ HOMEPAGE="https://www.openssh.com/"
 SRC_URI="
 	https://github.com/openssh/openssh-portable/archive/refs/tags/V_10_0_P2.tar.gz
 "
-S="${WORKDIR}/${PARCH}"
+S="${WORKDIR}/openssh-portable-V_10_0_P2"
 
 LICENSE="BSD GPL-2"
 SLOT="0"
