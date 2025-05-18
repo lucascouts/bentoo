@@ -73,7 +73,7 @@ COMMON_DEPEND="
     virtual/libusb:1
     logitech? ( dev-libs/protobuf-c:= )
     lzma? ( app-arch/xz-utils )
-    modemmanager? ( net-misc/modemmanager[mbim,qmi] )
+    modemmanager? ( >=net-misc/modemmanager-1.24.0[mbim,qmi] )
     policykit? ( >=sys-auth/polkit-0.114 )
     seccomp? ( sys-apps/systemd[seccomp] )
     sqlite? ( dev-db/sqlite )
