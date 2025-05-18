@@ -14,9 +14,9 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/${PV}/${P}.tar.xz"
 LICENSE="LGPL-2.1+"
 SLOT="0"
 KEYWORDS="amd64 ~arm ~arm64 ~loong ppc64 ~riscv x86"
-IUSE="amdgpu amt +archive bash-completion bluetooth cbor fastboot flashrom gnutls gtk-doc introspection logitech lzma minimal modemmanager nvme policykit seccomp spi +sqlite synaptics systemd test tpm uefi"
+IUSE="amdgpu amt +archive bash-completion bluetooth cbor elogind fastboot flashrom gnutls gtk-doc introspection logitech lzma minimal modemmanager nvme policykit seccomp spi +sqlite synaptics systemd test tpm uefi"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
-	^^ ( minimal systemd )
+	^^ ( elogind minimal systemd )
 	minimal? ( !introspection )
 	spi? ( lzma )
 	seccomp? ( systemd )
@@ -63,6 +63,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	>=net-misc/curl-7.62.0
 	archive? ( app-arch/libarchive:= )
 	cbor? ( >=dev-libs/libcbor-0.7.0:= )
+	elogind? ( >=sys-auth/elogind-211 )
 	flashrom? ( >=sys-apps/flashrom-1.2-r3 )
 	gnutls? ( >=net-libs/gnutls-3.6.0 )
 	virtual/libusb:1
@@ -131,6 +132,8 @@ src_configure() {
 	local emesonargs=(
 		--localstatedir "${EPREFIX}"/var
 		-Dbuild="$(usex minimal standalone all)"
+		-Dconsolekit="disabled"
+		-Dcurl="enabled"
 		-Defi_binary="false"
 		-Dman="true"
 		-Dsupported_build="enabled"
@@ -139,6 +142,7 @@ src_configure() {
 		$(meson_use bash-completion bash_completion)
 		$(meson_feature bluetooth bluez)
 		$(meson_feature cbor)
+		$(meson_feature elogind)
 		$(meson_feature gnutls)
 		$(meson_feature gtk-doc docs)
 		$(meson_feature lzma)

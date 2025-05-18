@@ -1,7 +1,0 @@
-pkgs_dirs: 
-  - ~/.conda/pkgs
-
-envs_dirs: 
-  - ~/.conda/envs
-
-allow_softlinks: False
