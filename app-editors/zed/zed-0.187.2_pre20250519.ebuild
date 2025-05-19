@@ -70,7 +70,7 @@ declare -A GIT_CRATES=(
 	[xim]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%'
 )
 
-LLVM_COMPAT=( 19 )
+LLVM_COMPAT=( {19..20} )
 RUST_MIN_VER="1.86.0"
 RUST_NEEDS_LLVM=1
 WEBRTC_COMMIT="b99fd2c-6"
@@ -79,8 +79,9 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 
 DESCRIPTION="The fast, collaborative code editor"
 HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
+GIT_COMMIT="d9f12879e285dd14c498a2e02d2de9381b82995e"
 SRC_URI="
-	https://github.com/zed-industries/zed/archive/refs/tags/v${PV/_/-}.tar.gz -> ${P}.tar.gz
+	https://github.com/zed-industries/zed/archive/${GIT_COMMIT}.zip -> ${P}.tar.gz
 	https://gitlab.com/api/v4/projects/35204985/packages/generic/${PN}/$(ver_cut 1-2)/${PN}-$(ver_cut 1-2)-crates.tar.xz
 	amd64? (
 		https://github.com/livekit/rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-x64-release.zip ->
