@@ -44,10 +44,10 @@ COMMON_DEPEND="
 	dev-libs/libxslt
 	>=gnome-base/librsvg-2.57.3:2
 	>=media-gfx/mypaint-brushes-1.3.1:1.0=
-	>=media-libs/babl-0.1.112[introspection,lcms,vala?]
+	>=media-libs/babl-0.1.114[introspection,lcms,vala?]
 	>=media-libs/fontconfig-2.12.6
 	>=media-libs/freetype-2.10.2
-	>=media-libs/gegl-0.4.58:0.4[cairo,introspection,lcms,vala?]
+	>=media-libs/gegl-0.4.62:0.4[cairo,introspection,lcms,vala?]
 	>=media-libs/gexiv2-0.14.0
 	>=media-libs/harfbuzz-2.6.5:=
 	>=media-libs/lcms-2.13.1:2
