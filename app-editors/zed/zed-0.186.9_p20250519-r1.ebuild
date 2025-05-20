@@ -81,7 +81,7 @@ DESCRIPTION="The fast, collaborative code editor"
 HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
 GIT_COMMIT="d9f12879e285dd14c498a2e02d2de9381b82995e"
 SRC_URI="
-	https://github.com/zed-industries/zed/archive/${GIT_COMMIT}.zip -> ${P}.tar.gz
+	https://github.com/zed-industries/zed/archive/${GIT_COMMIT}.tar.gz -> ${P}.tar.gz
 	https://gitlab.com/api/v4/projects/35204985/packages/generic/${PN}/$(ver_cut 1-2)/${PN}-$(ver_cut 1-2)-crates.tar.xz
 	amd64? (
 		https://github.com/livekit/rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-x64-release.zip ->
