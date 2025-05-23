@@ -299,7 +299,6 @@ PATCHES=(
 
 	# git master:
 	"${FILESDIR}/${PN}-25.2-unused-qt6network.patch"
-	"${FILESDIR}/${P}-poppler-25.05.patch"
 )
 
 _check_reqs() {
