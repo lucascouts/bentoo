@@ -17,8 +17,6 @@ BDEPEND=">=kde-frameworks/extra-cmake-modules-${KFMIN}:0"
 DEPEND="sys-boot/plymouth"
 RDEPEND="${DEPEND}"
 
-PATCHES=( "${FILESDIR}/${PN}-6.2.5-cmake4.patch" )
-
 src_configure() {
 	local mycmakeargs=(
 		-DDISTRO_NAME="Gentoo Linux"
