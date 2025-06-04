@@ -102,7 +102,7 @@ DEPEND="
 "
 
 PATCHES=(
-    "${FILESDIR}/${PN}-${PV}-re-add-elogind.patch"
+    "${FILESDIR}/${PN}-2.0.10-re-add-elogind.patch"
 )
 
 src_prepare() {
