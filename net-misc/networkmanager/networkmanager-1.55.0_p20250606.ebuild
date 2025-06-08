@@ -11,7 +11,8 @@ inherit gnome.org linux-info meson-multilib flag-o-matic python-any-r1 \
 DESCRIPTION="A set of co-operative tools that make networking simple and straightforward"
 HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
 
-SRC_URI="https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/archive/${PV}/NetworkManager-${PV}.tar.gz"
+GIT_COMMIT="46e0d2b4e4eb5948db12186a3c60d3fd98ae8cd4"
+SRC_URI="https://github.com/NetworkManager/NetworkManager/archive/${GIT_COMMIT}.zip"
 
 LICENSE="GPL-2+ LGPL-2.1+"
 SLOT="0"
@@ -123,6 +124,8 @@ BDEPEND="
 			dev-python/pygobject:3[${PYTHON_USEDEP}]')
 	)
 "
+
+S="${WORKDIR}/NetworkManager-${GIT_COMMIT}"
 
 python_check_deps() {
 	if use introspection; then
