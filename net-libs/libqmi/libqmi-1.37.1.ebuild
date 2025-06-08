@@ -7,8 +7,10 @@ if [[ ${PV} == "9999" ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mobile-broadband/libqmi.git"
 else
-	SRC_URI="https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/archive/${PV}/${P}.tar.bz2"
+	GIT_COMMIT="e194d1c82cd250d4b155731e570bdf81eda8a8a0"
+	SRC_URI="https://gitlab.freedesktop.org/mobile-broadband/libqmi/-/archive/${GIT_COMMIT}/libqmi-${GIT_COMMIT}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~loong ~mips ppc ppc64 ~riscv x86"
+	S="${WORKDIR}/libqmi-${GIT_COMMIT}"
 fi
 
 inherit bash-completion-r1 meson udev

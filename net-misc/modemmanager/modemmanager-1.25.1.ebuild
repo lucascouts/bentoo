@@ -7,7 +7,9 @@ inherit bash-completion-r1 meson python-any-r1 optfeature systemd udev vala xdg
 
 DESCRIPTION="Modem and mobile broadband management libraries"
 HOMEPAGE="https://www.freedesktop.org/wiki/Software/ModemManager/ https://gitlab.freedesktop.org/mobile-broadband/ModemManager"
-SRC_URI="https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/archive/${PV}/ModemManager-${PV}.tar.bz2"
+
+GIT_COMMIT="8486641f922a409a514db33c177aff10b1a18304"
+SRC_URI="https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/archive/${GIT_COMMIT}/ModemManager-${GIT_COMMIT}.tar.gz"
 
 LICENSE="GPL-2+"
 SLOT="0/1" # subslot = dbus interface version, i.e. N in org.freedesktop.ModemManager${N}
@@ -51,7 +53,7 @@ BDEPEND="
 	vala? ( $(vala_depend) )
 "
 
-S="${WORKDIR}/ModemManager-${PV}"
+S="${WORKDIR}/ModemManager-${GIT_COMMIT}"
 
 python_check_deps() {
 	python_has_version "dev-python/dbus-python[${PYTHON_USEDEP}]" &&
