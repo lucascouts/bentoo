@@ -70,7 +70,7 @@ declare -A GIT_CRATES=(
 	[xim]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%'
 )
 
-LLVM_COMPAT=( {19..20} )
+LLVM_COMPAT=( 19 )
 RUST_MIN_VER="1.86.0"
 RUST_NEEDS_LLVM=1
 WEBRTC_COMMIT="b99fd2c-6"
