@@ -318,20 +318,6 @@ multilib_src_configure() {
 	use wayland && platforms+=",wayland"
 	emesonargs+=(-Dplatforms=${platforms#,})
 
-	if use video_cards_freedreno ||
-	   use video_cards_intel || # crocus i915 iris
-	   use video_cards_nouveau ||
-	   use video_cards_panfrost ||
-	   use video_cards_r300 ||
-	   use video_cards_r600 ||
-	   use video_cards_radeonsi ||
-	   use video_cards_vmware || # svga
-	   use video_cards_zink; then
-		emesonargs+=($(meson_use d3d9 gallium-nine))
-	else
-		emesonargs+=(-Dgallium-nine=false)
-	fi
-
 	if use video_cards_d3d12 ||
 	   use video_cards_nouveau ||
 	   use video_cards_r600 ||
@@ -355,15 +341,6 @@ multilib_src_configure() {
 		emesonargs+=($(meson_feature vdpau gallium-vdpau))
 	else
 		emesonargs+=(-Dgallium-vdpau=disabled)
-	fi
-
-	if use video_cards_freedreno ||
-	   use video_cards_intel ||
-	   use video_cards_nouveau ||
-	   use video_cards_vmware; then
-		emesonargs+=($(meson_feature xa gallium-xa))
-	else
-		emesonargs+=(-Dgallium-xa=disabled)
 	fi
 
 	gallium_enable !llvm softpipe
