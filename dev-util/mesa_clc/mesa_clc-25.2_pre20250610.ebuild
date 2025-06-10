@@ -4,7 +4,7 @@
 EAPI=8
 
 LLVM_COMPAT=( {18..20} )
-PYTHON_COMPAT=( python3_{11..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 
 inherit llvm-r1 meson python-any-r1
 
@@ -19,7 +19,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="d279d019d45d9038356eb7b9747ef0b208a56d2c"
+	GIT_COMMIT="0d3e8fa5369ab3e3e9db5fd51abe417f7b0b4e16"
 	S="${WORKDIR}/mesa-${GIT_COMMIT}"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
