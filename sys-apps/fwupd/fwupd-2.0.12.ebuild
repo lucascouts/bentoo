@@ -13,12 +13,11 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/${PV}/${P}.tar.xz"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="amd64 ~arm ~arm64 ~loong ppc64 ~riscv x86"
-IUSE="amdgpu amt +archive bash-completion bluetooth cbor elogind fastboot flashrom gnutls gtk-doc introspection logitech lzma minimal modemmanager nvme policykit seccomp spi +sqlite synaptics systemd test tpm uefi"
+KEYWORDS="~arm ~arm64 ~loong ppc64 ~riscv x86"
+IUSE="amt +archive bash-completion bluetooth cbor elogind flashrom gnutls gtk-doc introspection logitech minimal modemmanager policykit seccomp spi synaptics systemd test uefi"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 	^^ ( elogind minimal systemd )
 	minimal? ( !introspection )
-	spi? ( lzma )
 	seccomp? ( systemd )
 	synaptics? ( gnutls )
 	test? ( archive )
@@ -60,7 +59,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	$(python_gen_cond_dep '
 		dev-python/pygobject:3[${PYTHON_USEDEP}]
 	')
-	>=net-misc/curl-7.62.0
 	archive? ( app-arch/libarchive:= )
 	cbor? ( >=dev-libs/libcbor-0.7.0:= )
 	elogind? ( >=sys-auth/elogind-211 )
@@ -68,13 +66,10 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	gnutls? ( >=net-libs/gnutls-3.6.0 )
 	virtual/libusb:1
 	logitech? ( dev-libs/protobuf-c:= )
-	lzma? ( app-arch/xz-utils )
 	modemmanager? ( net-misc/modemmanager[mbim,qmi] )
 	policykit? ( >=sys-auth/polkit-0.114 )
 	seccomp? ( sys-apps/systemd[seccomp] )
-	sqlite? ( dev-db/sqlite )
 	systemd? ( >=sys-apps/systemd-211 )
-	tpm? ( app-crypt/tpm2-tss:= )
 	uefi? (
 		sys-apps/fwupd-efi
 		sys-boot/efibootmgr
@@ -90,14 +85,10 @@ RDEPEND="
 DEPEND="
 	${COMMON_DEPEND}
 	x11-libs/pango[introspection]
-	amdgpu? (
-		sys-kernel/linux-headers
-		x11-libs/libdrm[video_cards_amdgpu]
-	)
 "
 
 PATCHES=(
-	"${FILESDIR}"/${PN}-2.0.3-pango.patch
+    "${FILESDIR}/${PN}-2.0.10-re-add-elogind.patch"
 )
 
 src_prepare() {
@@ -113,21 +104,9 @@ src_prepare() {
 
 src_configure() {
 	local plugins=(
-		-Dplugin_gpio="enabled"
-		-Dplugin_uf2="enabled"
-		$(meson_feature amdgpu plugin_amdgpu)
-		$(meson_feature amt plugin_intel_me)
-		$(meson_feature fastboot plugin_fastboot)
 		$(meson_feature flashrom plugin_flashrom)
-		$(meson_feature logitech plugin_logitech_bulkcontroller)
 		$(meson_feature modemmanager plugin_modem_manager)
-		$(meson_feature nvme plugin_nvme)
-		$(meson_feature synaptics plugin_synaptics_mst)
-		$(meson_feature synaptics plugin_synaptics_rmi)
-		$(meson_feature tpm plugin_tpm)
-		$(meson_feature uefi plugin_uefi_capsule)
 		$(meson_use uefi plugin_uefi_capsule_splash)
-		$(meson_feature uefi plugin_uefi_pk)
 	)
 	if use ppc64 || use riscv ; then
 		plugins+=( -Dplugin_msr="disabled" )
@@ -136,8 +115,6 @@ src_configure() {
 	local emesonargs=(
 		--localstatedir "${EPREFIX}"/var
 		-Dbuild="$(usex minimal standalone all)"
-		-Dconsolekit="disabled"
-		-Dcurl="enabled"
 		-Defi_binary="false"
 		-Dman="true"
 		-Dsupported_build="enabled"
@@ -149,12 +126,9 @@ src_configure() {
 		$(meson_feature elogind)
 		$(meson_feature gnutls)
 		$(meson_feature gtk-doc docs)
-		$(meson_feature lzma)
 		$(meson_feature introspection)
 		$(meson_feature policykit polkit)
-		$(meson_feature sqlite)
 		$(meson_feature systemd)
-		$(meson_use seccomp systemd_syscall_filter)
 		$(meson_use test tests)
 
 		${plugins[@]}

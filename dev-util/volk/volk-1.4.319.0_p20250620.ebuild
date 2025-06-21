@@ -3,15 +3,15 @@
 
 EAPI=8
 
-inherit cmake-multilib
+inherit cmake-multilib dot-a
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/zeux/volk.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="d7a676f2bdb25561316296aeae3acec3b3c677a5"
+	EGIT_COMMIT="49ba6858c13516019d699d94c31d5814025dd005"
 	SRC_URI="https://github.com/zeux/volk/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv"
+	KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc ppc64 ~riscv"
 	S="${WORKDIR}"/${PN}-${EGIT_COMMIT}
 fi
 
@@ -29,8 +29,14 @@ DEPEND="${RDEPEND}
 "
 
 multilib_src_configure() {
+	lto-guarantee-fat
+
 	local mycmakeargs=(
 		-DVOLK_INSTALL=on
 	)
 	cmake_src_configure
+}
+
+multilib_src_install_all() {
+	strip-lto-bytecode
 }

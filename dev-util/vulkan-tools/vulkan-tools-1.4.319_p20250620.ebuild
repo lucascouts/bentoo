@@ -4,8 +4,7 @@
 EAPI=8
 
 MY_PN=Vulkan-Tools
-PYTHON_COMPAT=( python3_{10..13} )
-
+PYTHON_COMPAT=( python3_{11..14} )
 inherit cmake-multilib python-any-r1
 
 if [[ ${PV} == *9999* ]]; then
@@ -13,7 +12,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="d671923090e4dc74c0ebdb10c6e09fa0826e1fe9"
+	EGIT_COMMIT="e3fc64396755191b3c51e5c57d0454872e7fa487"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
@@ -30,8 +29,6 @@ BDEPEND="${PYTHON_DEPS}
 	cube? ( ~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}] )
 "
 RDEPEND="
-	dev-util/vulkan-headers:=[${MULTILIB_USEDEP}]
-	dev-util/volk:=[${MULTILIB_USEDEP}]
 	media-libs/vulkan-loader[${MULTILIB_USEDEP},wayland?,X?]
 	wayland? ( dev-libs/wayland[${MULTILIB_USEDEP}] )
 	X? (
@@ -40,6 +37,7 @@ RDEPEND="
 	)
 "
 DEPEND="${RDEPEND}
+	dev-util/vulkan-headers
 	X? ( x11-libs/libXrandr[${MULTILIB_USEDEP}] )
 "
 
@@ -51,9 +49,6 @@ pkg_setup() {
 	use cube && MULTILIB_CHOST_TOOLS+=(
 		/usr/bin/vkcube
 		/usr/bin/vkcubepp
-	)
-	use cube && use wayland && MULTILIB_CHOST_TOOLS+=(
-		/usr/bin/vkcube-wayland
 	)
 
 	python-any-r1_pkg_setup
@@ -73,15 +68,15 @@ multilib_src_configure() {
 		-DVULKAN_HEADERS_INSTALL_DIR="${ESYSROOT}/usr"
 	)
 
-	if use cube; then
-		if use X; then
-			mycmakeargs+=(-DCUBE_WSI_SELECTION=XCB)
-		elif use wayland; then
-			mycmakeargs+=(-DCUBE_WSI_SELECTION=WAYLAND)
-		else
-			mycmakeargs+=(-DCUBE_WSI_SELECTION=DISPLAY)
-		fi
-	fi
-
 	cmake_src_configure
+}
+
+pkg_postinst() {
+	if use cube; then
+		einfo "As of version 1.4.304.0, the window system for 'vkcube' and 'vkcubepp'"
+		einfo "can be selected at runtime using the '--wsi' runtime argument."
+		einfo "For example, Wayland can be selected using '--wsi wayland'."
+		einfo "As such, 'vkcube-wayland' has been removed and the runtime argument"
+		einfo "must be used instead. See 'vkcube --help' for more information."
+	fi
 }

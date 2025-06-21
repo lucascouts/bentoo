@@ -1,20 +1,20 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 MY_PN=Vulkan-Utility-Libraries
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 PYTHON_REQ_USE="xml(+)"
-inherit cmake-multilib python-any-r1
+inherit cmake-multilib dot-a python-any-r1
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/KhronosGroup/${MY_PN}.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="54c9baf20802a13279e23fa4cb0528dd5cf16064"
+	EGIT_COMMIT="0f0babb553a60da5971d9f4d40cf720ce01602f1"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv x86"
+	KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc ppc64 ~riscv x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -31,12 +31,25 @@ DEPEND="dev-util/vulkan-headers
 		dev-cpp/gtest
 		>=dev-cpp/magic_enum-0.9.2
 	)"
-RDEPEND="!<media-libs/vulkan-layers-1.3.268"
 BDEPEND="${PYTHON_DEPS}"
+
+PATCHES=(
+	"${FILESDIR}"/${PN}-1.4.313.0-magic_enum-0.9.7.patch
+)
+
+src_configure() {
+	lto-guarantee-fat
+	multilib-minimal_src_configure
+}
 
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DBUILD_TESTS=$(usex test ON OFF)
 	)
 	cmake_src_configure
+}
+
+multilib_src_install_all() {
+	einstalldocs
+	strip-lto-bytecode
 }

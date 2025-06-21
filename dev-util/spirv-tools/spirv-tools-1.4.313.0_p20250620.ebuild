@@ -4,7 +4,7 @@
 EAPI=8
 
 MY_PN=SPIRV-Tools
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 PYTHON_REQ_USE="xml(+)"
 inherit cmake-multilib python-any-r1
 
@@ -12,9 +12,9 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/KhronosGroup/${MY_PN}.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="dec28643ed15f68a2bc95650de25e0a7486b564c"
+	EGIT_COMMIT="108b19e5c6979f496deffad4acbe354237afa7d3"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
+	KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ppc64 ~riscv ~s390 ~sparc x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
@@ -23,9 +23,8 @@ HOMEPAGE="https://github.com/KhronosGroup/SPIRV-Tools"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-# Tests fail upon finding symbols that do not match a regular expression
-# in the generated library. Easily hit with non-standard compiler flags
-RESTRICT="test"
+IUSE="test"
+RESTRICT="!test? ( test )"
 
 DEPEND="dev-util/spirv-headers"
 # RDEPEND=""
@@ -35,8 +34,23 @@ multilib_src_configure() {
 	local mycmakeargs=(
 		-DSPIRV-Headers_SOURCE_DIR="${ESYSROOT}"/usr/
 		-DSPIRV_WERROR=OFF
+		-DSPIRV_SKIP_TESTS=$(usex !test)
 		-DSPIRV_TOOLS_BUILD_STATIC=OFF
+		-DCMAKE_C_FLAGS="${CFLAGS} -DNDEBUG"
+		-DCMAKE_CXX_FLAGS="${CXXFLAGS} -DNDEBUG"
 	)
 
 	cmake_src_configure
+}
+
+src_test() {
+	CMAKE_SKIP_TESTS=(
+		# Not relevant for us downstream
+		spirv-tools-copyrights
+		# Tests fail upon finding symbols that do not match a regular expression
+		# in the generated library. Easily hit with non-standard compiler flags
+		spirv-tools-symbol-exports.*
+	)
+
+	multilib-minimal_src_test
 }

@@ -1,5 +1,5 @@
 diff --git a/internal/frontend/bridge-gui/BridgeSetup.cmake b/internal/frontend/bridge-gui/BridgeSetup.cmake
-index 7c6c634..6e103ba 100644
+index 7c6c634..6959892 100644
 --- a/internal/frontend/bridge-gui/BridgeSetup.cmake
 +++ b/internal/frontend/bridge-gui/BridgeSetup.cmake
 @@ -44,7 +44,7 @@ if (NOT DEFINED BRIDGE_APP_VERSION)
@@ -19,20 +19,10 @@ index 7c6c634..6e103ba 100644
 \ No newline at end of file
 +set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "toolchain")
 +endif()
-\ No newline at end of file
 diff --git a/internal/frontend/bridge-gui/bridge-gui/CMakeLists.txt b/internal/frontend/bridge-gui/bridge-gui/CMakeLists.txt
-index 93a9f49..dbb2dbe 100644
+index 93a9f49..ffe3a52 100644
 --- a/internal/frontend/bridge-gui/bridge-gui/CMakeLists.txt
 +++ b/internal/frontend/bridge-gui/bridge-gui/CMakeLists.txt
-@@ -65,7 +65,7 @@ include(../FindQt.cmake)
- 
- # Use CMAKE_INSTALL_PREFIX that is also used internally by CMake
- if (DEFINED ENV{BRIDGE_INSTALL_PATH})
--    set(CMAKE_INSTALL_PREFIX "$ENV{BRIDGE_INSTALL_PATH}")
-+#_cmake_modify_IGNORE     set(CMAKE_INSTALL_PREFIX "$ENV{BRIDGE_INSTALL_PATH}")
- else(DEFINED ENV{BRIDGE_INSTALL_PATH})
-     message(STATUS "Using Default install path (${CMAKE_INSTALL_PREFIX}), export BRIDGE_INSTALL_PATH to change it.")
- endif(DEFINED ENV{BRIDGE_INSTALL_PATH})
 @@ -167,12 +167,9 @@ set_target_properties(bridge-gui PROPERTIES
          WIN32_EXECUTABLE TRUE
          MACOSX_BUNDLE TRUE)
@@ -48,21 +38,11 @@ index 93a9f49..dbb2dbe 100644
  qt_generate_deploy_app_script(
          TARGET bridge-gui
          FILENAME_VARIABLE deploy_script
-@@ -187,3 +184,14 @@ else()
+@@ -187,3 +184,4 @@ else()
  endif()
  
  include(Deploy${DEPLOY_OS}.cmake)
 +endif()
-+message(STATUS "<<< Gentoo configuration >>>
-+Build type      ${CMAKE_BUILD_TYPE}
-+Install path    ${CMAKE_INSTALL_PREFIX}
-+Compiler flags:
-+C               ${CMAKE_C_FLAGS}
-+C++             ${CMAKE_CXX_FLAGS}
-+Linker flags:
-+Executable      ${CMAKE_EXE_LINKER_FLAGS}
-+Module          ${CMAKE_MODULE_LINKER_FLAGS}
-+Shared          ${CMAKE_SHARED_LINKER_FLAGS}\n")
 diff --git a/internal/frontend/bridge-gui/bridge-gui/main.cpp b/internal/frontend/bridge-gui/bridge-gui/main.cpp
 index 8c21436..c804410 100644
 --- a/internal/frontend/bridge-gui/bridge-gui/main.cpp
@@ -72,12 +52,12 @@ index 8c21436..c804410 100644
  QString const bridgeLock = "bridge-v3.lock"; ///< The file name used for the bridge-gui lock file.
  QString const bridgeGUILock = "bridge-v3-gui.lock"; ///< The file name used for the bridge-gui lock file.
 -QString const exeName = "bridge" + exeSuffix; ///< The bridge executable file name.*
-+QString const exeName = "protonmail-bridge" + exeSuffix; ///< The bridge executable file name.*
++QString const exeName = "proton-mail-bridge" + exeSuffix; ///< The bridge executable file name.*
  qint64 constexpr grpcServiceConfigWaitDelayMs = 180000; ///< The wait delay for the gRPC config file in milliseconds.
  QString const waitFlag = "--wait"; ///< The wait command-line flag.
  QString const orphanInstanceException =  "An orphan instance of bridge is already running. Please terminate it and relaunch the application.";
 diff --git a/internal/frontend/bridge-gui/bridgepp/CMakeLists.txt b/internal/frontend/bridge-gui/bridgepp/CMakeLists.txt
-index f4a0a55..62ba569 100644
+index f4a0a55..17cab0e 100644
 --- a/internal/frontend/bridge-gui/bridgepp/CMakeLists.txt
 +++ b/internal/frontend/bridge-gui/bridgepp/CMakeLists.txt
 @@ -164,6 +164,9 @@ target_link_libraries(bridgepp
@@ -95,4 +75,3 @@ index f4a0a55..62ba569 100644
  include(GoogleTest)
  gtest_discover_tests(bridgepp-test)
 +endif()
-\ No newline at end of file

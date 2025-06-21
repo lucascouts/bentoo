@@ -1,10 +1,10 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
 MY_PN=Vulkan-ValidationLayers
-PYTHON_COMPAT=( python3_{10..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 inherit cmake-multilib python-any-r1
 
 if [[ ${PV} == *9999* ]]; then
@@ -23,7 +23,9 @@ HOMEPAGE="https://github.com/KhronosGroup/Vulkan-ValidationLayers"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="wayland X"
+IUSE="wayland test X"
+# Many segfaults as of 1.4.313.0
+RESTRICT="!test? ( test ) test"
 
 RDEPEND="dev-util/spirv-tools[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
@@ -42,6 +44,10 @@ DEPEND="${RDEPEND}
 
 QA_SONAME="/usr/lib[^/]*/libVkLayer_khronos_validation.so"
 
+PATCHES=(
+	"${FILESDIR}"/${PN}-1.4.313.0-tests-no-static.patch
+)
+
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_C_FLAGS="${CFLAGS} -DNDEBUG"
@@ -51,7 +57,7 @@ multilib_src_configure() {
 		-DBUILD_WSI_WAYLAND_SUPPORT=$(usex wayland)
 		-DBUILD_WSI_XCB_SUPPORT=$(usex X)
 		-DBUILD_WSI_XLIB_SUPPORT=$(usex X)
-		-DBUILD_TESTS=OFF
+		-DBUILD_TESTS=$(usex test)
 	)
 	cmake_src_configure
 }

@@ -3,7 +3,7 @@ Description=Proton Mail IMAP/SMTP bridge
 Documentation=https://proton.me/mail/bridge/
 
 [Service]
-ExecStart=/usr/bin/protonmail-bridge --noninteractive
+ExecStart=/usr/bin/proton-mail-bridge --noninteractive
 Restart=on-failure
 
 # Hardening
