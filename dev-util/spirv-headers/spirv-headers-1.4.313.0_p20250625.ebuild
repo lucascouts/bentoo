@@ -3,32 +3,29 @@
 
 EAPI=8
 
-MY_PN=Vulkan-Headers
+MY_PN=SPIRV-Headers
 inherit cmake
 
 if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/KhronosGroup/${MY_PN}.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="10739e8e00a7b6f74d22dd0a547f1406ff1f5eb9"
+	EGIT_COMMIT="04b76709bf40a7ce8df3382060ef3620f19de566"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
-	KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv x86"
+	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
 fi
 
-DESCRIPTION="Vulkan Header files and API registry"
-HOMEPAGE="https://github.com/KhronosGroup/Vulkan-Headers"
+DESCRIPTION="Machine-readable files for the SPIR-V Registry"
+HOMEPAGE="https://registry.khronos.org/SPIR-V/ https://github.com/KhronosGroup/SPIRV-Headers"
 
-LICENSE="Apache-2.0"
+LICENSE="MIT"
 SLOT="0"
-IUSE="test"
-RESTRICT="!test? ( test )"
 
 src_configure() {
 	local mycmakeargs=(
-		-DVULKAN_HEADERS_ENABLE_MODULE=OFF
-		-DVULKAN_HEADERS_ENABLE_TESTS=$(usex test)
+		-DSPIRV_HEADERS_ENABLE_TESTS=OFF
+		-DSPIRV_HEADERS_ENABLE_INSTALL=ON
 	)
-
 	cmake_src_configure
 }

@@ -1,118 +1,75 @@
-# Copyright 1999-2025 Gentoo Authors
+# Copyright 2018-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
+inherit eapi9-ver go-module
+MY_PV=${PV/_/-}
 
-inherit cmake desktop go-env go-module systemd xdg-utils
+DESCRIPTION="Multi-container orchestration for Docker"
+HOMEPAGE="https://github.com/docker/compose"
+SRC_URI="https://github.com/docker/compose/archive/v${MY_PV}.tar.gz -> ${P}.gh.tar.gz"
 
-MY_PN="${PN/-mail/}"
-MY_P="${MY_PN}-${PV}"
+S="${WORKDIR}/compose-${MY_PV}"
 
-DESCRIPTION="Serves Proton Mail to IMAP/SMTP clients"
-HOMEPAGE="https://proton.me/mail/bridge https://github.com/ProtonMail/proton-bridge/"
-SRC_URI="https://github.com/ProtonMail/${MY_PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
-S="${WORKDIR}"/${MY_P}
+LICENSE="Apache-2.0"
+SLOT="2"
+KEYWORDS="amd64 ~arm64"
 
-LICENSE="GPL-3+ Apache-2.0 BSD BSD-2 ISC LGPL-3+ MIT MPL-2.0 Unlicense"
-SLOT="0"
-KEYWORDS="~amd64"
-IUSE="gui"
+RDEPEND=">=app-containers/docker-cli-23.0.0"
 
-# Quite a few tests require Internet access
-PROPERTIES="test_network"
 RESTRICT="test"
 
-RDEPEND="
-	app-crypt/libsecret
-	gui? (
-		>=dev-libs/protobuf-21.12:=
-		dev-libs/re2:=
-		>=dev-libs/sentry-native-0.6.5-r1
-		dev-qt/qtbase:6=[gui,icu,widgets]
-		dev-qt/qtdeclarative:6=[widgets]
-		dev-qt/qtsvg:6=
-		media-libs/mesa
-		net-libs/grpc:=
-	)
-"
-DEPEND="${RDEPEND}"
-
 PATCHES=(
-	"${FILESDIR}"/${PN}-3.15.1-gui_gentoo.patch
+	"${FILESDIR}/${PN}-2.34.0-revert-secrets-file-mode.patch"
 )
-
-# $S is there for bug 957684
-DOCS=( "${S}"/{README,Changelog}.md )
 
 src_unpack() {
 	default
 	cd "${S}" || die
-	ego mod vendor
-
-	go-env_set_compile_environment
+	
+	# Force direct fetching from source repositories
+	# This completely bypasses the Go proxy system
+	export GOPROXY=direct
+	export GOSUMDB=off
+	export GOPRIVATE="*"
+	
+	# Force Go to use system DNS resolver
+	export GODEBUG="netdns=cgo"
+	
+	# Set Git to use HTTPS instead of SSH for all repositories
+	git config --global url."https://github.com/".insteadOf "git@github.com:"
+	git config --global url."https://".insteadOf "git://"
+	
+	ego mod vendor || die "go mod vendor failed"
 }
 
 src_prepare() {
-	xdg_environment_reset
 	default
-	if use gui; then
-		# prepare desktop file
-		local desktopFilePath="${S}"/dist/${MY_PN}.desktop
-		sed -i 's/protonmail/proton-mail/g' ${desktopFilePath} || die
-		sed -i 's/Exec=proton-mail-bridge/Exec=proton-mail-bridge-gui/g' ${desktopFilePath} || die
-
-		# build GUI
-		local PATCHES=()
-		BUILD_DIR="${WORKDIR}"/gui_build \
-			CMAKE_USE_DIR="${S}"/internal/frontend/bridge-gui/bridge-gui \
-			cmake_src_prepare
-	fi
-}
-
-src_configure() {
-	if use gui; then
-		local mycmakeargs=(
-			-DBRIDGE_APP_FULL_NAME="Proton Mail Bridge"
-			-DBRIDGE_APP_VERSION="${PV}+git"
-			-DBRIDGE_REPO_ROOT="${S}"
-			-DBRIDGE_TAG="NOTAG"
-			-DBRIDGE_VENDOR="Gentoo Linux"
-			-DCMAKE_DISABLE_PRECOMPILE_HEADERS=OFF
-		)
-		BUILD_DIR="${WORKDIR}"/gui_build \
-			CMAKE_USE_DIR="${S}"/internal/frontend/bridge-gui/bridge-gui \
-			cmake_src_configure
-	fi
+	# do not strip
+	sed -i -e 's/-s -w//' Makefile || die
 }
 
 src_compile() {
-	emake -Onone build-nogui
-
-	if use gui; then
-		BUILD_DIR="${WORKDIR}"/gui_build \
-			CMAKE_USE_DIR="${S}"/internal/frontend/bridge-gui/bridge-gui \
-			cmake_src_compile
-	fi
+	emake VERSION=v${PV}
 }
 
 src_test() {
-	emake -Onone test
+	emake test
 }
 
 src_install() {
-	exeinto /usr/bin
-	newexe bridge ${PN}
+	exeinto /usr/libexec/docker/cli-plugins
+	doexe bin/build/docker-compose
+	dodoc README.md
+}
 
-	if use gui; then
-		BUILD_DIR="${WORKDIR}"/gui_build \
-			CMAKE_USE_DIR="${S}"/internal/frontend/bridge-gui/bridge-gui \
-			cmake_src_install
-		mv "${ED}"/usr/bin/bridge-gui "${ED}"/usr/bin/${PN}-gui || die
-		newicon {"${S}"/dist/bridge,${PN}}.svg
-		newmenu {dist/${MY_PN},${PN}}.desktop
-	fi
-
-	systemd_newuserunit "${FILESDIR}"/${PN}.service-r1 ${PN}.service
-
-	einstalldocs
+pkg_postinst() {
+	ver_replacing -ge 2 && return
+	ewarn
+	ewarn "docker-compose 2.x is a sub command of docker"
+	ewarn "Use 'docker compose' from the command line instead of"
+	ewarn "'docker-compose'"
+	ewarn "If you need to keep 1.x around, please run the following"
+	ewarn "command before your next --depclean"
+	ewarn "# emerge --noreplace docker-compose:0"
 }
