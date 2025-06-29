@@ -8,7 +8,6 @@ MY_PV=${PV/_/-}
 DESCRIPTION="Multi-container orchestration for Docker"
 HOMEPAGE="https://github.com/docker/compose"
 SRC_URI="https://github.com/docker/compose/archive/v${MY_PV}.tar.gz -> ${P}.gh.tar.gz"
-SRC_URI+=" https://dev.gentoo.org/~williamh/dist/${P}-deps.tar.xz"
 
 S="${WORKDIR}/compose-${MY_PV}"
 
@@ -23,6 +22,12 @@ RESTRICT="test"
 PATCHES=(
 	"${FILESDIR}/${PN}-2.34.0-revert-secrets-file-mode.patch"
 )
+
+src_unpack() {
+	default
+	cd "${S}" || die
+	go mod download || die
+}
 
 src_prepare() {
 	default
