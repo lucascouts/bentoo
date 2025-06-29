@@ -27,7 +27,7 @@ TEST_FONT=a28b222b79851716f8358d2800157d9ffe117b3545031ae51f69b7e1e1b9a969
 BUNDLED_CLANG_VER=llvmorg-21-init-11777-gfd3fecfc-1
 BUNDLED_RUST_VER=4a0969e06dbeaaa43914d2d00b2e843d49aa3886-1
 RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
-NODE_VER=24.2.0
+NODE_VER=24.03.0
 
 VIRTUALX_REQUIRED="pgo"
 
@@ -48,7 +48,7 @@ inherit python-any-r1 readme.gentoo-r1 rust systemd toolchain-funcs virtualx xdg
 DESCRIPTION="Open-source version of Google Chrome web browser"
 HOMEPAGE="https://www.chromium.org/"
 PPC64_HASH="a85b64f07b489b8c6fdb13ecf79c16c56c560fc6"
-PATCH_V="${PV%%\.*}-1"
+PATCH_V="${PV%%\.*}"
 SRC_URI="https://github.com/chromium-linux-tarballs/chromium-tarballs/releases/download/${PV}/chromium-${PV}-linux.tar.xz
 	!bundled-toolchain? (
 		https://gitlab.com/Matt.Jolly/chromium-patches/-/archive/${PATCH_V}/chromium-patches-${PATCH_V}.tar.bz2
@@ -419,7 +419,6 @@ src_prepare() {
 		"${FILESDIR}/chromium-134-bindgen-custom-toolchain.patch"
 		"${FILESDIR}/chromium-135-oauth2-client-switches.patch"
 		"${FILESDIR}/chromium-135-map_droppable-glibc.patch"
-		"${FILESDIR}/chromium-137-openh264-include-path.patch"
 		"${FILESDIR}/chromium-138-nodejs-version-check.patch"
 	)
 
@@ -536,7 +535,6 @@ src_prepare() {
 		base/third_party/xdg_user_dirs
 		buildtools/third_party/libc++
 		buildtools/third_party/libc++abi
-		chrome/third_party/mozilla_security_manager
 		net/third_party/mozilla_security_manager
 		net/third_party/nss
 		net/third_party/quic
@@ -689,9 +687,9 @@ src_prepare() {
 		third_party/mako
 		third_party/markupsafe
 		third_party/material_color_utilities
-		third_party/mesa
 		third_party/metrics_proto
 		third_party/minigbm
+		third_party/ml_dtypes
 		third_party/modp_b64
 		third_party/nasm
 		third_party/nearby
@@ -727,6 +725,7 @@ src_prepare() {
 		third_party/pyyaml
 		third_party/rapidhash
 		third_party/re2
+		third_party/readability
 		third_party/rnnoise
 		third_party/rust
 		third_party/ruy
@@ -762,6 +761,7 @@ src_prepare() {
 		third_party/tflite/src/third_party/xla/third_party/tsl
 		third_party/tflite/src/third_party/xla/xla/tsl/framework
 		third_party/tflite/src/third_party/xla/xla/tsl/lib/random
+		third_party/tflite/src/third_party/xla/xla/tsl/platform
 		third_party/tflite/src/third_party/xla/xla/tsl/protobuf
 		third_party/tflite/src/third_party/xla/xla/tsl/util
 		third_party/ukey2
@@ -889,9 +889,10 @@ src_prepare() {
 	einfo "Unbundling third-party libraries ..."
 	build/linux/unbundle/remove_bundled_libraries.py "${keeplibs[@]}" --do-remove || die
 
-	# bundled eu-strip is for amd64 only and we don't want to pre-stripped binaries
-	mkdir -p buildtools/third_party/eu-strip/bin || die
-	ln -s "${EPREFIX}"/bin/true buildtools/third_party/eu-strip/bin/eu-strip || die
+	# Interferes with our bundled clang path; we don't want stripped binaries anyway.
+	sed -i -e 's|${clang_base_path}/bin/llvm-strip|/bin/true|g' \
+		-e 's|${clang_base_path}/bin/llvm-objcopy|/bin/true|g' \
+		build/linux/strip_binary.gni || die
 }
 
 chromium_configure() {
@@ -1060,8 +1061,6 @@ chromium_configure() {
 		# We now need to opt-in
 		"enable_freetype=true"
 		"enable_hangout_services_extension=$(usex hangouts true false)"
-		# Disable nacl; deprecated, we can't build without pnacl (http://crbug.com/269560).
-		"enable_nacl=false"
 		# Don't need nocompile checks and GN crashes with our config (verify with modern GN)
 		"enable_nocompile_tests=false"
 		# pseudolocales are only used for testing
@@ -1399,6 +1398,14 @@ src_test() {
 		ToolsSanityTest.BadVirtualCallWrongType
 		CancelableEventTest.BothCancelFailureAndSucceedOccurUnderContention #new m133: TODO investigate
 		DriveInfoTest.GetFileDriveInfo # new m137: TODO investigate
+		# Broken since M139 dev
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/RendererProcessIsCritical
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/UtilityProcessIsCritical
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/BrowserProcessIsCritical
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/MainThreadIsCritical
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/IOThreadIsCritical
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/CompositorThreadIsCritical
+		CriticalProcessAndThreadSpotChecks/HangWatcherAnyCriticalThreadTests.AnyCriticalThreadHung/ThreadPoolIsNotCritical
 	)
 	local test_filter="-$(IFS=:; printf '%s' "${skip_tests[*]}")"
 	# test-launcher-bot-mode enables parallelism and plain output
