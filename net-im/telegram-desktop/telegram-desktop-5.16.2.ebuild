@@ -75,7 +75,6 @@ BDEPEND="
 "
 
 PATCHES=(
-	"${FILESDIR}"/tdesktop-4.2.4-jemalloc-only-telegram-r1.patch
 	"${FILESDIR}"/tdesktop-5.2.2-qt6-no-wayland.patch
 	"${FILESDIR}"/tdesktop-5.2.2-libdispatch.patch
 	"${FILESDIR}"/tdesktop-5.7.2-cstring.patch

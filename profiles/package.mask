@@ -1,0 +1,2 @@
+=net-im/telegram-desktop-5.16.2
+=app-containers/docker-compose-2.37.3
