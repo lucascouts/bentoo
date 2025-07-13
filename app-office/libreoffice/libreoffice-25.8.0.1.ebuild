@@ -84,8 +84,8 @@ S="${WORKDIR}/${PN}-${MY_PV}"
 LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
 
-[[ ${MY_PV} == *9999* ]] || \
-KEYWORDS="amd64 ~arm arm64 ppc64 ~riscv ~x86 ~amd64-linux"
+# [[ ${MY_PV} == *9999* ]] || \
+# KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
 
 # Extensions that need extra work:
 LO_EXTS="nlpsolver scripting-beanshell scripting-javascript wiki-publisher"
@@ -110,7 +110,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
 	app-arch/zip
 	app-crypt/argon2:=
-	app-crypt/gpgme:=[cxx]
+	dev-cpp/gpgmepp:=
 	app-text/hunspell:=
 	>=app-text/libabw-0.1.0
 	>=app-text/libebook-0.1
@@ -138,7 +138,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-libs/icu:=
 	dev-libs/libassuan:=
 	dev-libs/libgpg-error
-	>=dev-libs/liborcus-0.18.0:0/0.18
+	>=dev-libs/liborcus-0.20.0:0/0.20
 	dev-libs/librevenge
 	dev-libs/libxml2:=
 	dev-libs/libxslt
@@ -237,7 +237,8 @@ DEPEND="${COMMON_DEPEND}
 	dev-perl/Archive-Zip
 	>=dev-util/cppunit-1.14.0
 	>=dev-util/gperf-3.1
-	dev-util/mdds:1/2.1
+	dev-util/mdds:1/3.0
+	media-libs/libeot
 	media-libs/glm
 	x11-base/xorg-proto
 	x11-libs/libXt
@@ -292,13 +293,13 @@ PATCHES=(
 	"${FILESDIR}/${PN}-24.2-qtdetect.patch"
 	"${FILESDIR}/${PN}-25.2-cflags.patch"
 
+	# git master
+	"${FILESDIR}/${PN}-25.2-unused-qt6network.patch"
+	"${FILESDIR}/${PN}-25.2.4.3-gcc16.patch"
+
 	# add qt6 backend as possible fallback for gtk-based desktop environments:
 	# https://bugs.gentoo.org/950170
 	"${FILESDIR}/${PN}-25.2-vcl-backend-fallback.patch"
-
-	# git master:
-	"${FILESDIR}/${PN}-25.2-unused-qt6network.patch"
-	"${FILESDIR}/${PN}-25.2.4.3-gcc16.patch"
 )
 
 _check_reqs() {

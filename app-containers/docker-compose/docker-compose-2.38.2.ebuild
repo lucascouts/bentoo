@@ -8,21 +8,17 @@ MY_PV=${PV/_/-}
 DESCRIPTION="Multi-container orchestration for Docker"
 HOMEPAGE="https://github.com/docker/compose"
 SRC_URI="https://github.com/docker/compose/archive/v${MY_PV}.tar.gz -> ${P}.gh.tar.gz"
-SRC_URI+=" https://distfiles.obentoo.org/${P}-deps.tar.xz"
+SRC_URI+=" https://dev.gentoo.org/~williamh/dist/${P}-deps.tar.xz"
 
 S="${WORKDIR}/compose-${MY_PV}"
 
 LICENSE="Apache-2.0"
 SLOT="2"
-KEYWORDS="amd64 ~arm64"
+KEYWORDS="~amd64 ~arm64"
 
 RDEPEND=">=app-containers/docker-cli-23.0.0"
 
 RESTRICT="test"
-
-PATCHES=(
-	"${FILESDIR}/${PN}-2.34.0-revert-secrets-file-mode.patch"
-)
 
 src_prepare() {
 	default

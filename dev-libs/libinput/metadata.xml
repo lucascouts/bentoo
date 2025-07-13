@@ -2,9 +2,10 @@
 <!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
   <maintainer type="project">
-    <email>freedesktop-bugs@gentoo.org</email>
+    <email>x11@gentoo.org</email>
+    <name>X11</name>
   </maintainer>
   <upstream>
-    <remote-id type="freedesktop-gitlab">mobile-broadband/libmbim</remote-id>
+    <remote-id type="freedesktop-gitlab">libinput/libinput</remote-id>
   </upstream>
 </pkgmetadata>

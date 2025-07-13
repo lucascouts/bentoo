@@ -1,11 +1,12 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
-GNOME_ORG_MODULE="NetworkManager"
-PYTHON_COMPAT=( python3_{11..13} )
 
-inherit gnome.org linux-info meson-multilib flag-o-matic python-any-r1 \
+MY_PN="NetworkManager"
+PYTHON_COMPAT=( python3_{11..14} )
+
+inherit linux-info meson-multilib flag-o-matic python-any-r1 \
 		readme.gentoo-r1 systemd toolchain-funcs udev vala virtualx
 
 DESCRIPTION="A set of co-operative tools that make networking simple and straightforward"
@@ -17,9 +18,9 @@ SRC_URI="https://github.com/NetworkManager/NetworkManager/archive/${GIT_COMMIT}.
 LICENSE="GPL-2+ LGPL-2.1+"
 SLOT="0"
 
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~ppc ~ppc64 ~riscv ~sparc ~x86"
 
-IUSE="audit bluetooth +concheck connection-sharing debug dhclient dhcpcd elogind gnutls +gtk-doc +introspection iptables iwd psl libedit +nss nftables +modemmanager ofono ovs policykit +ppp resolvconf selinux syslog systemd teamd test +tools vala +wext +wifi"
+IUSE="audit bluetooth +concheck connection-sharing debug dhclient dhcpcd elogind gnutls gtk-doc +introspection iptables iwd psl libedit +nss nftables +modemmanager ofono ovs policykit +ppp resolvconf selinux syslog systemd teamd test +tools vala +wext +wifi"
 RESTRICT="!test? ( test )"
 
 REQUIRED_USE="
@@ -81,6 +82,7 @@ COMMON_DEPEND="
 	psl? ( net-libs/libpsl )
 	concheck? ( net-misc/curl )
 	tools? (
+		>=dev-libs/jansson-2.7:=
 		>=dev-libs/newt-0.52.15
 		libedit? ( dev-libs/libedit )
 		!libedit? ( sys-libs/readline:= )
@@ -101,6 +103,7 @@ DEPEND="${COMMON_DEPEND}
 	>=sys-kernel/linux-headers-3.18
 	net-libs/libndp[${MULTILIB_USEDEP}]
 	ppp? ( elibc_musl? ( net-libs/ppp-defs ) )
+	test? ( >=dev-libs/jansson-2.7 )
 "
 BDEPEND="
 	dev-util/gdbus-codegen
@@ -118,7 +121,6 @@ BDEPEND="
 	)
 	vala? ( $(vala_depend) )
 	test? (
-		>=dev-libs/jansson-2.7
 		$(python_gen_any_dep '
 			dev-python/dbus-python[${PYTHON_USEDEP}]
 			dev-python/pygobject:3[${PYTHON_USEDEP}]')
@@ -174,10 +176,13 @@ meson_nm_native_program() {
 }
 
 multilib_src_configure() {
-	# Workaround for LLD 17 (bug #915819)
+	# Workaround for LLD on musl systems (bug #959603)
 	append-ldflags $(test-flags-CCLD -Wl,--undefined-version)
-	# Build system requires -flto-partition=none support for LTO
-	tc-is-clang && filter-lto
+
+	# LTO is restricted in older clang for unclear reasons.
+	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/593
+	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2053
+	tc-is-clang && [[ $(clang-major-version) -lt 18 ]] && filter-lto
 
 	local emesonargs=(
 		--localstatedir="${EPREFIX}/var"
@@ -350,6 +355,11 @@ multilib_src_install_all() {
 
 	# Empty
 	rmdir "${ED}"/var{/lib{/NetworkManager,},} || die
+
+	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1653
+	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2068
+	# prebuilt manpages aren't installed by meson
+	use gtk-doc || doman man/*.[1578]
 }
 
 pkg_postinst() {
@@ -390,6 +400,10 @@ pkg_postinst() {
 		ewarn "works for you, and you're happy with, the alternative USE flags can be"
 		ewarn "disabled. If you want to use dhclient or dhcpcd, then you need to tweak"
 		ewarn "the main.dhcp configuration option to use one of them instead of internal."
+		# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/1988
+		ewarn
+		ewarn "Note that dhclient has been deprecated and support for that will be removed"
+		ewarn "in a future release."
 	fi
 }
 

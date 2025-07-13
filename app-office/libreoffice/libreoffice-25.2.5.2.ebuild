@@ -52,8 +52,6 @@ ADDONS_SRC=(
 	"${ADDONS_URI}/frozen-1.2.0.tar.gz"
 	# not packaged in Gentoo, https://skia.org/
 	"${ADDONS_URI}/skia-m130-3c64459d5df2fa9794b277f0959ed8a92552bf4c.tar.xz"
-	# not packaged in Gentoo, https://github.com/tsyrogit/zxcvbn-c
-	"${ADDONS_URI}/zxcvbn-c-2.5.tar.gz"
 
 	"base? (
 		${ADDONS_URI}/ba2930200c9f019c2d93a8c88c651a0f-flow-engine-0.9.4.zip
@@ -86,8 +84,8 @@ S="${WORKDIR}/${PN}-${MY_PV}"
 LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
 
-[[ ${MY_PV} == *9999* ]] || \
-KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
+# [[ ${MY_PV} == *9999* ]] || \
+# KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
 
 # Extensions that need extra work:
 LO_EXTS="nlpsolver scripting-beanshell scripting-javascript wiki-publisher"
@@ -112,7 +110,7 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	app-arch/unzip
 	app-arch/zip
 	app-crypt/argon2:=
-	app-crypt/gpgme:=[cxx]
+	dev-cpp/gpgmepp:=
 	app-text/hunspell:=
 	>=app-text/libabw-0.1.0
 	>=app-text/libebook-0.1
@@ -140,13 +138,14 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	dev-libs/icu:=
 	dev-libs/libassuan:=
 	dev-libs/libgpg-error
-	>=dev-libs/liborcus-0.20.0:0/0.20
+	>=dev-libs/liborcus-0.18.0:0/0.18
 	dev-libs/librevenge
 	dev-libs/libxml2:=
 	dev-libs/libxslt
 	dev-libs/nspr
 	dev-libs/nss
 	>=dev-libs/redland-1.0.16
+	dev-libs/zxcvbn-c
 	>=dev-libs/xmlsec-1.2.35:=[nss]
 	>=games-engines/box2d-2.4.1:0
 	media-gfx/fontforge
@@ -238,8 +237,7 @@ DEPEND="${COMMON_DEPEND}
 	dev-perl/Archive-Zip
 	>=dev-util/cppunit-1.14.0
 	>=dev-util/gperf-3.1
-	dev-util/mdds:1/3.0
-	media-libs/libeot
+	dev-util/mdds:1/2.1
 	media-libs/glm
 	x11-base/xorg-proto
 	x11-libs/libXt
@@ -294,13 +292,13 @@ PATCHES=(
 	"${FILESDIR}/${PN}-24.2-qtdetect.patch"
 	"${FILESDIR}/${PN}-25.2-cflags.patch"
 
+	# git master
+	"${FILESDIR}/${PN}-25.2-unused-qt6network.patch"
+	"${FILESDIR}/${PN}-25.2.4.3-gcc16.patch"
+
 	# add qt6 backend as possible fallback for gtk-based desktop environments:
 	# https://bugs.gentoo.org/950170
 	"${FILESDIR}/${PN}-25.2-vcl-backend-fallback.patch"
-
-	# git master:
-	"${FILESDIR}/${PN}-25.2-unused-qt6network.patch"
-	"${FILESDIR}/${PN}-25.2.3.2-poppler-25.05.patch"
 )
 
 _check_reqs() {
@@ -477,6 +475,9 @@ src_configure() {
 	export PYTHON_CFLAGS=$(python_get_CFLAGS)
 	export PYTHON_LIBS=$(python_get_LIBS)
 
+	# doesn't respect CPPFLAGS
+	append-flags "-I${ESYSROOT}/usr/include/zxcvbn"
+
 	if use qt6; then
 		export QT6DIR="$(qt6_get_bindir)/.."
 	fi
@@ -547,13 +548,13 @@ src_configure() {
 		--with-help="html"
 		--without-helppack-integration
 		--with-system-gpgmepp
+		--with-system-zxcvbn
 		--without-system-abseil
 		--without-system-dragonbox
 		--without-system-frozen
 		--without-system-jfreereport
 		--without-system-libfixmath
 		--without-system-sane
-		--without-system-zxcvbn
 		--without-system-java-websocket
 		$(use_enable base report-builder)
 		$(use_enable bluetooth sdremote-bluetooth)
