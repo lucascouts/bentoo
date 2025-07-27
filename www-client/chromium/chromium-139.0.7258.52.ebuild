@@ -27,7 +27,7 @@ TEST_FONT=a28b222b79851716f8358d2800157d9ffe117b3545031ae51f69b7e1e1b9a969
 BUNDLED_CLANG_VER=llvmorg-21-init-11777-gfd3fecfc-1
 BUNDLED_RUST_VER=4a0969e06dbeaaa43914d2d00b2e843d49aa3886-1
 RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
-NODE_VER=24.03.0
+NODE_VER=24.4.1
 
 VIRTUALX_REQUIRED="pgo"
 
@@ -1239,7 +1239,7 @@ chromium_compile() {
 	# Build mksnapshot and pax-mark it.
 	if use pax-kernel; then
 		local x
-		for x in mksnapshot v8_context_snapshot_generator; do
+		for x in mksnapshot v8_context_snapshot_generator code_cache_generator; do
 			if tc-is-cross-compiler; then
 				eninja -C out/Release "host/${x}"
 				pax-mark m "out/Release/host/${x}"
