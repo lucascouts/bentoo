@@ -87,10 +87,6 @@ DEPEND="
 	x11-libs/pango[introspection]
 "
 
-PATCHES=(
-    "${FILESDIR}/${PN}-2.0.10-re-add-elogind.patch"
-)
-
 src_prepare() {
 	default
 
