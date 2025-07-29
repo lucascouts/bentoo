@@ -14,9 +14,9 @@ SRC_URI="https://github.com/${PN}/${PN}/releases/download/${PV}/${P}.tar.xz"
 LICENSE="LGPL-2.1+"
 SLOT="0"
 KEYWORDS="~arm ~arm64 ~loong ppc64 ~riscv x86"
-IUSE="amt +archive bash-completion bluetooth cbor elogind flashrom gnutls gtk-doc introspection logitech minimal modemmanager policykit seccomp spi synaptics systemd test uefi"
+IUSE="amt +archive bash-completion bluetooth cbor flashrom gnutls gtk-doc introspection logitech minimal modemmanager policykit seccomp spi synaptics systemd test uefi"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
-	^^ ( elogind minimal systemd )
+	^^ ( minimal systemd )
 	minimal? ( !introspection )
 	seccomp? ( systemd )
 	synaptics? ( gnutls )
@@ -61,7 +61,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 	')
 	archive? ( app-arch/libarchive:= )
 	cbor? ( >=dev-libs/libcbor-0.7.0:= )
-	elogind? ( >=sys-auth/elogind-211 )
 	flashrom? ( >=sys-apps/flashrom-1.2-r3 )
 	gnutls? ( >=net-libs/gnutls-3.6.0 )
 	virtual/libusb:1
@@ -119,7 +118,6 @@ src_configure() {
 		$(meson_use bash-completion bash_completion)
 		$(meson_feature bluetooth bluez)
 		$(meson_feature cbor)
-		$(meson_feature elogind)
 		$(meson_feature gnutls)
 		$(meson_feature gtk-doc docs)
 		$(meson_feature introspection)
