@@ -1,2 +1,6 @@
-=net-im/telegram-desktop-5.16.2
-=app-containers/docker-compose-2.37.3
+=net-im/telegram-desktop:bentoo
+=app-containers/docker:bentoo
+=app-containers/docker-compose:bentoo
+=net-ftp/filezilla-pro:bentoo
+=media-libs/gstreamer:bentoo
+=net-misc/networkmanager::bentoo
