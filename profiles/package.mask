@@ -1,6 +1,8 @@
-=net-im/telegram-desktop:bentoo
-=app-containers/docker:bentoo
-=app-containers/docker-compose:bentoo
-=net-ftp/filezilla-pro:bentoo
-=media-libs/gstreamer:bentoo
-=net-misc/networkmanager::bentoo
+=app-containers/docker-compose-2.38.2:2::bentoo
+=app-containers/docker-28.3.2::bentoo
+=media-libs/gstreamer-1.27.1:1.0::bentoo
+=net-misc/networkmanager-1.55.0_p20250606::bentoo
+=sys-apps/fwupd-2.0.13::bentoo
+=net-ftp/filezilla-pro-3.69.3::bentoo
+=net-im/telegram-desktop-5.16.3::bentoo
+=media-gfx/blender-4.5.0:4.5::bentoo
