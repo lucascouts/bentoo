@@ -13,11 +13,12 @@ inherit flag-o-matic llvm-r1 meson-multilib python-any-r1 linux-info rust-toolch
 MY_P="${P/_/-}"
 
 CRATES="
-	syn@2.0.68
-	proc-macro2@1.0.86
-	quote@1.0.33
-	unicode-ident@1.0.12
 	paste@1.0.14
+	proc-macro2@1.0.86
+	quote@1.0.35
+	rustc-hash@2.1.1
+	syn@2.0.87
+	unicode-ident@1.0.12
 "
 
 RUST_MIN_VER="1.78.0"
@@ -33,7 +34,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="81c6ea950738e4248e04735ded5af49d09dce1b4"
+	GIT_COMMIT="fdcad6e547b097f9370218f2cded8e3cd123c3c3"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
@@ -60,25 +61,12 @@ for card in ${VIDEO_CARDS}; do
 done
 
 IUSE="${IUSE_VIDEO_CARDS}
-	cpu_flags_x86_sse2 d3d9 debug +llvm
+	cpu_flags_x86_sse2 debug +llvm
 	lm-sensors opencl +opengl +proprietary-codecs
-	test unwind vaapi valgrind vdpau vulkan
-	wayland +X xa +zstd"
+	sysprof test unwind vaapi valgrind vdpau vulkan
+	wayland +X +zstd"
 RESTRICT="!test? ( test )"
 REQUIRED_USE="
-	d3d9? (
-		|| (
-			video_cards_freedreno
-			video_cards_intel
-			video_cards_nouveau
-			video_cards_panfrost
-			video_cards_r300
-			video_cards_r600
-			video_cards_radeonsi
-			video_cards_vmware
-			video_cards_zink
-		)
-	)
 	llvm? ( ${LLVM_REQUIRED_USE} )
 	video_cards_lavapipe? ( llvm vulkan )
 	video_cards_radeon? ( x86? ( llvm ) amd64? ( llvm ) )
@@ -86,7 +74,6 @@ REQUIRED_USE="
 	video_cards_zink? ( vulkan opengl )
 	video_cards_nvk? ( vulkan video_cards_nouveau )
 	vdpau? ( X )
-	xa? ( X )
 "
 
 LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.121"
@@ -128,7 +115,7 @@ RDEPEND="
 	wayland? ( >=dev-libs/wayland-1.18.0[${MULTILIB_USEDEP}] )
 	${LIBDRM_DEPSTRING}[video_cards_freedreno?,video_cards_intel?,video_cards_nouveau?,video_cards_vc4?,video_cards_vivante?,video_cards_vmware?,${MULTILIB_USEDEP}]
 	X? (
-		>=x11-libs/libX11-1.6.2[${MULTILIB_USEDEP}]
+		>=x11-libs/libX11-1.8[${MULTILIB_USEDEP}]
 		>=x11-libs/libxshmfence-1.1[${MULTILIB_USEDEP}]
 		>=x11-libs/libXext-1.3.2[${MULTILIB_USEDEP}]
 		>=x11-libs/libXxf86vm-1.1.3[${MULTILIB_USEDEP}]
@@ -148,6 +135,7 @@ RDEPEND="${RDEPEND}
 "
 
 DEPEND="${RDEPEND}
+	sysprof? ( >=dev-util/sysprof-capture-3.38.0[${MULTILIB_USEDEP}] )
 	video_cards_d3d12? ( >=dev-util/directx-headers-1.614.1[${MULTILIB_USEDEP}] )
 	valgrind? ( dev-debug/valgrind )
 	wayland? ( >=dev-libs/wayland-protocols-1.41 )
@@ -164,7 +152,7 @@ CLC_DEPSTRING="
 BDEPEND="
 	${PYTHON_DEPS}
 	opencl? (
-		>=dev-util/bindgen-0.71.0
+		>=dev-util/bindgen-0.71.1
 		${RUST_DEPEND}
 	)
 	>=dev-build/meson-1.7.0
@@ -182,7 +170,7 @@ BDEPEND="
 	vulkan? (
 		dev-util/glslang
 		video_cards_nvk? (
-			>=dev-util/bindgen-0.71.0
+			>=dev-util/bindgen-0.71.1
 			>=dev-util/cbindgen-0.26.0
 			${RUST_DEPEND}
 			${CLC_DEPSTRING}
@@ -249,15 +237,6 @@ pkg_pretend() {
 		   ! use video_cards_radeonsi &&
 		   ! use video_cards_virgl; then
 			ewarn "Ignoring USE=vdpau      since VIDEO_CARDS does not contain d3d12, nouveau, r600, radeonsi, or virgl"
-		fi
-	fi
-
-	if use xa; then
-		if ! use video_cards_freedreno &&
-		   ! use video_cards_intel &&
-		   ! use video_cards_nouveau &&
-		   ! use video_cards_vmware; then
-			ewarn "Ignoring USE=xa         since VIDEO_CARDS does not contain freedreno, intel, nouveau, or vmware"
 		fi
 	fi
 
@@ -443,6 +422,7 @@ multilib_src_configure() {
 		$(meson_feature lm-sensors lmsensors)
 		$(meson_feature unwind libunwind)
 		$(meson_feature zstd)
+		$(meson_use sysprof)
 		$(meson_use cpu_flags_x86_sse2 sse2)
 		-Dvalgrind=$(usex valgrind auto disabled)
 		-Dvideo-codecs=$(usex proprietary-codecs "all" "all_free")
