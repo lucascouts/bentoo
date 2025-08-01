@@ -25,10 +25,6 @@ RDEPEND="
 DEPEND="${RDEPEND}"
 BDEPEND="virtual/pkgconfig"
 
-PATCHES=(
-	"${FILESDIR}"/${PN}-0.6.5_no-fuzz-test.patch
-)
-
 src_configure() {
 	local mycmakeargs=(
 		-DSENTRY_BUILD_EXAMPLES=OFF
