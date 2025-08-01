@@ -79,19 +79,17 @@ busybox_config_enabled() {
 PATCHES=(
 	"${FILESDIR}"/${PN}-1.26.2-bb.patch
 	"${FILESDIR}"/${PN}-1.34.1-skip-selinux-search.patch
-
 	"${FILESDIR}"/${PN}-1.36.0-fortify-source-3-fixdep.patch
 	"${FILESDIR}"/${PN}-1.36.1-kernel-6.8.patch
-
-	"${FILESDIR}"/${PN}-1.36.1-skip-dynamic-relocations.patch
-
-	# "${FILESDIR}"/${P}-*.patch
 )
 
 src_prepare() {
 	default
 
 	cp "${FILESDIR}"/ginit.c init/ || die
+
+	# Hackfix to disable HW acceleration for MD5/SHA1 on x86
+	sed -i 's/(defined(__i386__) || defined(__x86_64__))/defined(__x86_64__))/' libbb/hash_md5_sha.c || die
 
 	# flag cleanup
 	sed -i -r \
