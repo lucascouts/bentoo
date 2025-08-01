@@ -110,6 +110,7 @@ src_configure() {
 			-DBRIDGE_TAG="NOTAG"
 			-DBRIDGE_VENDOR="Gentoo Linux"
 			-DCMAKE_DISABLE_PRECOMPILE_HEADERS=OFF
+			-Dsentry_DIR="${S}/internal/sentry"
 		)
 		BUILD_DIR="${WORKDIR}"/gui_build \
 			CMAKE_USE_DIR="${S}"/internal/frontend/bridge-gui/bridge-gui \
