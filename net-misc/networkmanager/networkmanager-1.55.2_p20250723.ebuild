@@ -12,7 +12,7 @@ inherit linux-info meson-multilib flag-o-matic python-any-r1 \
 DESCRIPTION="A set of co-operative tools that make networking simple and straightforward"
 HOMEPAGE="https://wiki.gnome.org/Projects/NetworkManager"
 
-GIT_COMMIT="46e0d2b4e4eb5948db12186a3c60d3fd98ae8cd4"
+GIT_COMMIT="93ed7a2c38b7fab66feddfd0096e7ed665169b48"
 SRC_URI="https://github.com/NetworkManager/NetworkManager/archive/${GIT_COMMIT}.zip"
 
 LICENSE="GPL-2+ LGPL-2.1+"
@@ -355,11 +355,6 @@ multilib_src_install_all() {
 
 	# Empty
 	rmdir "${ED}"/var{/lib{/NetworkManager,},} || die
-
-	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1653
-	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2068
-	# prebuilt manpages aren't installed by meson
-	use gtk-doc || doman man/*.[1578]
 }
 
 pkg_postinst() {
