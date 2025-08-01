@@ -88,9 +88,6 @@ src_prepare() {
 
 	cp "${FILESDIR}"/ginit.c init/ || die
 
-	# Hackfix to disable HW acceleration for MD5/SHA1 on x86
-	#sed -i 's/(defined(__i386__) || defined(__x86_64__))/defined(__x86_64__))/' libbb/hash_md5_sha.c || die
-
 	# flag cleanup
 	sed -i -r \
 		-e 's:[[:space:]]?-(Werror|Os|Oz|falign-(functions|jumps|loops|labels)=1|fomit-frame-pointer)\>::g' \
