@@ -1,3 +1,2 @@
 =app-containers/docker-compose-2.38.2
 =app-containers/docker-28.3.2
-=media-gfx/blender-4.5.0
