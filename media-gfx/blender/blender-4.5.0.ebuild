@@ -66,7 +66,7 @@ SLOT="${BLENDER_BRANCH}"
 # potentially mirror cpu_flags_x86 + REQUIRED_USE
 IUSE="
 	alembic +bullet collada +color-management cuda +cycles +cycles-bin-kernels
-	debug doc +embree +ffmpeg +fftw +fluid +gmp gnome hip jack
+	debug doc +embree +ffmpeg +fftw +fluid +gmp +manifold gnome hip jack
 	jemalloc jpeg2k man +nanovdb ndof nls +oidn openal +openexr +opengl +openmp +openpgl
 	+opensubdiv +openvdb optix osl pipewire +pdf +potrace +pugixml pulseaudio
 	renderdoc sdl +sndfile +tbb test +tiff +truetype valgrind vulkan wayland +webp X
@@ -129,6 +129,7 @@ RDEPEND="${PYTHON_DEPS}
 	ffmpeg? ( media-video/ffmpeg:=[encode(+),lame(-),jpeg2k?,opus,theora,vorbis,vpx,x264,xvid] )
 	fftw? ( sci-libs/fftw:3.0=[threads] )
 	gmp? ( dev-libs/gmp[cxx] )
+	manifold? ( sci-mathematics/manifold )
 	gnome? ( gui-libs/libdecor )
 	hip? (
 		>=dev-util/hip-5.7:=
@@ -412,6 +413,7 @@ src_configure() {
 		-DWITH_DOC_MANPAGE="$(usex man)"
 		-DWITH_FFTW3="$(usex fftw)"
 		-DWITH_GMP="$(usex gmp)"
+		-DWITH_MANIFOLD="$(usex manifold)"
 		-DWITH_GTESTS="$(usex test)"
 		-DWITH_HARFBUZZ="$(usex truetype)"
 		-DWITH_HARU="$(usex pdf)"
