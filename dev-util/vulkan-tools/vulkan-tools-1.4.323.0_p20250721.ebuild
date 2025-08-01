@@ -23,13 +23,13 @@ HOMEPAGE="https://github.com/KhronosGroup/Vulkan-Tools"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-IUSE="cube wayland X"
+IUSE="cube wayland test X"
+RESTRICT="!test? ( test )"
 
 BDEPEND="${PYTHON_DEPS}
 	cube? ( ~dev-util/glslang-${PV}:=[${MULTILIB_USEDEP}] )
 "
 RDEPEND="
-	media-libs/vulkan-loader[${MULTILIB_USEDEP},wayland?,X?]
 	wayland? ( dev-libs/wayland[${MULTILIB_USEDEP}] )
 	X? (
 		x11-libs/libX11[${MULTILIB_USEDEP}]
@@ -39,6 +39,7 @@ RDEPEND="
 DEPEND="${RDEPEND}
 	dev-util/vulkan-headers
 	X? ( x11-libs/libXrandr[${MULTILIB_USEDEP}] )
+	test? ( ~media-libs/vulkan-loader-${PV}[${MULTILIB_USEDEP},wayland?,X?] )
 "
 
 pkg_setup() {
@@ -57,10 +58,12 @@ pkg_setup() {
 multilib_src_configure() {
 	local mycmakeargs=(
 		-DCMAKE_C_FLAGS="${CFLAGS} -DNDEBUG"
-		-DCMAKE_CXX_FLAGS="${CXXFLAGS} -DNDEBUG"
+		-DCMAKE_CXX_FLAGS="${CXXFLAGS} -DNDEBUG -DGIT_BRANCH_NAME=\\\"gentoo\\\" -DGIT_TAG_INFO=\\\"${PV//./_}\\\""
+		-DCMAKE_DISABLE_FIND_PACKAGE_Git=ON
 		-DCMAKE_SKIP_RPATH=ON
 		-DBUILD_VULKANINFO=ON
 		-DBUILD_CUBE=$(usex cube)
+		-DBUILD_TESTS=$(usex test)
 		-DBUILD_WERROR=OFF
 		-DBUILD_WSI_WAYLAND_SUPPORT=$(usex wayland)
 		-DBUILD_WSI_XCB_SUPPORT=$(usex X)

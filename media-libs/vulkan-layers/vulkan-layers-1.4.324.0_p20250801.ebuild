@@ -12,7 +12,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="6da7c687a85d05f7243ed38e6d353b3b8bdb10f3"
+	EGIT_COMMIT="f113d73531fb6b82f6cb3aebc0e7c0915b3f611e"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
@@ -30,7 +30,6 @@ RESTRICT="!test? ( test ) test"
 RDEPEND="dev-util/spirv-tools[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}
-	>=dev-cpp/robin-hood-hashing-3.11.5
 	dev-util/glslang:=[${MULTILIB_USEDEP}]
 	dev-util/spirv-headers
 	dev-util/vulkan-headers

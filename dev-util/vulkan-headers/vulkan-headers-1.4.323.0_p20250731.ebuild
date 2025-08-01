@@ -10,7 +10,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/KhronosGroup/${MY_PN}.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="89268a6d17fc87003b209a1422c17ab288be99a0"
+	EGIT_COMMIT="37057b4756df4009ad85803bd2e06ec8a3bb1bca"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~hppa ~loong ppc ppc64 ~riscv x86"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
@@ -31,4 +31,11 @@ src_configure() {
 	)
 
 	cmake_src_configure
+}
+
+src_install() {
+	# VULKAN_HEADERS_ENABLE_MODULE doesn't seem to be working so just
+	# delete the modules manually
+	cmake_src_install
+	find "${ED}" -name "*.cppm" -type f -delete || die
 }
