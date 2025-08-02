@@ -6,7 +6,7 @@ MY_PV=${PV/_/-}
 
 inherit go-module linux-info optfeature systemd toolchain-funcs udev
 
-GIT_COMMIT=45873be4ae3f5488c9498b3d9f17deaddaf609f4
+GIT_COMMIT=bea959c7b793b32a893820b97c4eadc7c87fabb0
 
 DESCRIPTION="The core functions you need to create Docker images and run Docker containers"
 HOMEPAGE="https://www.docker.com/"
