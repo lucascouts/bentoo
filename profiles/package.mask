@@ -1,2 +1,0 @@
-=app-containers/docker-compose-2.38.2
-=app-containers/docker-28.3.2
