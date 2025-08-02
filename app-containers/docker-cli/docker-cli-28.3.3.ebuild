@@ -22,7 +22,7 @@ IUSE="hardened selinux"
 # Add build dependencies for man page generation
 BDEPEND="
 	>=dev-lang/go-1.21
-	app-text/go-md2man
+	dev-go/go-md2man
 "
 
 RDEPEND="selinux? ( sec-policy/selinux-docker )"
