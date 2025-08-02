@@ -23,7 +23,7 @@ BDEPEND="
 	dev-vcs/git
 "
 
-RDEPEND=">=app-containers/docker-cli-23.0.0"
+RDEPEND="app-containers/docker-cli"
 
 # Tests require Internet access and we need network access for Go modules
 PROPERTIES="test_network"
