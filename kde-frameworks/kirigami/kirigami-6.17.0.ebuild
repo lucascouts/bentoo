@@ -33,10 +33,6 @@ RDEPEND="${DEPEND}
 "
 BDEPEND=">=dev-qt/qttools-${QTMIN}:6[linguist]"
 
-PATCHES=(
-	"${FILESDIR}"/kirigami-6.16.0-sw.patch
-)
-
 pkg_pretend() {
 	[[ ${MERGE_TYPE} != binary ]] && use openmp && tc-check-openmp
 }
