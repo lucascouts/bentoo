@@ -2,3 +2,4 @@
 =app-office/libreoffice-l10n-25.8.0.1
 =media-gfx/inkscape-1.4.2
 =net-ftp/filezilla-pro-3.69.3
+=app-editors/zed-0.198.5
