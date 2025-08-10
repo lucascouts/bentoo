@@ -1,4 +1,4 @@
-# Copyright 1999-2024 Gentoo Authors
+# Copyright 1999-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -13,13 +13,14 @@ else
 	S="${WORKDIR}/libqmi-${GIT_COMMIT}"
 fi
 
-inherit bash-completion-r1 meson udev
+PYTHON_COMPAT=( python3_{11..14} )
+inherit bash-completion-r1 meson python-any-r1 udev
 
 DESCRIPTION="Qualcomm MSM (Mobile Station Modem) Interface (QMI) modem protocol library"
 HOMEPAGE="https://www.freedesktop.org/wiki/Software/libqmi/ https://gitlab.freedesktop.org/mobile-broadband/libqmi"
 
 LICENSE="LGPL-2"
-SLOT="0/5.9" # soname of libqmi-glib.so
+SLOT="0/5.11" # soname of libqmi-glib.so
 IUSE="gtk-doc introspection +mbim +qrtr"
 
 RDEPEND="
@@ -31,6 +32,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 BDEPEND="
+	${PYTHON_DEPS}
 	sys-apps/help2man
 	virtual/pkgconfig
 	gtk-doc? ( dev-util/gtk-doc )

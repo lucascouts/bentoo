@@ -18,6 +18,7 @@ IUSE="amt +archive bash-completion bluetooth cbor flashrom gnutls gtk-doc intros
 REQUIRED_USE="${PYTHON_REQUIRED_USE}
 	^^ ( minimal systemd )
 	minimal? ( !introspection )
+	spi? ( lzma )
 	seccomp? ( systemd )
 	synaptics? ( gnutls )
 	test? ( archive )

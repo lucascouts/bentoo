@@ -355,6 +355,11 @@ multilib_src_install_all() {
 
 	# Empty
 	rmdir "${ED}"/var{/lib{/NetworkManager,},} || die
+
+	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1653
+	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2068
+	# prebuilt manpages aren't installed by meson
+	use gtk-doc || doman man/*.[1578]
 }
 
 pkg_postinst() {

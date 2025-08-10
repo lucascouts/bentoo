@@ -16,7 +16,7 @@ BASE_SRC_URI_TESTING="https://download.documentfoundation.org/${PN/-l10n/}/testi
 
 LICENSE="|| ( LGPL-3 MPL-1.1 )"
 SLOT="0"
-KEYWORDS="amd64 ~arm arm64 ~loong ppc64 ~riscv ~x86 ~amd64-linux"
+KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc64 ~riscv ~x86 ~amd64-linux"
 IUSE="offlinehelp"
 
 #

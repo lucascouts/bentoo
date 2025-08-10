@@ -9,7 +9,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_REPO_URI="https://github.com/zeux/volk.git"
 	inherit git-r3
 else
-	EGIT_COMMIT="0c89b50a41363a03597dea5614831f59f834222e"
+	EGIT_COMMIT="d64d20b4eaf2698296e085d9d9638c69af280e3e"
 	SRC_URI="https://github.com/zeux/volk/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 ~arm ~arm64 ~loong ~ppc ppc64 ~riscv"
 	S="${WORKDIR}"/${PN}-${EGIT_COMMIT}
