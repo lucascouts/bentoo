@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription>
+		PixiEditor is a cross-platform pixel art editor built with Avalonia UI and .NET. 
+		It provides a comprehensive set of tools for creating and editing pixel art, 
+		including layers, animation support, and various drawing tools optimized for 
+		pixel-perfect artwork.
+		
+		Key features:
+		- Multi-platform support (Linux, Windows, macOS)
+		- Layer-based editing
+		- Animation timeline and onion skinning
+		- Customizable brush tools
+		- Palette management
+		- Extension support via WASM
+		- Hardware-accelerated rendering with Vulkan/OpenGL
+	</longdescription>
+	<use>
+		<flag name="vulkan">Install Vulkan loader for hardware-accelerated rendering (requires compatible GPU and drivers)</flag>
+		<flag name="opengl">Ensure OpenGL support is available (requires graphics drivers)</flag>
+	</use>
+	<upstream>
+		<maintainer status="active">
+			<email>info@pixieditor.net</email>
+			<name>PixiEditor Team</name>
+		</maintainer>
+		<bugs-to>https://github.com/PixiEditor/PixiEditor/issues</bugs-to>
+		<remote-id type="github">PixiEditor/PixiEditor</remote-id>
+	</upstream>
+</pkgmetadata>
