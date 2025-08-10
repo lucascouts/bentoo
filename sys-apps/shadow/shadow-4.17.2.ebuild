@@ -230,7 +230,7 @@ src_install() {
 	fi
 
 	cd "${S}" || die
-	dodoc ChangeLog NEWS TODO
+	dodoc ChangeLog NEWS
 	newdoc README README.download
 	cd doc || die
 	dodoc HOWTO README* WISHLIST *.txt

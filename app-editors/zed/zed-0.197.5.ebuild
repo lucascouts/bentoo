@@ -15,7 +15,7 @@ declare -A GIT_CRATES=(
 	[blade-graphics]='https://github.com/kvark/blade;e0ec4e720957edd51b945b64dd85605ea54bcfe5;blade-%commit%/blade-graphics'
 	[blade-macros]='https://github.com/kvark/blade;e0ec4e720957edd51b945b64dd85605ea54bcfe5;blade-%commit%/blade-macros'
 	[blade-util]='https://github.com/kvark/blade;e0ec4e720957edd51b945b64dd85605ea54bcfe5;blade-%commit%/blade-util'
-	[dap-types]='https://github.com/zed-industries/dap-types;1b461b310481d01e02b2603c16d7144b926339f8;dap-types-%commit%/dap-types'
+	[dap-types]='https://github.com/zed-industries/dap-types;7f39295b441614ca9dbf44293e53c32f666897f9;dap-types-%commit%/dap-types'
 	[font-kit]='https://github.com/zed-industries/font-kit;5474cfad4b719a72ec8ed2cb7327b2b01fd10568;font-kit-%commit%'
 	[jj-lib-proc-macros]='https://github.com/jj-vcs/jj;e18eb8e05efaa153fad5ef46576af145bba1807f;jj-%commit%/lib/proc-macros'
 	[jj-lib]='https://github.com/jj-vcs/jj;e18eb8e05efaa153fad5ef46576af145bba1807f;jj-%commit%/lib'
@@ -67,6 +67,7 @@ declare -A GIT_CRATES=(
 	[tree-sitter-yaml]='https://github.com/zed-industries/tree-sitter-yaml;baff0b51c64ef6a1fb1f8390f3ad6015b83ec13a;tree-sitter-yaml-%commit%'
 	[webrtc-sys-build]='https://github.com/zed-industries/livekit-rust-sdks;d2eade7a6b15d6dbdb38ba12a1ff7bf07fcebba4;livekit-rust-sdks-%commit%/webrtc-sys/build'
 	[webrtc-sys]='https://github.com/zed-industries/livekit-rust-sdks;d2eade7a6b15d6dbdb38ba12a1ff7bf07fcebba4;livekit-rust-sdks-%commit%/webrtc-sys'
+	[windows-capture]='https://github.com/zed-industries/windows-capture;f0d6c1b6691db75461b732f6d5ff56eed002eeb9;windows-capture-%commit%'
 	[xim-ctext]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%/xim-ctext'
 	[xim-parser]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%/xim-parser'
 	[xim]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%'
@@ -82,8 +83,8 @@ inherit cargo check-reqs desktop flag-o-matic llvm-r1 toolchain-funcs xdg
 DESCRIPTION="The fast, collaborative code editor"
 HOMEPAGE="https://zed.dev https://github.com/zed-industries/zed"
 SRC_URI="
-	https://github.com/zed-industries/zed/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz
-	https://github.com/gentoo-crate-dist/zed/releases/download/v${PV}/${P}-crates.tar.xz
+	https://github.com/zed-industries/zed/archive/refs/tags/v${PV/_/-}.tar.gz -> ${P}.tar.gz
+	https://github.com/gentoo-crate-dist/zed/releases/download/v${PV/_/-}/${P/_/-}-crates.tar.xz
 	amd64? (
 		https://github.com/livekit/rust-sdks/releases/download/webrtc-${WEBRTC_COMMIT}/webrtc-linux-x64-release.zip ->
 			webrtc-${WEBRTC_COMMIT}-linux-x64-release.zip
@@ -94,7 +95,7 @@ SRC_URI="
 	)
 	${CARGO_CRATE_URIS}"
 
-S="${WORKDIR}/${P}"
+S="${WORKDIR}/${PN}-${PV/_/-}"
 LICENSE="GPL-3+"
 # Dependent crate licenses
 LICENSE+="
@@ -173,32 +174,31 @@ src_prepare() {
 
 	export APP_CLI="zedit"
 	export APP_ICON="zed"
-	export APP_ID="dev.zed.Zed"
+	if [[ "${PV}" == *pre ]]; then
+		export APP_ID="dev.zed.Zed-Preview"
+	else
+		export APP_ID="dev.zed.Zed"
+	fi
 	export APP_NAME="Zed"
 	export APP_ARGS="%U"
 	export DO_STARTUP_NOTIFY="true"
 	envsubst < "crates/zed/resources/zed.desktop.in" > ${APP_ID}.desktop || die
 
-	# Cargo offline fetch workaround for notify
+	# Cargo offline fetch workaround
 	local NOTIFY_COMMIT="bbb9ea5ae52b253e095737847e367c30653a2e96"
 	local NOTIFY_GIT="notify = { git = \"https://github.com/zed-industries/notify.git\", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_PATH="notify = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify\""
 	local NOTIFY_TYPES_GIT="notify-types = { git = \"https://github.com/zed-industries/notify.git\", rev = \"${NOTIFY_COMMIT}\""
 	local NOTIFY_TYPES_PATH="notify-types = \\{ path = \"${WORKDIR}/notify-${NOTIFY_COMMIT}/notify-types\""
 
+	local WIN_CAP_COMMIT="f0d6c1b6691db75461b732f6d5ff56eed002eeb9"
+	local WIN_CAP_GIT="windows-capture = { git = \"https://github.com/zed-industries/windows-capture.git\", rev = \"${WIN_CAP_COMMIT}\""
+	local WIN_CAP_PATH="windows-capture = \\{ path = \"${WORKDIR}/windows-capture-${WIN_CAP_COMMIT}\""
+
 	sed -e "s#${NOTIFY_GIT}#${NOTIFY_PATH}#" \
 		-e "s#${NOTIFY_TYPES_GIT}#${NOTIFY_TYPES_PATH}#" \
-		-i "${S}/Cargo.toml" || die "Cargo fetch workaround for notify failed"
-
-	# Cargo offline fetch workaround for windows-capture
-	local WINDOWS_CAPTURE_COMMIT="f0d6c1b6691db75461b732f6d5ff56eed002eeb9"
-	local WINDOWS_CAPTURE_GIT="windows-capture = { git = \"https://github.com/zed-industries/windows-capture.git\", rev = \"${WINDOWS_CAPTURE_COMMIT}\""
-	local WINDOWS_CAPTURE_PATH="windows-capture = \\{ path = \"${WORKDIR}/windows-capture-${WINDOWS_CAPTURE_COMMIT}\""
-
-	if grep -q "${WINDOWS_CAPTURE_GIT}" "${S}/Cargo.toml"; then
-		sed -e "s#${WINDOWS_CAPTURE_GIT}#${WINDOWS_CAPTURE_PATH}#" \
-			-i "${S}/Cargo.toml" || die "Cargo fetch workaround for windows-capture failed"
-	fi
+		-e "s#${WIN_CAP_GIT}#${WIN_CAP_PATH}#" \
+		-i "${S}/Cargo.toml" || die "Cargo fetch workaround failed"
 }
 
 src_configure() {
@@ -226,28 +226,9 @@ src_install() {
 	domenu "${S}/${APP_ID}.desktop"
 }
 
-src_test() {
+src_test () {
 	mkdir -p "${HOME}/.config/zed" || die
 	mkdir -p "${HOME}/.local/share/zed/logs/" || die
 
 	SHELL=/usr/bin/sh RUST_BACKTRACE=full cargo_src_test -vv
-}
-
-pkg_postinst() {
-	xdg_pkg_postinst
-
-	elog "Zed ${PV} has been installed."
-	elog ""
-	elog "To use Zed, run: zedit"
-	elog ""
-	elog "For the latest documentation, visit: https://zed.dev/docs"
-	elog ""
-	elog "This version includes:"
-	elog "  - Magistral support for Ollama"
-	elog "  - Screen selector dropdown for screen sharing"
-	elog "  - Option to disable all AI features"
-	elog "  - Improved agent panel with automatic retries"
-	elog "  - Enhanced keymap editor"
-	elog ""
-	elog "Note: You will need to regenerate the crates tarball for this version."
 }
