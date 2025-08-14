@@ -285,6 +285,11 @@ src_install() {
 		rm "${ED}/${CUDA_PATH}/targets/${narch}-linux/lib/libcufile_rdma"* || die "failed to remove rdma files"
 	fi
 
+	# /opt/cuda/include directory is in conflict with symlink
+	# moving the crt directory to the system specialised include directory and removing conflict
+	mv  "${ED}/opt/cuda/include/crt" "${ED}/opt/cuda/targets/${narch}-linux/include"
+	rmdir "${ED}/opt/cuda/include"
+
 	# Add include and lib symlinks
 	dosym -r "${CUDA_PATH}/targets/${narch}-linux/include" "${CUDA_PATH}/include"
 	dosym -r "${CUDA_PATH}/targets/${narch}-linux/lib" "${CUDA_PATH}/$(get_libdir)"
