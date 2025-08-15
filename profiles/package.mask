@@ -3,4 +3,4 @@
 =media-gfx/inkscape-1.4.2
 =net-ftp/filezilla-pro-3.69.4
 =dev-util/nvidia-cuda-toolkit-13.0.0
-=sys-firmware/intel-microcode-20250812_p20250813
+=app-crypt/gpgme-2.0.0
