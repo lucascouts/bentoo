@@ -27,7 +27,7 @@ TEST_FONT=a28b222b79851716f8358d2800157d9ffe117b3545031ae51f69b7e1e1b9a969
 BUNDLED_CLANG_VER=llvmorg-21-init-11777-gfd3fecfc-1
 BUNDLED_RUST_VER=4a0969e06dbeaaa43914d2d00b2e843d49aa3886-1
 RUST_SHORT_HASH=${BUNDLED_RUST_VER:0:10}-${BUNDLED_RUST_VER##*-}
-NODE_VER=24.04.1
+NODE_VER=24.5.0
 
 VIRTUALX_REQUIRED="pgo"
 
@@ -75,7 +75,7 @@ LICENSE+=" FFT2D FTL IJG ISC LGPL-2 LGPL-2.1 libpng libpng2 MIT MPL-1.1 MPL-2.0 
 LICENSE+=" SGI-B-2.0 SSLeay SunSoft Unicode-3.0 Unicode-DFS-2015 Unlicense UoI-NCSA X11-Lucent"
 LICENSE+=" rar? ( unRAR )"
 
-SLOT="0/beta"
+SLOT="0/stable"
 # Dev exists mostly to give devs some breathing room for beta/stable releases;
 # it shouldn't be keyworded but adventurous users can select it.
 if [[ ${SLOT} != "0/dev" ]]; then
