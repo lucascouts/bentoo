@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Kiro is an AI-powered Integrated Development Environment (IDE) based on 
+		Visual Studio Code that helps developers turn ideas into production code 
+		through spec-driven development. This is the official binary distribution.
+	</longdescription>
+	<use>
+		<flag name="wayland">
+			Enable native Wayland support for better integration with 
+			Wayland-based desktop environments
+		</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">kiro-dev/kiro</remote-id>
+		<bugs-to>https://github.com/kiro-dev/kiro/issues</bugs-to>
+		<doc lang="en">https://kiro.dev/docs</doc>
+	</upstream>
+</pkgmetadata>

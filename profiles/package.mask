@@ -1,5 +1,5 @@
-=app-office/libreoffice-25.8.0.1
-=app-office/libreoffice-l10n-25.8.0.1
+=app-office/libreoffice-25.8.0.4
+=app-office/libreoffice-l10n-25.8.0.4
 =media-gfx/inkscape-1.4.2
 =net-ftp/filezilla-pro-3.69.4
 =dev-util/nvidia-cuda-toolkit-13.0.0
