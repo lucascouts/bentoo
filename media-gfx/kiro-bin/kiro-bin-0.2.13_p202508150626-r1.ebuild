@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit desktop unpacker xdg bash-completion-r1
+inherit bash-completion-r1 desktop unpacker xdg
 
 BUILD_ID="202508150626"
 MY_PN="kiro"
@@ -50,7 +50,7 @@ RDEPEND="
 	media-libs/vulkan-loader
 "
 
-# QA overrides for legitimate binaries only
+# QA overrides for Electron binaries
 QA_PREBUILT="
 	opt/kiro/kiro
 	opt/kiro/chrome_crashpad_handler
@@ -69,66 +69,83 @@ src_prepare() {
 	
 	# Configure chrome-sandbox permissions
 	if [[ -f usr/share/kiro/chrome-sandbox ]]; then
-		chmod 4755 usr/share/kiro/chrome-sandbox || die
+		chmod 4755 usr/share/kiro/chrome-sandbox || die "Failed to set chrome-sandbox permissions"
 	fi
 	
 	# Remove Debian files
-	rm -rf DEBIAN/ || die
+	rm -rf DEBIAN/ || die "Failed to remove Debian files"
 	
-	# Comprehensive cleanup of ARM64 binaries
-	einfo "Cleaning up ARM64/cross-platform binaries..."
+	# Remove cross-platform binaries to eliminate QA warnings
+	einfo "Cleaning up unnecessary cross-platform binaries..."
 	
-	# Count files before cleanup
-	local files_before=$(find usr/share/kiro -type f | wc -l)
+	local files_removed=0
 	
-	# Remove ARM64 directories and files
-	find usr/share/kiro -path "*/arm64/*" -delete 2>/dev/null || true
-	find usr/share/kiro -path "*/aarch64/*" -delete 2>/dev/null || true
-	find usr/share/kiro -name "*arm64*" -delete 2>/dev/null || true
-	find usr/share/kiro -name "*aarch64*" -delete 2>/dev/null || true
-	find usr/share/kiro -name "*.arm64" -delete 2>/dev/null || true
+	# Remove ARM64/aarch64 binaries
+	while IFS= read -r -d '' file; do
+		rm -f "${file}" && ((files_removed++))
+	done < <(find usr/share/kiro -path "*/arm64/*" -type f -print0 2>/dev/null)
 	
-	# Remove other unnecessary platform binaries
-	find usr/share/kiro -path "*/darwin/*" -delete 2>/dev/null || true
-	find usr/share/kiro -path "*/win32/*" -delete 2>/dev/null || true
-	find usr/share/kiro -name "*.dll" -delete 2>/dev/null || true
-	find usr/share/kiro -name "*.dylib" -delete 2>/dev/null || true
+	while IFS= read -r -d '' file; do
+		rm -f "${file}" && ((files_removed++))
+	done < <(find usr/share/kiro -path "*/aarch64/*" -type f -print0 2>/dev/null)
+	
+	while IFS= read -r -d '' file; do
+		rm -f "${file}" && ((files_removed++))
+	done < <(find usr/share/kiro -name "*arm64*" -type f -print0 2>/dev/null)
+	
+	# Remove other platform binaries
+	while IFS= read -r -d '' file; do
+		rm -f "${file}" && ((files_removed++))
+	done < <(find usr/share/kiro -path "*/darwin/*" -o -path "*/win32/*" -o -name "*.dll" -o -name "*.dylib" -type f -print0 2>/dev/null)
 	
 	# Clean up empty directories
 	find usr/share/kiro -type d -empty -delete 2>/dev/null || true
 	
-	# Count files after cleanup
-	local files_after=$(find usr/share/kiro -type f | wc -l)
-	local files_removed=$((files_before - files_after))
-	
-	einfo "Cleanup completed: removed ${files_removed} unnecessary files"
+	einfo "Removed ${files_removed} unnecessary cross-platform files"
 	
 	# Verify main executable exists
-	if [[ ! -f usr/share/kiro/kiro ]]; then
-		die "Main Kiro executable not found after cleanup!"
-	fi
+	[[ -f usr/share/kiro/kiro ]] || die "Main Kiro executable not found after cleanup!"
 }
 
 src_install() {
-	# Install application
+	# Method 1: Use doins for regular files, then fix permissions
+	# This is the most "Gentoo way" but requires careful permission handling
+	
+	# Install application to /opt/kiro
 	insinto /opt/kiro
 	doins -r usr/share/kiro/*
 	
-	# Make binaries executable
+	# Fix permissions for executables
+	# Note: fperms works on installed paths (relative to ${D})
 	fperms +x /opt/kiro/kiro
 	fperms +x /opt/kiro/chrome_crashpad_handler
 	fperms 4755 /opt/kiro/chrome-sandbox
 	
-	# Shared libraries
+	# Fix permissions for shared libraries
+	# We need to find them in the source, not the destination
 	local lib
 	for lib in usr/share/kiro/lib*.so*; do
-		[[ -f "${lib}" ]] && fperms +x "/opt/kiro/${lib##*/}"
+		if [[ -f "${lib}" ]]; then
+			local basename_lib="${lib##*/}"
+			fperms +x "/opt/kiro/${basename_lib}"
+		fi
+	done
+	
+	# Alternative approach for libraries using find in destination
+	# This ensures we catch all .so files regardless of naming
+	find "${D}/opt/kiro" -name "*.so*" -type f -print0 | while IFS= read -r -d '' so_file; do
+		# Convert full path to relative path for fperms
+		local rel_path="${so_file#${D}}"
+		fperms +x "${rel_path}"
 	done
 	
 	# Wrapper script with enhanced error handling
 	exeinto /usr/bin
 	newexe - kiro <<-'EOF'
 		#!/bin/bash
+		# Kiro IDE wrapper script
+		
+		set -e
 		
 		export ELECTRON_IS_DEV=0
 		export ELECTRON_FORCE_IS_PACKAGED=true
@@ -141,9 +158,10 @@ src_install() {
 			--disable-software-rasterizer
 			--enable-features=VaapiVideoDecoder
 			--disable-dev-shm-usage
+			--disable-background-timer-throttling
 		)
 		
-		# Wayland support
+		# Wayland support detection
 		if [[ -n "${WAYLAND_DISPLAY}" ]] && command -v wayland-scanner >/dev/null 2>&1; then
 			KIRO_ARGS+=(
 				--ozone-platform=wayland
@@ -160,18 +178,18 @@ src_install() {
 		exec /opt/kiro/kiro "${KIRO_ARGS[@]}" "$@"
 	EOF
 	
-	# Desktop entry - fix invalid categories
+	# Desktop entry - fix categories and paths
 	if [[ -f usr/share/applications/kiro.desktop ]]; then
 		sed -i \
 			-e 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' \
 			-e 's|Categories=.*|Categories=Development;IDE;TextEditor;|g' \
-			usr/share/applications/kiro.desktop || die
+			usr/share/applications/kiro.desktop || die "Failed to fix desktop entry"
 		domenu usr/share/applications/kiro.desktop
 	fi
 	
 	# URL handler
 	if [[ -f usr/share/applications/kiro-url-handler.desktop ]]; then
-		sed -i 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' usr/share/applications/kiro-url-handler.desktop || die
+		sed -i 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' usr/share/applications/kiro-url-handler.desktop || die "Failed to fix URL handler"
 		domenu usr/share/applications/kiro-url-handler.desktop
 	fi
 	
@@ -206,10 +224,21 @@ src_install() {
 pkg_postinst() {
 	xdg_pkg_postinst
 	
+	# Verify installation
+	if [[ ! -x "${EROOT}/opt/kiro/kiro" ]]; then
+		eerror "Kiro executable was not installed correctly!"
+		eerror "Please check the installation and file a bug report."
+		die "Installation verification failed"
+	fi
+	
 	elog "Kiro IDE ${PV} (build ${BUILD_ID}) successfully installed!"
 	elog ""
+	elog "Installation verified:"
+	elog "  Executable: ${EROOT}/opt/kiro/kiro"
+	elog "  Wrapper: ${EROOT}/usr/bin/kiro"
+	elog ""
 	elog "This version has been optimized for amd64 systems with"
-	elog "unnecessary ARM64 binaries removed for cleaner installation."
+	elog "unnecessary cross-platform binaries removed."
 	elog ""
 	elog "To optimize your experience:"
 	elog "  • Make sure you have a stable connection for AI features"
