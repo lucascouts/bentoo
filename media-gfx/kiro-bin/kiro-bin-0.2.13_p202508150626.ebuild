@@ -3,7 +3,7 @@
 
 EAPI=8
 
-inherit desktop unpacker xdg
+inherit desktop unpacker xdg bash-completion-r1
 
 BUILD_ID="202508150626"
 MY_PN="kiro"
@@ -50,7 +50,16 @@ RDEPEND="
 	media-libs/vulkan-loader
 "
 
-QA_PREBUILT="opt/kiro/*"
+# QA overrides específicos
+QA_PREBUILT="
+	opt/kiro/kiro
+	opt/kiro/chrome_crashpad_handler
+	opt/kiro/chrome-sandbox
+	opt/kiro/lib*.so*
+"
+
+# Ignorar binários ARM64 nas extensões
+QA_PRESTRIPPED="opt/kiro/resources/app/extensions/.*"
 
 S="${WORKDIR}"
 
@@ -68,6 +77,10 @@ src_prepare() {
 	
 	# Remover arquivos Debian
 	rm -rf DEBIAN/ || die
+	
+	# Remover binários ARM64 para evitar QA warnings
+	find usr/share/kiro/resources/app/extensions -name "*arm64*" -type f -delete 2>/dev/null || true
+	find usr/share/kiro/resources/app/extensions -name "*aarch64*" -type f -delete 2>/dev/null || true
 }
 
 src_install() {
@@ -114,9 +127,12 @@ src_install() {
 		exec /opt/kiro/kiro "${KIRO_ARGS[@]}" "$@"
 	EOF
 	
-	# Desktop entry
+	# Desktop entry - corrigir categorias inválidas
 	if [[ -f usr/share/applications/kiro.desktop ]]; then
-		sed -i 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' usr/share/applications/kiro.desktop || die
+		sed -i \
+			-e 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' \
+			-e 's|Categories=.*|Categories=Development;IDE;TextEditor;|g' \
+			usr/share/applications/kiro.desktop || die
 		domenu usr/share/applications/kiro.desktop
 	fi
 	
@@ -143,9 +159,9 @@ src_install() {
 		newins usr/share/appdata/kiro.appdata.xml dev.kiro.kiro.appdata.xml
 	fi
 	
-	# Shell completions
+	# Shell completions - usar função correta
 	if [[ -f usr/share/bash-completion/completions/kiro ]]; then
-		newbashcomp usr/share/bash-completion/completions/kiro kiro
+		dobashcomp usr/share/bash-completion/completions/kiro
 	fi
 	
 	if [[ -f usr/share/zsh/vendor-completions/_kiro ]]; then
