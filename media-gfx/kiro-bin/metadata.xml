@@ -8,7 +8,21 @@
 	<longdescription lang="en">
 		Kiro is an AI-powered Integrated Development Environment (IDE) based on 
 		Visual Studio Code that helps developers turn ideas into production code 
-		through spec-driven development. This is the official binary distribution.
+		through spec-driven development. Built on the Electron framework, Kiro 
+		provides modern code editing capabilities with AI assistance for enhanced 
+		productivity.
+		
+		This is the official binary distribution providing pre-compiled executables
+		for immediate use without compilation requirements.
+		
+		Features include:
+		- AI-powered code completion and generation
+		- Spec-driven development workflow  
+		- Modern code editor with syntax highlighting
+		- Integrated terminal and debugging tools
+		- Extension marketplace compatibility
+		- Git integration
+		- Multi-language support
 	</longdescription>
 	<use>
 		<flag name="wayland">
