@@ -6,11 +6,10 @@ EAPI=8
 inherit bash-completion-r1 desktop unpacker xdg
 
 BUILD_ID="202508150626"
-MY_PN="kiro"
 
 DESCRIPTION="AI IDE that helps you do your best work by turning ideas into production code"
 HOMEPAGE="https://kiro.dev/"
-SRC_URI="https://prod.download.desktop.kiro.dev/releases/${BUILD_ID}--distro-linux-x64-deb/${BUILD_ID}-distro-linux-x64.deb -> ${MY_PN}-${PV}.deb"
+SRC_URI="https://prod.download.desktop.kiro.dev/releases/${BUILD_ID}--distro-linux-x64-deb/${BUILD_ID}-distro-linux-x64.deb -> ${P}.deb"
 
 LICENSE="MIT"
 SLOT="0"
@@ -108,21 +107,16 @@ src_prepare() {
 }
 
 src_install() {
-	# Method 1: Use doins for regular files, then fix permissions
-	# This is the most "Gentoo way" but requires careful permission handling
-	
 	# Install application to /opt/kiro
 	insinto /opt/kiro
 	doins -r usr/share/kiro/*
 	
 	# Fix permissions for executables
-	# Note: fperms works on installed paths (relative to ${D})
 	fperms +x /opt/kiro/kiro
 	fperms +x /opt/kiro/chrome_crashpad_handler
 	fperms 4755 /opt/kiro/chrome-sandbox
 	
 	# Fix permissions for shared libraries
-	# We need to find them in the source, not the destination
 	local lib
 	for lib in usr/share/kiro/lib*.so*; do
 		if [[ -f "${lib}" ]]; then
@@ -131,10 +125,8 @@ src_install() {
 		fi
 	done
 	
-	# Alternative approach for libraries using find in destination
-	# This ensures we catch all .so files regardless of naming
+	# Additional approach for libraries using find in destination
 	find "${D}/opt/kiro" -name "*.so*" -type f -print0 | while IFS= read -r -d '' so_file; do
-		# Convert full path to relative path for fperms
 		local rel_path="${so_file#${D}}"
 		fperms +x "${rel_path}"
 	done
