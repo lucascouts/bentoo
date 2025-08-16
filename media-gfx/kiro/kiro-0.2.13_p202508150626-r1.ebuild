@@ -66,6 +66,20 @@ src_unpack() {
 src_prepare() {
 	default
 	
+	# Debug: Show package structure
+	einfo "=== PACKAGE STRUCTURE DEBUG ==="
+	einfo "Desktop files found:"
+	find . -name "*.desktop" -type f || true
+	
+	if [[ -f usr/share/applications/kiro.desktop ]]; then
+		einfo "Original kiro.desktop content:"
+		cat usr/share/applications/kiro.desktop
+	fi
+	
+	einfo "Icon files found:"
+	find . -name "*.png" -o -name "*.svg" -o -name "*.ico" | head -20 || true
+	einfo "=============================="
+	
 	# Configure chrome-sandbox permissions
 	if [[ -f usr/share/kiro/chrome-sandbox ]]; then
 		chmod 4755 usr/share/kiro/chrome-sandbox || die "Failed to set chrome-sandbox permissions"
@@ -170,24 +184,131 @@ src_install() {
 		exec /opt/kiro/kiro "${KIRO_ARGS[@]}" "$@"
 	EOF
 	
-	# Desktop entry - fix categories and paths
-	if [[ -f usr/share/applications/kiro.desktop ]]; then
-		sed -i \
-			-e 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' \
-			-e 's|Categories=.*|Categories=Development;IDE;TextEditor;|g' \
-			usr/share/applications/kiro.desktop || die "Failed to fix desktop entry"
-		domenu usr/share/applications/kiro.desktop
+	# Icons - comprehensive installation following Cursor pattern
+	einfo "Installing icons..."
+	
+	# Install all available icon structures
+	if [[ -d usr/share/icons ]]; then
+		einfo "Installing icon theme structure from usr/share/icons"
+		insinto /usr/share
+		doins -r usr/share/icons
 	fi
 	
-	# URL handler
-	if [[ -f usr/share/applications/kiro-url-handler.desktop ]]; then
-		sed -i 's|/usr/share/kiro/bin/kiro|/usr/bin/kiro|g' usr/share/applications/kiro-url-handler.desktop || die "Failed to fix URL handler"
-		domenu usr/share/applications/kiro-url-handler.desktop
+	# Install pixmaps
+	if [[ -d usr/share/pixmaps ]]; then
+		einfo "Installing pixmap icons from usr/share/pixmaps"
+		insinto /usr/share/pixmaps
+		doins usr/share/pixmaps/*
 	fi
 	
-	# Icon
+	# Create specific icon entries for the application
+	local icon_name="kiro"
+	local icon_installed=false
+	
+	# Try different icon sources
 	if [[ -f usr/share/pixmaps/code-oss.png ]]; then
-		newicon usr/share/pixmaps/code-oss.png kiro.png
+		einfo "Installing main icon from pixmaps/code-oss.png"
+		newicon usr/share/pixmaps/code-oss.png "${icon_name}.png"
+		icon_installed=true
+		
+		# Also install to hicolor theme in multiple sizes
+		local sizes=(16 22 24 32 48 64 128 256)
+		for size in "${sizes[@]}"; do
+			newicon -s "${size}" usr/share/pixmaps/code-oss.png "${icon_name}.png"
+		done
+	fi
+	
+	# Debug: Show what icons were installed
+	einfo "Icon installation summary:"
+	einfo "  Target icon name: ${icon_name}"
+	einfo "  Icon installed: ${icon_installed}"
+	
+	# Desktop entry - completely rewrite to ensure correct paths
+	if [[ -f usr/share/applications/kiro.desktop ]]; then
+		einfo "Processing desktop file..."
+		
+		# Show original content
+		einfo "Original desktop file:"
+		cat usr/share/applications/kiro.desktop
+		
+		# Instead of sed, create a new desktop file from scratch to ensure correctness
+		cat > kiro-fixed.desktop <<-EOF
+			[Desktop Entry]
+			Version=1.0
+			Type=Application
+			Name=Kiro IDE
+			Comment=AI IDE that helps you do your best work by turning ideas into production code
+			Exec=/opt/kiro/kiro %F
+			Icon=${icon_name}
+			Categories=Development;IDE;TextEditor;
+			MimeType=text/plain;inode/directory;
+			StartupWMClass=kiro
+			StartupNotify=true
+			Terminal=false
+		EOF
+		
+		# If there are additional fields in the original, try to preserve them
+		if grep -q "^Keywords=" usr/share/applications/kiro.desktop; then
+			local keywords
+			keywords=$(grep "^Keywords=" usr/share/applications/kiro.desktop | head -1)
+			echo "${keywords}" >> kiro-fixed.desktop
+		fi
+		
+		if grep -q "^GenericName=" usr/share/applications/kiro.desktop; then
+			local generic_name
+			generic_name=$(grep "^GenericName=" usr/share/applications/kiro.desktop | head -1)
+			echo "${generic_name}" >> kiro-fixed.desktop
+		fi
+		
+		# Show corrected content
+		einfo "Corrected desktop file:"
+		cat kiro-fixed.desktop
+		
+		domenu kiro-fixed.desktop
+		einfo "Desktop file installed successfully"
+	else
+		ewarn "No desktop file found at usr/share/applications/kiro.desktop"
+		
+		# Create minimal desktop file if none exists
+		cat > kiro-minimal.desktop <<-EOF
+			[Desktop Entry]
+			Version=1.0
+			Type=Application
+			Name=Kiro IDE
+			Comment=AI IDE for development
+			Exec=/opt/kiro/kiro %F
+			Icon=${icon_name}
+			Categories=Development;IDE;TextEditor;
+			StartupWMClass=kiro
+			StartupNotify=true
+			Terminal=false
+		EOF
+		
+		domenu kiro-minimal.desktop
+		einfo "Created minimal desktop file"
+	fi
+	
+	# URL handler - also completely rewrite if it exists
+	if [[ -f usr/share/applications/kiro-url-handler.desktop ]]; then
+		einfo "Processing URL handler desktop file..."
+		
+		cat > kiro-url-handler-fixed.desktop <<-EOF
+			[Desktop Entry]
+			Version=1.0
+			Type=Application
+			Name=Kiro IDE URL Handler
+			Comment=Handle Kiro IDE URLs
+			Exec=/opt/kiro/kiro --open-url %U
+			Icon=${icon_name}
+			Categories=Development;IDE;
+			NoDisplay=true
+			StartupNotify=true
+			Terminal=false
+			MimeType=x-scheme-handler/kiro;
+		EOF
+		
+		domenu kiro-url-handler-fixed.desktop
+		einfo "URL handler desktop file installed"
 	fi
 	
 	# MIME types
@@ -228,6 +349,16 @@ pkg_postinst() {
 	elog "Installation verified:"
 	elog "  Executable: ${EROOT}/opt/kiro/kiro"
 	elog "  Wrapper: ${EROOT}/usr/bin/kiro"
+	elog "  Desktop file: ${EROOT}/usr/share/applications/kiro-fixed.desktop"
+	elog ""
+	elog "If Kiro doesn't appear in your application menu:"
+	elog "  1. Update desktop database: update-desktop-database"
+	elog "  2. Update icon cache: gtk-update-icon-cache -f -t /usr/share/icons/hicolor"
+	elog "  3. Restart your desktop environment or log out/in"
+	elog ""
+	elog "You can also launch Kiro manually:"
+	elog "  Direct: /opt/kiro/kiro"
+	elog "  Via wrapper: kiro (if wrapper script exists)"
 	elog ""
 	elog "This version has been optimized for amd64 systems with"
 	elog "unnecessary cross-platform binaries removed."
