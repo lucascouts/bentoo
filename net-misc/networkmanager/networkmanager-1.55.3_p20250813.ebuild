@@ -359,7 +359,7 @@ multilib_src_install_all() {
 	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/issues/1653
 	# https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2068
 	# prebuilt manpages aren't installed by meson
-	use gtk-doc || doman man/*.[1578]
+	use gtk-doc
 }
 
 pkg_postinst() {
