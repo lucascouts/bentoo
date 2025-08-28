@@ -28,7 +28,7 @@ QA_PREBUILT="*"
 
 src_install() {
 	dodir /opt
-	tar xozf nxclient.tar.gz -C "${ED}"/opt || die
+	tar xozf nxrunner.tar.gz -C "${ED}"/opt || die
 	tar xozf nxplayer.tar.gz -C "${ED}"/opt || die
 
 	doenvd "${FILESDIR}"/50nxplayer
