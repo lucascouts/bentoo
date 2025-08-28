@@ -5,11 +5,11 @@ EAPI=8
 
 inherit desktop xdg
 
-BUILD="esr-bb32"
+BUILD="esr-bb9"
 
 DESCRIPTION="Betterbird is a fine-tuned version of Mozilla Thunderbird."
 HOMEPAGE="https://github.com/Betterbird/thunderbird-patches/ https://betterbird.eu/"
-SRC_URI="https://www.betterbird.eu/downloads/LinuxArchive/betterbird-${PV}${BUILD}.en-US.linux-x86_64.tar.bz2"
+SRC_URI="https://www.betterbird.eu/downloads/LinuxArchive/betterbird-${PV}${BUILD}.en-US.linux-x86_64.tar.xz"
 
 S="${WORKDIR}"
 LICENSE="MPL-2.0"
