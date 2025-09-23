@@ -9,8 +9,7 @@ CRATES="
 	addr2line@0.24.2
 	adler2@2.0.0
 	aes@0.8.4
-	agent-client-protocol@0.0.20
-	agentic-coding-protocol@0.0.10
+	agent-client-protocol@0.2.0-alpha.8
 	ahash@0.7.8
 	ahash@0.8.11
 	aho-corasick@1.1.3
@@ -64,7 +63,7 @@ CRATES="
 	async-stream@0.3.6
 	async-tar@0.5.0
 	async-task@4.7.1
-	async-trait@0.1.88
+	async-trait@0.1.89
 	async-tungstenite@0.29.1
 	async_zip@0.0.17
 	asynchronous-codec@0.7.0
@@ -106,7 +105,6 @@ CRATES="
 	backtrace@0.3.74
 	base16ct@0.1.1
 	base64-simd@0.8.0
-	base64@0.13.1
 	base64@0.21.7
 	base64@0.22.1
 	base64ct@1.7.3
@@ -126,7 +124,6 @@ CRATES="
 	bitstream-io@2.6.0
 	bitvec@1.0.1
 	blake2@0.10.6
-	blake3@1.8.2
 	block-buffer@0.10.4
 	block-padding@0.3.3
 	block2@0.6.1
@@ -206,7 +203,6 @@ CRATES="
 	const-random-macro@0.1.16
 	const-random@0.1.18
 	constant_time_eq@0.1.5
-	constant_time_eq@0.3.1
 	convert_case@0.4.0
 	convert_case@0.6.0
 	convert_case@0.8.0
@@ -280,9 +276,7 @@ CRATES="
 	der@0.6.1
 	der@0.7.10
 	deranged@0.4.0
-	derive_more-impl@2.0.1
 	derive_more@0.99.19
-	derive_more@2.0.1
 	dialoguer@0.11.0
 	diff@0.1.13
 	diffy@0.4.2
@@ -384,7 +378,6 @@ CRATES="
 	fsevent-sys@4.1.0
 	funty@2.0.0
 	futf@0.1.5
-	futures-batch@0.6.1
 	futures-channel@0.3.31
 	futures-core@0.3.31
 	futures-executor@0.3.31
@@ -395,7 +388,6 @@ CRATES="
 	futures-macro@0.3.31
 	futures-sink@0.3.31
 	futures-task@0.3.31
-	futures-timer@3.0.3
 	futures-util@0.3.31
 	futures@0.1.31
 	futures@0.3.31
@@ -403,7 +395,6 @@ CRATES="
 	generator@0.8.5
 	generic-array@0.14.7
 	gethostname@0.4.3
-	getrandom@0.1.16
 	getrandom@0.2.15
 	getrandom@0.3.2
 	gif@0.13.1
@@ -467,7 +458,7 @@ CRATES="
 	gpu-alloc-ash@0.7.0
 	gpu-alloc-types@0.3.0
 	gpu-alloc@0.6.0
-	grid@0.17.0
+	grid@0.18.0
 	group@0.12.1
 	h2@0.3.26
 	h2@0.4.9
@@ -498,13 +489,13 @@ CRATES="
 	hkdf@0.12.4
 	hmac@0.12.1
 	home@0.5.11
+	hound@3.5.1
 	html5ever@0.27.0
 	html5ever@0.31.0
 	http-body-util@0.1.3
 	http-body@0.4.6
 	http-body@1.0.1
 	http-range-header@0.3.1
-	http-types@2.12.0
 	http@0.2.12
 	http@1.3.1
 	httparse@1.10.1
@@ -540,7 +531,6 @@ CRATES="
 	imgref@1.11.0
 	indexmap@2.9.0
 	indoc@2.0.6
-	infer@0.2.3
 	inherent@1.0.12
 	inotify-sys@0.1.5
 	inotify@0.11.0
@@ -624,13 +614,14 @@ CRATES="
 	lyon_tessellation@1.0.15
 	mac@0.1.1
 	mach2@0.4.2
+	mach2@0.5.0
 	malloc_buf@0.0.6
 	maplit@1.0.2
 	markup5ever@0.12.1
 	markup5ever@0.16.1
 	markup5ever_rcdom@0.3.0
 	match_token@0.1.0
-	matchers@0.1.0
+	matchers@0.2.0
 	matchit@0.7.3
 	maybe-async@0.2.10
 	maybe-owned@0.3.4
@@ -676,7 +667,6 @@ CRATES="
 	notify-debouncer-mini@0.4.1
 	notify@6.1.1
 	ntapi@0.4.1
-	nu-ansi-term@0.46.0
 	nu-ansi-term@0.50.1
 	num-bigint-dig@0.8.4
 	num-bigint@0.4.6
@@ -727,7 +717,6 @@ CRATES="
 	ouroboros@0.18.5
 	ouroboros_macro@0.18.5
 	outref@0.5.2
-	overload@0.1.1
 	p256@0.11.1
 	page_size@0.6.0
 	palette@0.7.6
@@ -748,6 +737,7 @@ CRATES="
 	pbjson@0.6.0
 	pbkdf2@0.11.0
 	pbkdf2@0.12.2
+	pciid-parser@0.8.0
 	pem-rfc7468@0.7.0
 	pem@3.0.5
 	percent-encoding@2.3.1
@@ -831,16 +821,12 @@ CRATES="
 	quote@1.0.40
 	r-efi@5.2.0
 	radium@0.7.0
-	rand@0.7.3
 	rand@0.8.5
 	rand@0.9.1
-	rand_chacha@0.2.2
 	rand_chacha@0.3.1
 	rand_chacha@0.9.0
-	rand_core@0.5.1
 	rand_core@0.6.4
 	rand_core@0.9.3
-	rand_hc@0.2.0
 	range-map@0.2.0
 	rangemap@1.5.1
 	rav1e@0.7.1
@@ -858,10 +844,8 @@ CRATES="
 	ref-cast@1.0.24
 	referencing@0.30.0
 	regalloc2@0.11.2
-	regex-automata@0.1.10
 	regex-automata@0.4.9
 	regex-lite@0.1.6
-	regex-syntax@0.6.29
 	regex-syntax@0.8.5
 	regex@1.11.1
 	rend@0.4.2
@@ -938,8 +922,6 @@ CRATES="
 	serde_json@1.0.140
 	serde_json_lenient@0.2.4
 	serde_path_to_error@0.1.17
-	serde_qs@0.10.1
-	serde_qs@0.8.5
 	serde_repr@0.1.20
 	serde_spanned@0.6.8
 	serde_urlencoded@0.7.1
@@ -969,10 +951,8 @@ CRATES="
 	slab@0.4.9
 	slotmap@1.0.7
 	smallvec@1.15.0
-	smart-default@0.6.0
 	smart-default@0.7.1
 	smol@2.0.2
-	smol_str@0.1.24
 	smol_str@0.2.2
 	socket2@0.5.9
 	spdx@0.10.8
@@ -990,6 +970,9 @@ CRATES="
 	sqlx-sqlite@0.8.5
 	sqlx@0.8.5
 	stable_deref_trait@1.2.0
+	stacker@0.1.21
+	stacksafe-macro@0.1.4
+	stacksafe@0.1.4
 	static_assertions@1.1.0
 	streaming-iterator@0.1.9
 	strict-num@0.1.1
@@ -1032,7 +1015,7 @@ CRATES="
 	system-configuration@0.6.1
 	system-deps@6.2.2
 	system-interface@0.27.3
-	taffy@0.8.3
+	taffy@0.9.0
 	tagptr@0.2.0
 	take-until@0.2.0
 	tao-core-video-sys@0.2.0
@@ -1088,12 +1071,11 @@ CRATES="
 	tracing-core@0.1.33
 	tracing-log@0.2.0
 	tracing-serde@0.2.0
-	tracing-subscriber@0.3.19
+	tracing-subscriber@0.3.20
 	tracing@0.1.41
 	trait-variant@0.1.2
 	tree-sitter-bash@0.25.0
 	tree-sitter-c@0.23.4
-	tree-sitter-cpp@0.23.4
 	tree-sitter-css@0.23.2
 	tree-sitter-diff@0.1.0
 	tree-sitter-elixir@0.3.4
@@ -1170,7 +1152,6 @@ CRATES="
 	warp@0.3.7
 	wasi@0.11.0+wasi-snapshot-preview1
 	wasi@0.14.2+wasi-0.2.4
-	wasi@0.9.0+wasi-snapshot-preview1
 	wasite@0.1.0
 	wasm-bindgen-backend@0.2.100
 	wasm-bindgen-futures@0.4.50
@@ -1327,7 +1308,7 @@ CRATES="
 	x11rb-protocol@0.13.1
 	x11rb@0.13.1
 	xattr@0.2.3
-	xcb@1.5.0
+	xcb@1.6.0
 	xcursor@0.3.8
 	xdg-home@1.3.0
 	xkbcommon@0.8.0
@@ -1337,6 +1318,7 @@ CRATES="
 	xmlwriter@0.1.0
 	yaml-rust2@0.8.1
 	yansi@1.0.1
+	yawc@0.2.5
 	yazi@0.2.1
 	yeslogic-fontconfig-sys@6.0.0
 	yoke-derive@0.7.5
@@ -1373,10 +1355,9 @@ CRATES="
 declare -A GIT_CRATES=(
 	[alacritty_terminal]='https://github.com/zed-industries/alacritty;828457c9ff1f7ea0a0469337cc8a37ee3a1b0590;alacritty-%commit%/alacritty_terminal'
 	[async-pipe]='https://github.com/zed-industries/async-pipe-rs;82d00a04211cf4e1236029aa03e6b6ce2a74c553;async-pipe-rs-%commit%'
-	[async-stripe]='https://github.com/zed-industries/async-stripe;3672dd4efb7181aa597bf580bf5a2f5d23db6735;async-stripe-%commit%'
-	[blade-graphics]='https://github.com/kvark/blade;e0ec4e720957edd51b945b64dd85605ea54bcfe5;blade-%commit%/blade-graphics'
-	[blade-macros]='https://github.com/kvark/blade;e0ec4e720957edd51b945b64dd85605ea54bcfe5;blade-%commit%/blade-macros'
-	[blade-util]='https://github.com/kvark/blade;e0ec4e720957edd51b945b64dd85605ea54bcfe5;blade-%commit%/blade-util'
+	[blade-graphics]='https://github.com/kvark/blade;bfa594ea697d4b6326ea29f747525c85ecf933b9;blade-%commit%/blade-graphics'
+	[blade-macros]='https://github.com/kvark/blade;bfa594ea697d4b6326ea29f747525c85ecf933b9;blade-%commit%/blade-macros'
+	[blade-util]='https://github.com/kvark/blade;bfa594ea697d4b6326ea29f747525c85ecf933b9;blade-%commit%/blade-util'
 	[dap-types]='https://github.com/zed-industries/dap-types;1b461b310481d01e02b2603c16d7144b926339f8;dap-types-%commit%/dap-types'
 	[font-kit]='https://github.com/zed-industries/font-kit;5474cfad4b719a72ec8ed2cb7327b2b01fd10568;font-kit-%commit%'
 	[jj-lib-proc-macros]='https://github.com/jj-vcs/jj;e18eb8e05efaa153fad5ef46576af145bba1807f;jj-%commit%/lib/proc-macros'
@@ -1388,7 +1369,7 @@ declare -A GIT_CRATES=(
 	[livekit-protocol]='https://github.com/zed-industries/livekit-rust-sdks;5f04705ac3f356350ae31534ffbc476abc9ea83d;livekit-rust-sdks-%commit%/livekit-protocol'
 	[livekit-runtime]='https://github.com/zed-industries/livekit-rust-sdks;5f04705ac3f356350ae31534ffbc476abc9ea83d;livekit-rust-sdks-%commit%/livekit-runtime'
 	[livekit]='https://github.com/zed-industries/livekit-rust-sdks;5f04705ac3f356350ae31534ffbc476abc9ea83d;livekit-rust-sdks-%commit%/livekit'
-	[lsp-types]='https://github.com/zed-industries/lsp-types;39f629bdd03d59abd786ed9fc27e8bca02c0c0ec;lsp-types-%commit%'
+	[lsp-types]='https://github.com/zed-industries/lsp-types;0874f8742fe55b4dc94308c1e3c0069710d8eeaf;lsp-types-%commit%'
 	[nbformat]='https://github.com/ConradIrwin/runtimed;7130c804216b6914355d15d0b91ea91f6babd734;runtimed-%commit%/crates/nbformat'
 	[notify-types]='https://github.com/zed-industries/notify;bbb9ea5ae52b253e095737847e367c30653a2e96;notify-%commit%/notify-types'
 	[notify]='https://github.com/zed-industries/notify;bbb9ea5ae52b253e095737847e367c30653a2e96;notify-%commit%/notify'
@@ -1421,6 +1402,7 @@ declare -A GIT_CRATES=(
 	[runtimelib]='https://github.com/ConradIrwin/runtimed;7130c804216b6914355d15d0b91ea91f6babd734;runtimed-%commit%/crates/runtimelib'
 	[scap]='https://github.com/zed-industries/scap;808aa5c45b41e8f44729d02e38fd00a2fe2722e7;scap-%commit%'
 	[tiktoken-rs]='https://github.com/zed-industries/tiktoken-rs;30c32a4522751699adeda0d5840c71c3b75ae73d;tiktoken-rs-%commit%/tiktoken-rs'
+	[tree-sitter-cpp]='https://github.com/tree-sitter/tree-sitter-cpp;5cb9b693cfd7bfacab1d9ff4acac1a4150700609;tree-sitter-cpp-%commit%'
 	[tree-sitter-gitcommit]='https://github.com/zed-industries/tree-sitter-git-commit;88309716a69dd13ab83443721ba6e0b491d37ee9;tree-sitter-git-commit-%commit%'
 	[tree-sitter-gomod]='https://github.com/camdencheek/tree-sitter-go-mod;6efb59652d30e0e9cd5f3b3a669afd6f1a926d3c;tree-sitter-go-mod-%commit%'
 	[tree-sitter-gowork]='https://github.com/zed-industries/tree-sitter-go-work;acb0617bf7f4fda02c6217676cc64acb89536dc7;tree-sitter-go-work-%commit%'
@@ -1431,14 +1413,13 @@ declare -A GIT_CRATES=(
 	[webrtc-sys-build]='https://github.com/zed-industries/livekit-rust-sdks;5f04705ac3f356350ae31534ffbc476abc9ea83d;livekit-rust-sdks-%commit%/webrtc-sys/build'
 	[webrtc-sys]='https://github.com/zed-industries/livekit-rust-sdks;5f04705ac3f356350ae31534ffbc476abc9ea83d;livekit-rust-sdks-%commit%/webrtc-sys'
 	[windows-capture]='https://github.com/zed-industries/windows-capture;f0d6c1b6691db75461b732f6d5ff56eed002eeb9;windows-capture-%commit%'
-	[xim-ctext]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%/xim-ctext'
-	[xim-parser]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%/xim-parser'
-	[xim]='https://github.com/XDeme1/xim-rs;d50d461764c2213655cd9cf65a0ea94c70d3c4fd;xim-rs-%commit%'
-	[yawc]='https://github.com/deviant-forks/yawc;1899688f3e69ace4545aceb97b2a13881cf26142;yawc-%commit%'
+	[xim-ctext]='https://github.com/zed-industries/xim-rs;c0a70c1bd2ce197364216e5e818a2cb3adb99a8d;xim-rs-%commit%/xim-ctext'
+	[xim-parser]='https://github.com/zed-industries/xim-rs;c0a70c1bd2ce197364216e5e818a2cb3adb99a8d;xim-rs-%commit%/xim-parser'
+	[xim]='https://github.com/zed-industries/xim-rs;c0a70c1bd2ce197364216e5e818a2cb3adb99a8d;xim-rs-%commit%'
 )
 
 LLVM_COMPAT=( 20 )
-RUST_MIN_VER="1.88.0"
+RUST_MIN_VER="1.89.0"
 RUST_NEEDS_LLVM=1
 WEBRTC_COMMIT="b99fd2c-6"
 
@@ -1558,10 +1539,6 @@ src_prepare() {
 	local WIN_CAP_COMMIT="f0d6c1b6691db75461b732f6d5ff56eed002eeb9"
 	local WIN_CAP_GIT="windows-capture = { git = \"https://github.com/zed-industries/windows-capture.git\", rev = \"${WIN_CAP_COMMIT}\""
 	local WIN_CAP_PATH="windows-capture = \\{ path = \"${WORKDIR}/windows-capture-${WIN_CAP_COMMIT}\""
-
-	local YAWC_COMMIT="1899688f3e69ace4545aceb97b2a13881cf26142"
-	local YAWC_GIT="yawc = { git = \"https://github.com/deviant-forks/yawc\", rev = \"${YAWC_COMMIT}\""
-	local YAWC_PATH="yawc = \\{ path = \"${WORKDIR}/yawc-${YAWC_COMMIT}\""
 
 	sed -e "s#${NOTIFY_GIT}#${NOTIFY_PATH}#" \
 		-e "s#${NOTIFY_TYPES_GIT}#${NOTIFY_TYPES_PATH}#" \
