@@ -9,7 +9,7 @@ CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB es es-419 et fa fi fil fr gu
 
 inherit chromium-2 desktop pax-utils unpacker xdg optfeature shell-completion
 
-BUILD_ID="b753cece5c67c47cb5637199a5a5de2b7100c18f"
+BUILD_ID="9d178a4a5589981b62546448bb32920a8219a5de"
 DESCRIPTION="Cursor App - AI-first coding environment"
 HOMEPAGE="https://www.cursor.com/"
 SRC_URI="
@@ -20,6 +20,7 @@ SRC_URI="
 		https://downloads.cursor.com/production/${BUILD_ID}/linux/arm64/Cursor-${PV}-aarch64.AppImage -> ${P}-arm64.AppImage
 	)
 "
+
 S="${WORKDIR}"
 
 LICENSE="cursor"
