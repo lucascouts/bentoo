@@ -1,11 +1,11 @@
-# Copyright 2024 Gentoo Authors
+# Copyright 2024-2025 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-CHROMIUM_LANGS="af am ar bg bn ca cs da de el en-GB en-US es es-419 et fa fi fil fr
-	gu he hi hr hu id it ja kn ko lt lv ml mr ms nb nl pl pt-BR pt-PT ro ru sk
-	sl sr sv sw ta te th tr uk ur vi zh-CN zh-TW"
+CHROMIUM_LANGS="af am ar az bg bn ca cs da de el en-GB en-US es es-419 et fa fi fil fr
+	gu he hi hr hu id it ja ka kk km kn ko lo lt lv mk ml mn mr ms my nb nl pl pt-BR pt-PT ro ru
+	si sk sl sq sr-Latn sr sv sw ta te th tr uk ur uz vi zh-CN zh-TW"
 
 inherit chromium-2 desktop pax-utils unpacker xdg
 
@@ -18,13 +18,14 @@ S=${WORKDIR}
 
 LICENSE="MPL-2.0"
 SLOT="0"
-KEYWORDS="-* amd64"
+KEYWORDS="-* ~amd64"
 
-IUSE="qt5 qt6"
-RESTRICT="bindist mirror strip"
+IUSE="qt6"
+RESTRICT="bindist strip"
 
 RDEPEND="
 	>=app-accessibility/at-spi2-core-2.46.0:2
+	app-misc/ca-certificates
 	dev-libs/expat
 	dev-libs/glib:2
 	dev-libs/nspr
@@ -49,11 +50,6 @@ RDEPEND="
 	x11-libs/libXfixes
 	x11-libs/libXrandr
 	x11-libs/pango
-	qt5? (
-		dev-qt/qtcore:5
-		dev-qt/qtgui:5[X]
-		dev-qt/qtwidgets:5
-	)
 	qt6? ( dev-qt/qtbase:6[gui,widgets] )
 "
 
@@ -78,7 +74,7 @@ src_install() {
 
 	# Remove cron job and menu for updating from Debian repos.
 	rm -r ${BRAVE_HOME}/cron/ || die
-	rm -r etc usr/share/menu || die
+	rm -r etc || die
 
 	# Rename docs directory to our needs.
 	mv usr/share/doc/${MY_PN} usr/share/doc/${PF} || die
@@ -96,9 +92,7 @@ src_install() {
 	chromium_remove_language_paks
 	popd > /dev/null || die
 
-	if ! use qt5; then
-		rm "${BRAVE_HOME}/libqt5_shim.so" || die
-	fi
+	rm "${BRAVE_HOME}/libqt5_shim.so" || die
 	if ! use qt6; then
 		rm "${BRAVE_HOME}/libqt6_shim.so" || die
 	fi
