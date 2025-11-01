@@ -3,7 +3,7 @@
 
 EAPI=8
 
-PYTHON_COMPAT=( python3_{11..13} )
+PYTHON_COMPAT=( python3_{11..14} )
 
 inherit xdg cmake python-any-r1 optfeature toolchain-funcs flag-o-matic
 
@@ -39,7 +39,7 @@ CDEPEND="
 	media-libs/opus
 	media-libs/rnnoise
 	>=media-libs/tg_owt-0_pre20241202:=[screencast=,X=]
-	>=media-video/ffmpeg-4:=[opus,vpx]
+	>=media-video/ffmpeg-6:=[opus,vpx]
 	net-libs/tdlib:=[tde2e]
 	sys-libs/zlib:=[minizip]
 	kde-frameworks/kcoreaddons:6
@@ -69,7 +69,7 @@ BDEPEND="
 	${PYTHON_DEPS}
 	>=dev-build/cmake-3.16
 	>=dev-cpp/cppgir-2.0_p20240315
-	dev-libs/gobject-introspection
+	>=dev-libs/gobject-introspection-1.82.0-r2
 	dev-util/gdbus-codegen
 	virtual/pkgconfig
 	wayland? ( dev-util/wayland-scanner )
@@ -81,7 +81,6 @@ PATCHES=(
 	"${FILESDIR}"/tdesktop-5.2.2-libdispatch.patch
 	"${FILESDIR}"/tdesktop-5.7.2-cstring.patch
 	"${FILESDIR}"/tdesktop-5.8.3-cstdint.patch
-	"${FILESDIR}"/tdesktop-5.12.3-fix-webview.patch
 	"${FILESDIR}"/tdesktop-5.14.3-system-cppgir.patch
 )
 

@@ -5,7 +5,7 @@ EAPI=8
 
 inherit bash-completion-r1 desktop unpacker xdg
 
-BUILD_ID="202510142329"
+BUILD_ID="202510301715"
 
 DESCRIPTION="AI IDE that helps you do your best work by turning ideas into production code"
 HOMEPAGE="https://kiro.dev/"
