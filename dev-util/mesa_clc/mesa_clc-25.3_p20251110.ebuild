@@ -19,7 +19,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="b7e2041750e4a524304ad92ead539a4a32ac6fc1"
+	GIT_COMMIT="0c31313b6ecf0eaebfcb8f4c9fadd837ed990bf4"
 	S="${WORKDIR}/mesa-${GIT_COMMIT}"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="~amd64 ~x86"
@@ -45,7 +45,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	dev-libs/expat
-	>=sys-libs/zlib-1.2.8:=
+	>=virtual/zlib-1.2.8:=
 	x11-libs/libdrm
 "
 BDEPEND="

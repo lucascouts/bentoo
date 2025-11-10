@@ -34,7 +34,7 @@ if [[ ${PV} == 9999 ]]; then
 	EGIT_REPO_URI="https://gitlab.freedesktop.org/mesa/mesa.git"
 	inherit git-r3
 else
-	GIT_COMMIT="b7e2041750e4a524304ad92ead539a4a32ac6fc1"
+	GIT_COMMIT="0c31313b6ecf0eaebfcb8f4c9fadd837ed990bf4"
 	SRC_URI="https://gitlab.freedesktop.org/${PN}/${PN}/-/archive/${GIT_COMMIT}/mesa-${GIT_COMMIT}.tar.gz -> ${MY_P}.tar.gz"
 	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~loong ~mips ~ppc ~ppc64 ~riscv ~s390 ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
 fi
@@ -63,7 +63,7 @@ done
 IUSE="${IUSE_VIDEO_CARDS}
 	cpu_flags_x86_sse2 debug +llvm
 	lm-sensors opencl +opengl +proprietary-codecs
-	sysprof test unwind vaapi valgrind vulkan
+	sysprof test unwind vaapi valgrind vdpau vulkan
 	wayland +X +zstd"
 RESTRICT="!test? ( test )"
 REQUIRED_USE="
@@ -73,6 +73,7 @@ REQUIRED_USE="
 	video_cards_r300?   ( x86? ( llvm ) amd64? ( llvm ) )
 	video_cards_zink? ( vulkan opengl )
 	video_cards_nvk? ( vulkan video_cards_nouveau )
+	vdpau? ( X )
 "
 
 LIBDRM_DEPSTRING=">=x11-libs/libdrm-2.4.121"
@@ -80,7 +81,7 @@ RDEPEND="
 	>=dev-libs/expat-2.1.0-r3[${MULTILIB_USEDEP}]
 	>=dev-util/spirv-tools-1.3.231.0[${MULTILIB_USEDEP}]
 	>=media-libs/libglvnd-1.3.2[X?,${MULTILIB_USEDEP}]
-	>=sys-libs/zlib-1.2.9[${MULTILIB_USEDEP}]
+	>=virtual/zlib-1.2.9:=[${MULTILIB_USEDEP}]
 	unwind? ( sys-libs/libunwind[${MULTILIB_USEDEP}] )
 	llvm? (
 		$(llvm_gen_dep "
@@ -107,6 +108,7 @@ RDEPEND="
 	vaapi? (
 		>=media-libs/libva-1.7.3:=[${MULTILIB_USEDEP}]
 	)
+	vdpau? ( >=x11-libs/libvdpau-1.5:=[${MULTILIB_USEDEP}] )
 	video_cards_radeonsi? ( virtual/libelf:0=[${MULTILIB_USEDEP}] )
 	video_cards_zink? ( media-libs/vulkan-loader:=[${MULTILIB_USEDEP}] )
 	vulkan? ( virtual/libudev:= )
@@ -228,6 +230,16 @@ pkg_pretend() {
 		fi
 	fi
 
+	if use vdpau; then
+		if ! use video_cards_d3d12 &&
+		   ! use video_cards_nouveau &&
+		   ! use video_cards_r600 &&
+		   ! use video_cards_radeonsi &&
+		   ! use video_cards_virgl; then
+			ewarn "Ignoring USE=vdpau      since VIDEO_CARDS does not contain d3d12, nouveau, r600, radeonsi, or virgl"
+		fi
+	fi
+
 	if ! use llvm; then
 		use opencl     && ewarn "Ignoring USE=opencl     since USE does not contain llvm"
 	fi
@@ -298,6 +310,16 @@ multilib_src_configure() {
 
 	if use video_cards_d3d12; then
 		emesonargs+=($(meson_feature vaapi gallium-d3d12-video))
+	fi
+
+	if use video_cards_d3d12 ||
+	   use video_cards_nouveau ||
+	   use video_cards_r600 ||
+	   use video_cards_radeonsi ||
+	   use video_cards_virgl; then
+		emesonargs+=($(meson_feature vdpau gallium-vdpau))
+	else
+		emesonargs+=(-Dgallium-vdpau=disabled)
 	fi
 
 	gallium_enable !llvm softpipe
@@ -400,6 +422,7 @@ multilib_src_configure() {
 		$(meson_feature lm-sensors lmsensors)
 		$(meson_feature unwind libunwind)
 		$(meson_feature zstd)
+		$(meson_use llvm amd-use-llvm)
 		$(meson_use sysprof)
 		$(meson_use cpu_flags_x86_sse2 sse2)
 		-Dvalgrind=$(usex valgrind auto disabled)
