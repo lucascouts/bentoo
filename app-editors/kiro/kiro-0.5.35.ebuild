@@ -5,11 +5,9 @@ EAPI=8
 
 inherit bash-completion-r1 desktop unpacker xdg
 
-BUILD_ID="202511032205"
-
 DESCRIPTION="AI IDE that helps you do your best work by turning ideas into production code"
 HOMEPAGE="https://kiro.dev/"
-SRC_URI="https://prod.download.desktop.kiro.dev/releases/${BUILD_ID}--distro-linux-x64-deb/${BUILD_ID}-distro-linux-x64.deb -> ${P}.deb"
+SRC_URI="https://prod.download.desktop.kiro.dev/releases/stable/linux-x64/signed/${PV}/deb/${PN}-ide-${PV}-stable-linux-x64.deb -> ${P}.deb"
 
 LICENSE="MIT"
 SLOT="0"
