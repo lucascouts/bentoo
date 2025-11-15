@@ -30,14 +30,14 @@ S=${WORKDIR}
 
 LICENSE="MPL-2.0"
 SLOT="0"
-KEYWORDS="~amd64"  # Binary package, architecture-specific
+KEYWORDS="~amd64"
 IUSE="+l10n_en-US qt6 selinux"
 
 RESTRICT="
-	bindist  # Brave's license restricts redistribution
-	mirror   # Upstream provides official downloads only
-	strip    # Pre-stripped binary
-	test     # No test suite for binary package
+	bindist
+	mirror
+	strip
+	test
 "
 
 RDEPEND="
@@ -139,6 +139,12 @@ src_install() {
 	# Clean up temporary and unnecessary files
 	find "${ED}" -type f \( -name '*.tmp' -o -name '.git*' \) -delete || die
 
+	# Move appdata to metainfo if it exists (deprecated location)
+	# Upstream may have already fixed this in newer versions
+	if [[ -d usr/share/appdata ]]; then
+		mv usr/share/appdata usr/share/metainfo || die
+	fi
+
 	# Rename documentation directory
 	mv usr/share/doc/${PN} usr/share/doc/${PF} || die
 
@@ -146,26 +152,35 @@ src_install() {
 	rm -r etc/cron.daily || die "Failed to remove cron scripts"
 	rm -r "${BRAVE_HOME}"/cron || die "Failed to remove cron scripts"
 
-	# Decompress documentation
+	# Decompress and recompress with bzip2 for consistency
+	# Gentoo uses bzip2 for documentation compression by default
 	gzip -d usr/share/doc/${PF}/changelog.gz || die
-	gzip -d usr/share/man/man1/${MY_PN}.1.gz || die
+	bzip2 -9 usr/share/doc/${PF}/changelog || die
 	
-	# Handle man page symlink for consistency
-	if [[ -e usr/share/man/man1/brave-browser.1.gz ]]; then
+	gzip -d usr/share/man/man1/${MY_PN}.1.gz || die
+	bzip2 -9 usr/share/man/man1/${MY_PN}.1 || die
+	
+	# Create symlink with correct .bz2 extension
+	# Handle both potential cases: .gz or .bz2 from upstream
+	if [[ -e usr/share/man/man1/brave-browser.1.gz ]] || \
+	   [[ -e usr/share/man/man1/brave-browser.1.bz2 ]]; then
 		if [[ -L usr/share/man/man1/brave-browser.1.gz ]]; then
 			rm usr/share/man/man1/brave-browser.1.gz || die
-		else
-			die "usr/share/man/man1/brave-browser.1.gz exists but is not a symlink"
+		elif [[ -L usr/share/man/man1/brave-browser.1.bz2 ]]; then
+			rm usr/share/man/man1/brave-browser.1.bz2 || die
+		elif [[ -f usr/share/man/man1/brave-browser.1.gz ]] || \
+		     [[ -f usr/share/man/man1/brave-browser.1.bz2 ]]; then
+			die "usr/share/man/man1/brave-browser.1.* exists but is not a symlink"
 		fi
 	fi
-	dosym ${MY_PN}.1 usr/share/man/man1/brave-browser.1
+	dosym ${MY_PN}.1.bz2 usr/share/man/man1/brave-browser.1.bz2
 
 	# Remove unused language packs
 	pushd "${BRAVE_HOME}/locales" > /dev/null || die
 	chromium_remove_language_paks
 	popd > /dev/null || die
 
-	# Remove Brave extension language directories
+	# Remove unused Brave extension language directories
 	pushd "${BRAVE_HOME}/resources/brave_extension/_locales" > /dev/null || die
 	brave_remove_language_dirs
 	popd > /dev/null || die
