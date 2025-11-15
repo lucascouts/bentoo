@@ -153,23 +153,17 @@ src_install() {
 	rm -r "${BRAVE_HOME}"/cron || die "Failed to remove cron scripts"
 
 	# Decompress files - let Portage handle compression automatically
-	# The .gz files from upstream need to be decompressed first
 	gzip -d usr/share/doc/${PF}/changelog.gz || die
 	gzip -d usr/share/man/man1/${MY_PN}.1.gz || die
 	
-	# Handle man page symlink - ensure it points to the uncompressed file
-	# Portage will compress both the target and symlink automatically
-	if [[ -e usr/share/man/man1/brave-browser.1.gz ]]; then
-		if [[ -L usr/share/man/man1/brave-browser.1.gz ]]; then
-			# Remove the .gz symlink from upstream
-			rm usr/share/man/man1/brave-browser.1.gz || die
-		elif [[ -f usr/share/man/man1/brave-browser.1.gz ]]; then
-			die "usr/share/man/man1/brave-browser.1.gz exists but is not a symlink"
-		fi
-	fi
+	# Remove ALL existing brave-browser symlinks from upstream package
+	# The .deb contains a symlink pointing to .gz which we just decompressed
+	rm -f usr/share/man/man1/brave-browser.1.gz || die
+	rm -f usr/share/man/man1/brave-browser.1.bz2 || die
+	rm -f usr/share/man/man1/brave-browser.1 || die
 	
-	# Create symlink pointing to uncompressed file
-	# Portage will compress and update the symlink automatically
+	# Create new symlink pointing to uncompressed file
+	# Portage will compress both files and update symlink automatically
 	dosym ${MY_PN}.1 usr/share/man/man1/brave-browser.1
 
 	# Remove unused language packs
