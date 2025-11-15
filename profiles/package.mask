@@ -1,3 +1,0 @@
-=media-gfx/inkscape-1.4.2
-=net-ftp/filezilla-pro-3.69.4
-=dev-util/nvidia-cuda-toolkit-13.0.0
