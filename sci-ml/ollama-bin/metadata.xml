@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Ollama is a tool for running large language models (LLMs) locally on your 
+		machine. It provides a simple interface to download, run, and manage models 
+		like Llama 3.2, Mistral, Gemma, and many others.
+
+		This is a binary distribution package that installs pre-built binaries from 
+		the official Ollama releases. The binaries are provided under the MIT license 
+		and include GPU acceleration support for both NVIDIA (CUDA) and AMD (ROCm) 
+		graphics cards.
+
+		Key features:
+		- Easy model management with pull, push, and create commands
+		- Built-in API server for programmatic access
+		- GPU acceleration support (CUDA and ROCm)
+		- Efficient memory management with automatic model loading/unloading
+		- Support for multiple models and concurrent requests
+		- Compatible with OpenAI API format
+
+		Models are stored in /var/lib/ollama and can range from 2GB (3B parameters) 
+		to 40GB+ (70B parameters) in size. GPU acceleration significantly improves 
+		inference speed but requires compatible hardware.
+
+		Security Note: This package installs pre-compiled binaries. Security 
+		hardening features (ASLR, PIE, stack protections) depend on upstream's 
+		build configuration. The service runs as a dedicated 'ollama' user with 
+		restricted permissions for defense in depth.
+	</longdescription>
+	<use>
+		<flag name="cuda">
+			Enable NVIDIA CUDA GPU acceleration support. Requires compatible NVIDIA 
+			GPU (compute capability 6.0+, Pascal architecture or newer) and 
+			nvidia-cuda-toolkit. Significantly improves inference performance for 
+			large models.
+		</flag>
+		<flag name="rocm">
+			Enable AMD ROCm GPU acceleration support. Requires compatible AMD GPU 
+			(Radeon RX 6000 series or newer, or Radeon VII) and ROCm libraries. 
+			May require HSA_OVERRIDE_GFX_VERSION environment variable for optimal 
+			compatibility. This is experimental and not all GPU models are supported.
+		</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">ollama/ollama</remote-id>
+		<bugs-to>https://github.com/ollama/ollama/issues</bugs-to>
+		<doc lang="en">https://github.com/ollama/ollama/tree/main/docs</doc>
+		<changelog>https://github.com/ollama/ollama/releases</changelog>
+	</upstream>
+	<slots>
+		<subslots>
+			Package does not use subslots as it is a self-contained binary 
+			distribution. All dependencies are either bundled or runtime-only.
+		</subslots>
+	</slots>
+</pkgmetadata>

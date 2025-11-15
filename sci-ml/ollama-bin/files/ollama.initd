@@ -1,0 +1,65 @@
+#!/sbin/openrc-run
+# Copyright 1999-2025 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+description="Ollama - Large Language Model Service"
+command="/usr/bin/ollama"
+command_args="serve"
+command_user="ollama:ollama"
+command_background="true"
+pidfile="/run/${RC_SVCNAME}.pid"
+output_log="/var/log/ollama/${RC_SVCNAME}.log"
+error_log="/var/log/ollama/${RC_SVCNAME}-error.log"
+
+depend() {
+	need net
+	use dns logger
+	after firewall
+}
+
+start_pre() {
+	# Ensure log directory exists
+	checkpath --directory --owner ollama:ollama --mode 0750 \
+		/var/log/ollama
+
+	# Ensure state directory exists
+	checkpath --directory --owner ollama:ollama --mode 0750 \
+		/var/lib/ollama
+
+	# Set default environment if not configured
+	if [ -z "${OLLAMA_HOST}" ]; then
+		export OLLAMA_HOST="${OLLAMA_HOST:-0.0.0.0:11434}"
+	fi
+
+	if [ -z "${OLLAMA_MODELS}" ]; then
+		export OLLAMA_MODELS="${OLLAMA_MODELS:-/var/lib/ollama}"
+	fi
+}
+
+start() {
+	ebegin "Starting ${RC_SVCNAME}"
+	start-stop-daemon --start \
+		--pidfile "${pidfile}" \
+		--user "${command_user}" \
+		--stdout "${output_log}" \
+		--stderr "${error_log}" \
+		--background \
+		--make-pidfile \
+		--exec "${command}" \
+		-- ${command_args}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping ${RC_SVCNAME}"
+	start-stop-daemon --stop \
+		--pidfile "${pidfile}" \
+		--retry "TERM/30/KILL/5"
+	eend $?
+}
+
+reload() {
+	ebegin "Reloading ${RC_SVCNAME}"
+	start-stop-daemon --signal HUP --pidfile "${pidfile}"
+	eend $?
+}

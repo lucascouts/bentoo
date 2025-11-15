@@ -1,0 +1,58 @@
+# Copyright 1999-2025 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+# Ollama configuration file for OpenRC
+# This file is sourced by the init script
+
+# Bind address for Ollama API server
+# Default: 0.0.0.0:11434 (listens on all interfaces)
+# For localhost only: 127.0.0.1:11434
+OLLAMA_HOST="0.0.0.0:11434"
+
+# Directory where models are stored
+# Default: /var/lib/ollama
+OLLAMA_MODELS="/var/lib/ollama"
+
+# How long to keep models in memory after use
+# Examples: "5m" (5 minutes), "1h" (1 hour), "0" (unload immediately)
+# Default: 5m
+#OLLAMA_KEEP_ALIVE="5m"
+
+# Number of parallel requests to process
+# Default: 1 (sequential processing)
+# Increase for better throughput with multiple concurrent users
+#OLLAMA_NUM_PARALLEL="1"
+
+# Maximum number of loaded models
+# Default: 1
+# Increase if you need multiple models loaded simultaneously
+#OLLAMA_MAX_LOADED_MODELS="1"
+
+# Context window size
+# Larger values use more memory but allow longer conversations
+# Default: 2048
+#OLLAMA_NUM_CTX="2048"
+
+# Enable debug logging
+# Set to 1 to enable verbose debug output
+#OLLAMA_DEBUG="0"
+
+# GPU Configuration (NVIDIA CUDA)
+# Comma-separated list of GPU device IDs to use
+# Example: "0" (first GPU), "0,1" (first two GPUs)
+#CUDA_VISIBLE_DEVICES="0"
+
+# GPU Configuration (AMD ROCm)
+# Override GPU version for compatibility
+# Example for RX 6000 series: "10.3.0"
+# Example for Radeon VII: "9.0.6"
+#HSA_OVERRIDE_GFX_VERSION=""
+
+# Memory limits (optional)
+# Set maximum memory usage for models
+# Example: "8G" for 8 gigabytes
+#OLLAMA_MAX_VRAM=""
+
+# Additional command-line arguments
+# Add any extra flags to pass to 'ollama serve'
+#OLLAMA_EXTRA_ARGS=""

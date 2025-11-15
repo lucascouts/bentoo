@@ -1,0 +1,240 @@
+Ollama - Large Language Models on Gentoo
+=========================================
+
+Ollama has been successfully installed on your Gentoo system!
+
+QUICK START
+-----------
+
+1. Start the service:
+
+   For systemd:
+   $ sudo systemctl enable --now ollama
+   $ sudo systemctl status ollama
+
+   For OpenRC:
+   $ sudo rc-service ollama start
+   $ sudo rc-update add ollama default
+
+2. Run your first model:
+   $ ollama run llama3.2:3b
+
+3. List installed models:
+   $ ollama list
+
+4. Browse available models:
+   https://ollama.com/library
+
+
+CONFIGURATION
+-------------
+
+Models Location:    /var/lib/ollama
+Logs Directory:     /var/log/ollama
+Default API Port:   11434
+
+Environment Variables (set in /etc/conf.d/ollama for OpenRC):
+
+  OLLAMA_HOST          Bind address (default: 0.0.0.0:11434)
+  OLLAMA_MODELS        Model storage directory
+  OLLAMA_KEEP_ALIVE    How long to keep models in memory (default: 5m)
+  OLLAMA_NUM_PARALLEL  Number of parallel requests (default: 1)
+
+
+GPU ACCELERATION
+----------------
+
+NVIDIA CUDA:
+- Automatically detected if nvidia-cuda-toolkit is installed
+- Control GPU selection with CUDA_VISIBLE_DEVICES
+- Example: CUDA_VISIBLE_DEVICES=0 ollama run llama3.2
+
+AMD ROCm:
+- Supported on RX 6000 series and newer
+- May require HSA_OVERRIDE_GFX_VERSION setting
+- Example for RX 6900 XT: HSA_OVERRIDE_GFX_VERSION=10.3.0
+
+Check GPU usage:
+$ watch -n 1 nvidia-smi  # For NVIDIA
+$ watch -n 1 rocm-smi    # For AMD
+
+
+USER PERMISSIONS
+----------------
+
+To allow non-root users to interact with Ollama:
+
+$ sudo usermod -aG ollama YOUR_USERNAME
+
+Then log out and back in for changes to take effect.
+
+
+COMMON TASKS
+------------
+
+Download a specific model:
+$ ollama pull llama3.2:3b
+
+Remove a model:
+$ ollama rm llama3.2:3b
+
+Show model information:
+$ ollama show llama3.2:3b
+
+Create a custom model:
+$ ollama create mymodel -f Modelfile
+
+Copy a model:
+$ ollama cp llama3.2:3b my-llama
+
+
+USING THE API
+-------------
+
+Ollama provides a REST API on port 11434:
+
+Generate a response:
+$ curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.2:3b",
+  "prompt": "Why is the sky blue?"
+}'
+
+Chat completion:
+$ curl http://localhost:11434/api/chat -d '{
+  "model": "llama3.2:3b",
+  "messages": [
+    {"role": "user", "content": "Hello!"}
+  ]
+}'
+
+List local models:
+$ curl http://localhost:11434/api/tags
+
+
+PERFORMANCE TUNING
+------------------
+
+For better performance with multiple concurrent users:
+- Increase OLLAMA_NUM_PARALLEL in configuration
+- Increase OLLAMA_MAX_LOADED_MODELS if you have enough VRAM/RAM
+- Use faster storage (NVMe SSD) for /var/lib/ollama
+
+For larger context windows:
+- Set OLLAMA_NUM_CTX to desired size (e.g., 4096, 8192)
+- Note: Larger contexts use more memory
+
+Memory requirements by model size:
+- 3B parameters:  ~2GB RAM/VRAM
+- 7B parameters:  ~4GB RAM/VRAM
+- 13B parameters: ~8GB RAM/VRAM
+- 34B parameters: ~20GB RAM/VRAM
+- 70B parameters: ~40GB RAM/VRAM
+
+
+SECURITY CONSIDERATIONS
+-----------------------
+
+1. Network Binding:
+   - Default binds to 0.0.0.0 (all interfaces)
+   - For local use only, set OLLAMA_HOST=127.0.0.1:11434
+
+2. Firewall:
+   - Block port 11434 from external networks if not needed
+   - Use iptables or nftables to restrict access
+
+3. Model Downloads:
+   - Models are downloaded from Ollama's CDN
+   - Verify model checksums after download
+   - Be cautious when using custom/community models
+
+4. Resource Limits:
+   - Large models can consume significant memory
+   - Monitor system resources during operation
+
+
+TROUBLESHOOTING
+---------------
+
+Service won't start:
+- Check logs: journalctl -u ollama (systemd)
+            or tail -f /var/log/ollama/ollama.log (OpenRC)
+- Verify port 11434 is not already in use: netstat -tlnp | grep 11434
+- Check disk space: df -h /var/lib/ollama
+
+GPU not detected:
+- NVIDIA: Verify with nvidia-smi
+- AMD: Verify with rocm-smi
+- Check kernel modules are loaded
+- Ensure user is in 'video' group for GPU access
+
+Out of memory errors:
+- Use smaller models (3B instead of 7B)
+- Reduce OLLAMA_NUM_CTX
+- Close other GPU-intensive applications
+- Consider adding system RAM or VRAM
+
+Model download fails:
+- Check internet connection
+- Verify DNS resolution
+- Check disk space in /var/lib/ollama
+- Try clearing /var/lib/ollama/models/blobs and redownload
+
+
+INTEGRATIONS
+------------
+
+Python:
+$ pip install ollama
+>>> import ollama
+>>> response = ollama.chat(model='llama3.2:3b', messages=[
+...   {'role': 'user', 'content': 'Why is the sky blue?'}
+... ])
+
+JavaScript/TypeScript:
+$ npm install ollama
+const ollama = require('ollama').default;
+const response = await ollama.chat({
+  model: 'llama3.2:3b',
+  messages: [{ role: 'user', content: 'Why is the sky blue?' }]
+});
+
+
+UPGRADING
+---------
+
+To upgrade Ollama:
+$ sudo emerge --update ollama-bin
+
+Your models and configuration will be preserved during upgrades.
+
+
+UNINSTALLING
+------------
+
+To remove Ollama but keep models:
+$ sudo emerge --unmerge ollama-bin
+
+To completely remove everything including models:
+$ sudo emerge --unmerge ollama-bin
+$ sudo rm -rf /var/lib/ollama
+
+
+MORE INFORMATION
+----------------
+
+Official Documentation: https://github.com/ollama/ollama/tree/main/docs
+API Reference:         https://github.com/ollama/ollama/blob/main/docs/api.md
+Model Library:         https://ollama.com/library
+Community Discord:     https://discord.gg/ollama
+GitHub Issues:         https://github.com/ollama/ollama/issues
+
+
+GENTOO-SPECIFIC NOTES
+---------------------
+
+- This is a binary package built by upstream
+- GPU support requires appropriate USE flags during installation
+- Service runs as 'ollama' user for security
+- Logs are rotated by logrotate if installed
+
+For Gentoo-specific issues, please report to your overlay maintainer.
