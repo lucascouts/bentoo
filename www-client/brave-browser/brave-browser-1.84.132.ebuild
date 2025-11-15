@@ -152,28 +152,25 @@ src_install() {
 	rm -r etc/cron.daily || die "Failed to remove cron scripts"
 	rm -r "${BRAVE_HOME}"/cron || die "Failed to remove cron scripts"
 
-	# Decompress and recompress with bzip2 for consistency
-	# Gentoo uses bzip2 for documentation compression by default
+	# Decompress files - let Portage handle compression automatically
+	# The .gz files from upstream need to be decompressed first
 	gzip -d usr/share/doc/${PF}/changelog.gz || die
-	bzip2 -9 usr/share/doc/${PF}/changelog || die
-	
 	gzip -d usr/share/man/man1/${MY_PN}.1.gz || die
-	bzip2 -9 usr/share/man/man1/${MY_PN}.1 || die
 	
-	# Create symlink with correct .bz2 extension
-	# Handle both potential cases: .gz or .bz2 from upstream
-	if [[ -e usr/share/man/man1/brave-browser.1.gz ]] || \
-	   [[ -e usr/share/man/man1/brave-browser.1.bz2 ]]; then
+	# Handle man page symlink - ensure it points to the uncompressed file
+	# Portage will compress both the target and symlink automatically
+	if [[ -e usr/share/man/man1/brave-browser.1.gz ]]; then
 		if [[ -L usr/share/man/man1/brave-browser.1.gz ]]; then
+			# Remove the .gz symlink from upstream
 			rm usr/share/man/man1/brave-browser.1.gz || die
-		elif [[ -L usr/share/man/man1/brave-browser.1.bz2 ]]; then
-			rm usr/share/man/man1/brave-browser.1.bz2 || die
-		elif [[ -f usr/share/man/man1/brave-browser.1.gz ]] || \
-		     [[ -f usr/share/man/man1/brave-browser.1.bz2 ]]; then
-			die "usr/share/man/man1/brave-browser.1.* exists but is not a symlink"
+		elif [[ -f usr/share/man/man1/brave-browser.1.gz ]]; then
+			die "usr/share/man/man1/brave-browser.1.gz exists but is not a symlink"
 		fi
 	fi
-	dosym ${MY_PN}.1.bz2 usr/share/man/man1/brave-browser.1.bz2
+	
+	# Create symlink pointing to uncompressed file
+	# Portage will compress and update the symlink automatically
+	dosym ${MY_PN}.1 usr/share/man/man1/brave-browser.1
 
 	# Remove unused language packs
 	pushd "${BRAVE_HOME}/locales" > /dev/null || die
