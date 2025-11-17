@@ -24,7 +24,6 @@ HOMEPAGE="https://github.com/KhronosGroup/Vulkan-ValidationLayers"
 LICENSE="Apache-2.0"
 SLOT="0"
 IUSE="wayland test X"
-# Many segfaults as of 1.4.313.0
 RESTRICT="!test? ( test ) test"
 
 RDEPEND="dev-util/spirv-tools[${MULTILIB_USEDEP}]"
@@ -42,10 +41,6 @@ DEPEND="${RDEPEND}
 "
 
 QA_SONAME="/usr/lib[^/]*/libVkLayer_khronos_validation.so"
-
-PATCHES=(
-	"${FILESDIR}"/${PN}-1.4.323.0-tests-no-static.patch
-)
 
 multilib_src_configure() {
 	local mycmakeargs=(
