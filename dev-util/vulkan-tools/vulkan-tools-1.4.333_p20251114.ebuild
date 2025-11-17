@@ -12,7 +12,7 @@ if [[ ${PV} == *9999* ]]; then
 	EGIT_SUBMODULES=()
 	inherit git-r3
 else
-	EGIT_COMMIT="f5f5add52941db500e84c01d40ebd4cda986e43f"
+	EGIT_COMMIT="0a1fb7e8cb346f69862e4f12c1d7b09d23e2f84c"
 	SRC_URI="https://github.com/KhronosGroup/${MY_PN}/archive/${EGIT_COMMIT}.tar.gz -> ${P}.tar.gz"
 	KEYWORDS="amd64 arm arm64 ~loong ppc ppc64 ~riscv"
 	S="${WORKDIR}"/${MY_PN}-${EGIT_COMMIT}
