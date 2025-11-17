@@ -11,7 +11,7 @@ GIT_COMMIT=198b5e3ed55aa0bcde02ef4502afa7549ad8d355
 DESCRIPTION="The core functions you need to create Docker images and run Docker containers"
 HOMEPAGE="https://www.docker.com/"
 SRC_URI="https://github.com/moby/moby/archive/refs/tags/${PN}-v${MY_PV}.tar.gz -> ${P}.tar.gz"
-S="${WORKDIR}/moby-${PV}"
+S="${WORKDIR}/moby-docker-v${PV}"
 
 LICENSE="Apache-2.0"
 SLOT="0"
