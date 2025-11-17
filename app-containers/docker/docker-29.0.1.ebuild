@@ -6,7 +6,7 @@ MY_PV=${PV/_/-}
 
 inherit go-module linux-info optfeature systemd toolchain-funcs udev
 
-GIT_COMMIT=bea959c7b793b32a893820b97c4eadc7c87fabb0
+GIT_COMMIT=198b5e3ed55aa0bcde02ef4502afa7549ad8d355
 
 DESCRIPTION="The core functions you need to create Docker images and run Docker containers"
 HOMEPAGE="https://www.docker.com/"
@@ -35,7 +35,7 @@ RDEPEND="
 	sys-process/procps
 	>=dev-vcs/git-1.7
 	>=app-arch/xz-utils-4.9
-	>=app-containers/containerd-1.7.27[apparmor?,btrfs?,seccomp?]
+	>=app-containers/containerd-2.1.4[apparmor?,btrfs?,seccomp?]
 	>=app-containers/runc-1.2.6[apparmor?,seccomp?]
 	!app-containers/docker-proxy
 	!<app-containers/docker-cli-${PV}

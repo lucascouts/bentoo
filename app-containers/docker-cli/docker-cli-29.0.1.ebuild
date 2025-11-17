@@ -3,11 +3,11 @@
 
 EAPI=8
 
-inherit bash-completion-r1 go-module
+inherit shell-completion go-module
 MY_PV=${PV/_/-}
 
 # update this on every bump
-GIT_COMMIT=980b85681696fbd95927fd8ded8f6d91bdca95b0
+GIT_COMMIT=eedd9698e9c3ee3aa9100789ea4b4515443d2e50
 
 DESCRIPTION="the command line binary for docker"
 HOMEPAGE="https://www.docker.com/"

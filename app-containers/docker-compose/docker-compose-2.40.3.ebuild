@@ -23,7 +23,10 @@ BDEPEND="
 	dev-vcs/git
 "
 
-RDEPEND="app-containers/docker-cli"
+RDEPEND="|| (
+	app-containers/docker
+	app-containers/podman[wrapper(+)]
+)"
 
 # Tests require Internet access and we need network access for Go modules
 PROPERTIES="test_network"
