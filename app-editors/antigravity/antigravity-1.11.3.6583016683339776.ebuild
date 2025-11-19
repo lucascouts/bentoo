@@ -26,7 +26,6 @@ RESTRICT="bindist mirror strip"
 RDEPEND="
 	>=app-accessibility/at-spi2-core-2.46.0:2
 	app-crypt/libsecret[crypt]
-	x11-misc/shared-mime-info
 	dev-libs/expat
 	dev-libs/glib:2
 	dev-libs/nspr
@@ -54,6 +53,7 @@ RDEPEND="
 	x11-libs/libXScrnSaver
 	x11-libs/libXtst
 	x11-libs/pango
+	x11-misc/shared-mime-info
 	x11-misc/xdg-utils
 	libsecret? ( app-crypt/libsecret )
 	wayland? ( dev-libs/wayland )
@@ -84,7 +84,7 @@ src_prepare() {
 src_install() {
 	local appdir="/opt/${PN}"
 
-	# Install main application files
+	# Install data files
 	insinto "${appdir}"
 	doins chrome_100_percent.pak
 	doins chrome_200_percent.pak
@@ -108,11 +108,12 @@ src_install() {
 	doexe libvk_swiftshader.so
 	doexe libvulkan.so.1
 
-	# Resources, locales and bin directory
+	# Resources and locales
 	insinto "${appdir}"
 	doins -r resources
 	doins -r locales
 	
+	# Bin directory
 	if [[ -d bin ]]; then
 		insinto "${appdir}/bin"
 		doins -r bin/.
@@ -128,32 +129,24 @@ src_install() {
 	dosym "${appdir}/antigravity" /usr/bin/antigravity
 
 	# Shell completions
-	if [[ -f resources/completions/bash/antigravity ]]; then
-		newbashcomp resources/completions/bash/antigravity antigravity
-	fi
-	if [[ -f resources/completions/zsh/_antigravity ]]; then
-		insinto /usr/share/zsh/site-functions
-		newins resources/completions/zsh/_antigravity _antigravity
-	fi
+	newbashcomp resources/completions/bash/antigravity antigravity
+	insinto /usr/share/zsh/site-functions
+	newins resources/completions/zsh/_antigravity _antigravity
 
-	# Desktop file
+	# Desktop file (fixed duplicate Comment)
 	make_desktop_entry \
 		"antigravity" \
 		"Antigravity" \
 		"antigravity" \
 		"Development;IDE;TextEditor" \
-		"GenericName=Text Editor\nComment=Code Editing. Redefined.\nStartupNotify=true\nStartupWMClass=antigravity"
+		"GenericName=Text Editor\nStartupNotify=true\nStartupWMClass=antigravity"
 
 	# Icon
 	newicon resources/app/resources/linux/code.png antigravity.png
 
 	# Documentation
-	if [[ -f resources/app/LICENSE.txt ]]; then
-		dodoc resources/app/LICENSE.txt
-	fi
-	if [[ -f resources/app/ThirdPartyNotices.txt ]]; then
-		dodoc resources/app/ThirdPartyNotices.txt
-	fi
+	dodoc resources/app/LICENSE.txt
+	dodoc resources/app/ThirdPartyNotices.txt
 
 	# PaX marking for JIT
 	pax-mark -m "${ED}${appdir}"/antigravity
