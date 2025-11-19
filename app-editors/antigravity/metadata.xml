@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Antigravity is Google's next-generation AI-driven code editor and IDE built on
+		VSCode OSS 1.104.0 with Electron 37.3.1. It provides advanced code intelligence,
+		integrated development tools, and extensive language support for modern software
+		development.
+		
+		Features include:
+		- AI-powered code completion and suggestions
+		- Advanced IntelliSense and language servers
+		- Integrated debugging tools
+		- Git integration with diff viewer
+		- Extension marketplace support
+		- GPU-accelerated rendering (Vulkan/OpenGL)
+		- Multi-language support (40+ languages)
+		- Terminal integration
+	</longdescription>
+	<use>
+		<flag name="libsecret">
+			Enable password storage support using libsecret for storing
+			credentials securely in the system keyring (GNOME Keyring, KWallet)
+		</flag>
+		<flag name="wayland">
+			Enable native Wayland support for better performance and
+			security on Wayland compositors. Eliminates XWayland overhead.
+		</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">google/antigravity</remote-id>
+	</upstream>
+</pkgmetadata>
