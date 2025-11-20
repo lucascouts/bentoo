@@ -1,115 +1,86 @@
-# Copyright 1999-2025 Gentoo Authors
-# Distributed under the terms of the GNU General Public License v2
-
 EAPI=8
 
 inherit bash-completion-r1 desktop xdg
 
-DESCRIPTION="Antigravity - Modern code editor built on Electron (binary release)"
-HOMEPAGE="https://antigravity.app"
+DESCRIPTION="Google Antigravity AI-driven IDE (binary release)"
+HOMEPAGE="https://antigravity.google/"
 
-# Dynamic version calculation
 MY_PV="${PV%.*}-${PV##*.}"
-SRC_URI="
-	amd64? ( https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/${MY_PV}/linux-x64/Antigravity.tar.gz -> ${P}-amd64.tar.gz )
-"
+SRC_URI="amd64? ( https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/${MY_PV}/linux-x64/Antigravity.tar.gz -> ${PN}-${MY_PV}.tar.gz )"
 
 LICENSE="all-rights-reserved"
 SLOT="0"
 KEYWORDS="~amd64"
-RESTRICT="bindist mirror strip test"
+RESTRICT="bindist mirror strip"
 
 RDEPEND="
-	app-accessibility/at-spi2-core:2
-	app-crypt/libsecret
-	dev-libs/expat
-	dev-libs/glib:2
-	dev-libs/nspr
-	dev-libs/nss
-	media-libs/alsa-lib
-	media-libs/libpng:0
-	net-print/cups
-	sys-apps/dbus
-	x11-libs/cairo
-	x11-libs/gdk-pixbuf:2
-	x11-libs/gtk+:3
-	x11-libs/libX11
-	x11-libs/libXcomposite
-	x11-libs/libXcursor
-	x11-libs/libXdamage
-	x11-libs/libXext
-	x11-libs/libXfixes
-	x11-libs/libXi
-	x11-libs/libXrandr
-	x11-libs/libXrender
-	x11-libs/libXScrnSaver
-	x11-libs/libXtst
-	x11-libs/libdrm
-	x11-libs/libxcb
-	x11-libs/libxkbcommon
-	x11-libs/pango
-	x11-misc/xdg-utils
+  app-accessibility/at-spi2-core
+  app-crypt/libsecret
+  dev-libs/glib
+  dev-libs/nss
+  media-libs/alsa-lib
+  media-libs/libpng
+  net-print/cups
+  x11-libs/gtk+:3
+  x11-libs/libX11
+  x11-libs/libXcursor
+  x11-libs/libXdamage
+  x11-libs/libXext
+  x11-libs/libXfixes
+  x11-libs/libXi
+  x11-libs/libXrandr
+  x11-libs/libXrender
+  x11-libs/libXScrnSaver
+  x11-libs/libXtst
+  x11-libs/pango
+  x11-misc/xdg-utils
 "
+DEPEND="${RDEPEND}"
+BDEPEND=""
 
 S="${WORKDIR}/Antigravity"
 
 QA_PREBUILT="*"
 
 src_install() {
-	local destdir="/opt/antigravity"
+  local appdir="/opt/${PN}"
 
-	# Install application files
-	insinto "${destdir}"
-	doins -r .
+  dodir "${appdir}"
+  cp -r "${S}"/. "${ED}${appdir}" || die "Failed to install application files"
 
-	# Set executable permissions
-	fperms 755 "${destdir}/antigravity"
-	fperms 755 "${destdir}/bin/antigravity" 
-	fperms 755 "${destdir}/chrome_crashpad_handler"
-	fperms 4755 "${destdir}/chrome-sandbox"
+  fperms 0755 "${appdir}/antigravity" "${appdir}/bin/antigravity" "${appdir}/chrome_crashpad_handler"
+  fperms 4755 "${appdir}/chrome-sandbox"
 
-	# Create symlink
-	dosym "${destdir}/antigravity" /usr/bin/antigravity
+  dosym "${appdir}/antigravity" /usr/bin/antigravity
 
-	# Install completions if they exist
-	if [[ -f resources/completions/bash/antigravity ]]; then
-		newbashcomp resources/completions/bash/antigravity antigravity
-	fi
-	
-	if [[ -f resources/completions/zsh/_antigravity ]]; then
-		insinto /usr/share/zsh/site-functions
-		newins resources/completions/zsh/_antigravity _antigravity
-	fi
+  newbashcomp resources/completions/bash/antigravity antigravity
+  insinto /usr/share/zsh/site-functions
+  newins resources/completions/zsh/_antigravity _antigravity
 
-	# Install icon
-	if [[ -f resources/app/resources/linux/code.png ]]; then
-		newicon resources/app/resources/linux/code.png antigravity.png
-	fi
+  newicon resources/app/resources/linux/code.png antigravity.png
 
-	# Create desktop entry
-	make_desktop_entry \
-		"antigravity %F" \
-		"Antigravity" \
-		"antigravity" \
-		"Development;IDE;TextEditor;" \
-		"MimeType=text/plain;inode/directory;\nStartupWMClass=antigravity"
+  cat > "${T}/${PN}.desktop" <<EOF || die "Failed to write desktop file"
+[Desktop Entry]
+Name=Antigravity
+Comment=Google Antigravity IDE
+Exec=/usr/bin/antigravity %F
+Icon=antigravity
+Terminal=false
+Type=Application
+Categories=Development;IDE;
+StartupWMClass=antigravity
+EOF
 
-	# Install documentation
-	if [[ -f resources/app/LICENSE.txt ]]; then
-		dodoc resources/app/LICENSE.txt
-	fi
-	if [[ -f resources/app/ThirdPartyNotices.txt ]]; then
-		dodoc resources/app/ThirdPartyNotices.txt
-	fi
-}
+  insinto /usr/share/applications
+  doins "${T}/${PN}.desktop"
+
+  dodoc resources/app/LICENSE.txt resources/app/ThirdPartyNotices.txt
+  }
 
 pkg_postinst() {
-	xdg_pkg_postinst
-	
-	elog "Antigravity has been installed to /opt/antigravity"
-	elog "Configuration will be stored in ~/.config/Antigravity"
+  xdg_pkg_postinst
 }
 
 pkg_postrm() {
-	xdg_pkg_postrm
+  xdg_pkg_postrm
 }
