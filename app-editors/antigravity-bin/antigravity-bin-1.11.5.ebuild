@@ -54,7 +54,7 @@ RDEPEND="
 
 BDEPEND=""
 
-S="${WORKDIR}"
+S="${WORKDIR}/Antigravity"
 
 QA_PREBUILT="
 	opt/${MY_PN}/*.so
