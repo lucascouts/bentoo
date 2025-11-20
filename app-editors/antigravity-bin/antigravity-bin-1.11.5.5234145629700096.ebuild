@@ -51,7 +51,7 @@ RDEPEND="
 	x11-misc/xdg-utils
 "
 
-S="${WORKDIR}"
+S="${WORKDIR}/Antigravity"
 
 QA_PREBUILT="*"
 
