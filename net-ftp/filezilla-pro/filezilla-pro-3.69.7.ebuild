@@ -42,7 +42,7 @@ pkg_nofetch() {
 src_prepare() {
 	default
 	cd ${WORKDIR}/FileZilla3/share/applications/
-	mv filezilla.desktop filezilla-pro.desktop
+	mv filezilla.desktop filezilla.desktop
 }
 
 src_install() {
@@ -50,19 +50,19 @@ src_install() {
 	doins -r * || die
 	
 	fperms +x "/opt/${PN}/bin/filezilla"
-	dosym "/opt/${PN}/bin/filezilla" /usr/bin/filezilla-pro
+	dosym "/opt/${PN}/bin/filezilla" /usr/bin/filezilla
 
 	fperms +x "/opt/${PN}/bin/fzputtygen"
-	dosym "/opt/${PN}/bin/fzputtygen" /usr/bin/fzputtygen-pro
+	dosym "/opt/${PN}/bin/fzputtygen" /usr/bin/fzputtygen
 
 	fperms +x "/opt/${PN}/bin/fzsftp"
-	dosym "/opt/${PN}/bin/fzsftp" /usr/bin/fzsftp-pro
+	dosym "/opt/${PN}/bin/fzsftp" /usr/bin/fzsftp
 
 	fperms +x "/opt/${PN}/bin/fzstorj"
-	dosym "/opt/${PN}/bin/fzstorj" /usr/bin/fzstorj-pro
+	dosym "/opt/${PN}/bin/fzstorj" /usr/bin/fzstorj
 
-	newicon share/pixmaps/filezilla.png filezilla-pro.png
-	domenu share/applications/filezilla-pro.desktop
+	newicon share/pixmaps/filezilla.png filezilla.png
+	domenu share/applications/filezilla.desktop
 }
 
 pkg_postinst() {

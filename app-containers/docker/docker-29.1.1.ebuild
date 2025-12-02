@@ -6,7 +6,7 @@ MY_PV=${PV/_/-}
 
 inherit go-module linux-info optfeature systemd toolchain-funcs udev
 
-GIT_COMMIT=198b5e3ed55aa0bcde02ef4502afa7549ad8d355
+GIT_COMMIT=9a84135d52409f56005ec1de31664205a0d1230c
 
 DESCRIPTION="The core functions you need to create Docker images and run Docker containers"
 HOMEPAGE="https://www.docker.com/"
@@ -70,6 +70,13 @@ pkg_setup() {
 		~POSIX_MQUEUE
 	"
 	WARNING_POSIX_MQUEUE="CONFIG_POSIX_MQUEUE: is required for bind-mounting /dev/mqueue into containers"
+
+	if kernel_is ge 6 17; then
+		CONFIG_CHECK+="
+			~IP_NF_IPTABLES_LEGACY
+			~NETFILTER_XTABLES_LEGACY
+		"
+	fi
 
 	if kernel_is lt 4 8; then
 		CONFIG_CHECK+="
@@ -288,6 +295,8 @@ src_install() {
 	newconfd contrib/init/openrc/docker.confd docker
 
 	systemd_dounit contrib/init/systemd/docker.{service,socket}
+
+	udev_dorules contrib/udev/*.rules
 
 	dodoc AUTHORS CONTRIBUTING.md NOTICE README.md
 	dodoc -r docs/*
