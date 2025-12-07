@@ -6,7 +6,7 @@ EAPI=8
 inherit go-module
 
 DESCRIPTION="CLI tools for Bentoo Linux distribution maintainers and developers"
-HOMEPAGE="https://github.com/obentoo/bentoo-tools"
+HOMEPAGE="https://github.com/obentoo/bentoolkit"
 SRC_URI="https://github.com/obentoo/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="MIT"
@@ -23,7 +23,7 @@ src_unpack() {
 }
 
 src_compile() {
-	local version_pkg="github.com/obentoo/bentoo-tools/internal/common/version"
+	local version_pkg="github.com/obentoo/bentoolkit/internal/common/version"
 	local build_date=$(date -u '+%Y-%m-%d_%H:%M:%S')
 	local ldflags="-X ${version_pkg}.Version=${PV} -X ${version_pkg}.Commit=release -X ${version_pkg}.BuildDate=${build_date}"
 
@@ -36,7 +36,7 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "bentoo-tools has been installed."
+	elog "bentoolkit has been installed."
 	elog ""
 	elog "Available commands:"
 	elog "  bentoo overlay status  - View pending changes"
