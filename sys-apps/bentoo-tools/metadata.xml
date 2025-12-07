@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>lucascs@proton.me</email>
+		<name>Lucas C.S.</name>
+	</maintainer>
+	<longdescription lang="en">
+		Bentoo Tools is a CLI toolkit for Bentoo Linux distribution maintainers
+		and developers. Written in Go, it provides overlay management with
+		automatic commit message generation, git operations (add, status, commit,
+		push), and streamlined workflows for ebuild maintenance.
+
+
+	</longdescription>
+	<upstream>
+		<remote-id type="github">lucascouts/bentoo-tools</remote-id>
+		<bugs-to>https://github.com/lucascouts/bentoo-tools/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
