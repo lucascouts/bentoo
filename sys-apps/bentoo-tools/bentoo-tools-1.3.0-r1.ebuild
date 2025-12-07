@@ -23,7 +23,11 @@ src_unpack() {
 }
 
 src_compile() {
-	ego build -o bentoo ./cmd/bentoo
+	local version_pkg="github.com/obentoo/bentoo-tools/internal/common/version"
+	local build_date=$(date -u '+%Y-%m-%d_%H:%M:%S')
+	local ldflags="-X ${version_pkg}.Version=${PV} -X ${version_pkg}.Commit=release -X ${version_pkg}.BuildDate=${build_date}"
+
+	ego build -ldflags "${ldflags}" -o bentoo ./cmd/bentoo
 }
 
 src_install() {
