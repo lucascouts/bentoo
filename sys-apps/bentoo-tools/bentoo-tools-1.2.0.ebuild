@@ -23,11 +23,11 @@ src_unpack() {
 }
 
 src_compile() {
-	ego build -o ${PN} ./cmd/bentoo
+	ego build -o bentoo ./cmd/bentoo
 }
 
 src_install() {
-	dobin ${PN}
+	dobin bentoo
 	einstalldocs
 }
 
