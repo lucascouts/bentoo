@@ -1,0 +1,6 @@
+package: app-portage/bentoolkit
+upstream:
+  type: github
+  repo: obentoo/bentoolkit
+  watch: releases
+notes: Bentoo toolkit - own project
