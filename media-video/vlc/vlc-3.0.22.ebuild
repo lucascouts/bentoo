@@ -15,7 +15,7 @@ if [[ ${PV} == *9999* ]] ; then
 	EGIT_REPO_URI="https://code.videolan.org/videolan/vlc.git"
 	inherit git-r3
 else
-	COMMIT=5bd37679406d364c39c3385867794cce814aa664
+	COMMIT=
 	if [[ -n ${COMMIT} ]] ; then
 		SRC_URI="https://code.videolan.org/videolan/vlc/-/archive/${COMMIT}.tar.gz -> ${P}-${COMMIT:0:8}.tar.gz"
 		S="${WORKDIR}/${PN}-${COMMIT}"
@@ -23,11 +23,11 @@ else
 		if [[ ${MY_P} == ${P} ]] ; then
 			SRC_URI="https://download.videolan.org/pub/videolan/${PN}/${PV}/${P}.tar.xz"
 		else
-			SRC_URI="https://download.videolan.org/pub/videolan/testing/${MY_P}/${MY_P}.tar.xz"
+			SRC_URI="https://download.videolan.org/videolan/testing/${MY_PV}/${MY_P}.tar.xz"
 		fi
 		S="${WORKDIR}/${MY_P}"
 	fi
-	KEYWORDS="~amd64 ~arm ~arm64 ~loong ~ppc ~ppc64 ~riscv -sparc ~x86"
+	KEYWORDS="amd64 ~arm arm64 ~loong ppc ppc64 ~riscv -sparc x86"
 fi
 inherit autotools flag-o-matic lua-single toolchain-funcs virtualx xdg
 
@@ -70,10 +70,11 @@ BDEPEND="
 	wayland? ( dev-util/wayland-scanner )
 	x86? ( dev-lang/yasm )
 "
+# depends on abseil-cpp via protobuf targets
 RDEPEND="
 	media-libs/libvorbis
 	net-dns/libidn:=
-	sys-libs/zlib
+	virtual/zlib:=
 	virtual/libintl
 	virtual/opengl
 	a52? ( media-libs/a52dec )
@@ -91,6 +92,7 @@ RDEPEND="
 	cddb? ( media-libs/libcddb )
 	chromaprint? ( media-libs/chromaprint:= )
 	chromecast? (
+		dev-cpp/abseil-cpp:=
 		>=dev-libs/protobuf-2.5.0:=
 		>=net-libs/libmicrodns-0.1.2:=
 	)
@@ -236,12 +238,18 @@ DEPEND="${RDEPEND}
 DOCS=( AUTHORS THANKS NEWS README doc/fortunes.txt )
 
 PATCHES=(
+	# downstream patches
 	"${FILESDIR}"/${PN}-3.0.22-gettext-version.patch # bug 766549
 	"${FILESDIR}"/${PN}-3.0.22-no-vlc-cache-gen.patch # bugs 564842, 608256
 	"${FILESDIR}"/${PN}-2.1.0-fix-libtremor-libs.patch # build system
 	"${FILESDIR}"/${PN}-3.0.6-fdk-aac-2.0.0.patch # bug 672290
 	"${FILESDIR}"/${PN}-3.0.11.1-configure_lua_version.patch
 	"${FILESDIR}"/${PN}-3.0.18-drop-minizip-dep.patch
+	# 3.0.x branch (in 3.0.22):
+	"${FILESDIR}"/${P}-fixes.patch # relevant bugfixes since 3.0.22_rc2 tag
+	# bug 961436
+	"${FILESDIR}"/${P}-ffmpeg8-1.patch # upstream git master backport
+	"${FILESDIR}"/${P}-ffmpeg8-2.patch # downstream
 )
 
 pkg_setup() {
@@ -262,7 +270,7 @@ src_prepare() {
 	fi
 
 	# Make it build with libtool 1.5
-	# rm m4/lt* m4/libtool.m4 || die
+	rm m4/lt* m4/libtool.m4 || die
 
 	# We are not in a real git checkout due to the absence of a .git directory.
 	touch src/revision.txt || die
